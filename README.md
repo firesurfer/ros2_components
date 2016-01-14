@@ -1,2 +1,1 @@
-# ros2_component_base
-A component wrapper around ros2
+# An easy to use ros2 component framework
