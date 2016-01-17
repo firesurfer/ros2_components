@@ -1,12 +1,13 @@
 #include "Entity.h"
 namespace KamaroModule {
   
-  EntityBase::EntityBase(uint16_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > parentNode, std::string _className)
+  EntityBase::EntityBase(uint16_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className)
   {
     this->id = _id;
     this->subscriber = _subscribe;
-    this->parent = parentNode;
+    this->parentNode = _parentNode;
     this->className = _className;
+   
     REFLECT(id);
     REFLECT(virtualEntity);
     REFLECT(className);

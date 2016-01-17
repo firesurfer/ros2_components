@@ -49,6 +49,6 @@ class SpecificElement : public Element{
     }
     virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
     {
-	return rclcpp::parameter::ParameterVariant(prefix+":"+key, data);
+	return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
 };
