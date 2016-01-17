@@ -8,9 +8,12 @@
 #include <mutex>
 #include <fstream>
 #include <string>
+#include <geometry_msgs/msg/transform_stamped.hpp>
+#include <tf2_ros/transform_broadcaster.h>
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/subscription.hpp"
+
 #include <memory>
 #include "Reflect.h"
 
@@ -71,12 +74,22 @@ namespace KamaroModule
 	 * The node -> we need to pass in order to create the publisher, subscription and parameter client
 	 */
 	std::shared_ptr<rclcpp::node::Node> parent;
-	
+	/**
+	 * Helper method so we can use REFLECT on a variable
+	 */
 	template <class T>
 	void addElement(string type,T &data){
 	    internalmap.push_back( (Element*)new SpecificElement<T>(type , data));
 	}
-	vector<Element*> internalmap;
+	/*
+	 * Vector all elements that had used REFLECT on them are stored in
+	 */
+	std::vector<Element*> internalmap;
+	
+	/**
+	 * Contains children of this entity -> used for building some kind of tree 
+	 */
+	std::vector<EntityBase*> childs;
 	
     private:
 	/**
@@ -133,7 +146,9 @@ namespace KamaroModule
 	    }
 	    std::cout << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<< " ptr: " << this << std::endl;
 	}
-	
+	/**
+	 * @brief Copy Constructor
+	 */
 	Entity(const Entity &t):EntityBase(t)
 	{
 	   
@@ -159,12 +174,16 @@ namespace KamaroModule
 	 * @return
 	 */
 	virtual bool publish() { }
-	
+	/**
+	 * @brief add a new listener to be called when new data arrives
+	 */
 	void addListener(std::function<void(typename MessageType::SharedPtr)> listener) {
 	    listeners.push_back(listener);
 	    std::cout << "added listener to: "<< this << std::endl;
 	}
-	
+	/**
+	 * @brief tell the word we have new meta information (Like is a lidar mounted upside down)
+	 */
 	virtual void publishMetaInformation()
 	{
 	    std::cout << "Publish meta information in: " <<  getName() << std::endl;
@@ -179,7 +198,9 @@ namespace KamaroModule
 	}
 	
     protected:
-	
+	/**
+	 * @brief This is the method to handle new data inside your entity
+	 */
 	virtual void listenerCallback(const typename MessageType::SharedPtr  msg)
 	{
 	   // std::cout << "New message in: "<< std::endl;
@@ -198,7 +219,10 @@ namespace KamaroModule
 	
 	
     private:
-	vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
+	std::vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
+	/**
+	 * @brief calls the rest of the registerd listeners
+	 */
 	void internalListenerCallback(const typename MessageType::SharedPtr msg) {
 	    std::cout << "New message in: "<< getName()<< " ptr: " <<this<< " Listeners: " << listeners.size()<<std::endl;
 	    if(msg)

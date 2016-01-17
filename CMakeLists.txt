@@ -12,7 +12,9 @@ find_package(builtin_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
-
+find_package(tf2 REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 macro(targets)
 	if(NOT "${target_suffix} " STREQUAL " ")
@@ -29,6 +31,9 @@ macro(targets)
 	)
 	ament_target_dependencies(ros2_components${target_suffix}
         	"rclcpp"
+		"geometry_msgs"
+		"tf2"
+		"tf2_msgs"
 	)
     	ament_export_libraries(ros2_components${target_suffix})
 
