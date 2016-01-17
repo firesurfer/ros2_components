@@ -14,7 +14,6 @@
 #include <memory>
 #include "Reflect.h"
 
-#define quote(x) #x
 
 using namespace std;
 using namespace std::placeholders;
