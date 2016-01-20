@@ -11,9 +11,10 @@
 
 //Comment this in if you want to use the tf broadcaster: With alpha 3 of ros2 you will get some compiler errors you will have to fix by hand in the ros2 code
 //The errors are already committed as an issue
-/* #include <geometry_msgs/msg/transform_stamped.hpp>
- * #include <tf2_ros/transform_broadcaster.h>
- * #define USE_TF2   
+/*
+ #include <tf2_ros/transform_broadcaster.h>
+  #include <tf2_ros/transform_listener.h>
+  #define USE_TF2   
  */
 
 #include "rclcpp/rclcpp.hpp"
@@ -92,7 +93,8 @@ namespace KamaroModule
 	 * Helper method so we can use REFLECT on a variable
 	 */
 	template <class T>
-	void addElement(string type,T &data){
+	void addElement(string type,T &data)
+	{
 	    internalmap.push_back( (Element*)new SpecificElement<T>(type , data));
 	}
 	/*
@@ -155,6 +157,11 @@ namespace KamaroModule
 	    parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
 	    std::cout << "Registered event on parameter client" << std::endl;
 	    
+#ifdef USE_TF2		
+	   // tfBroadcaster = std::make_shared<tf2_ros::TransformBroadcaster>();
+	    //tfBuffer = std::make_shared<tf2_ros::Buffer>();
+	    //tfListener = std::make_shared<tf2_ros::TransformListener>(tfBuffer);
+#endif  
 	    if(!isSubscriber())
 		kamaroPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
 	    else
@@ -197,7 +204,8 @@ namespace KamaroModule
 	/**
 	 * @brief add a new listener to be called when new data arrives
 	 */
-	void addListener(std::function<void(typename MessageType::SharedPtr)> listener) {
+	void addListener(std::function<void(typename MessageType::SharedPtr)> listener)
+	{
 	    listeners.push_back(listener);
 	    std::cout << "added listener to: "<< this << std::endl;
 	}
@@ -236,7 +244,11 @@ namespace KamaroModule
 	std::shared_ptr<rclcpp::subscription::Subscription<MessageType>> kamaroSubscription;
 	rclcpp::subscription::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameterEventSubscription;
 	
-	
+#ifdef USE_TF2
+	//tf2_ros::Buffer tfBuffer;
+	//std::shared_ptr<tf2_ros::TransformListener> tfListener;
+	tf2_ros::TransformBroadcaster tfBroadcaster;
+#endif
 	
 	
     private:
@@ -244,7 +256,8 @@ namespace KamaroModule
 	/**
 	 * @brief calls the rest of the registerd listeners
 	 */
-	void internalListenerCallback(const typename MessageType::SharedPtr msg) {
+	void internalListenerCallback(const typename MessageType::SharedPtr msg)
+	{
 	    std::cout << "New message in: "<< getName()<< " ptr: " <<this<< " Listeners: " << listeners.size()<<std::endl;
 	    if(msg)
 	    {

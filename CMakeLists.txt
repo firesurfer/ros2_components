@@ -13,6 +13,7 @@ find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 find_package(tf2_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
@@ -34,7 +35,9 @@ macro(targets)
 		"geometry_msgs"
 		"tf2"
 		"tf2_msgs"
+		"tf2_ros"
 	)
+
     	ament_export_libraries(ros2_components${target_suffix})
 
 	install(TARGETS ros2_components${target_suffix}
