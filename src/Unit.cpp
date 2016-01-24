@@ -18,10 +18,6 @@
 #include "Unit.h"
 namespace KamaroModule {
     
-    Unit::Unit( uint16_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::shared_ptr<ActorType> actor, std::shared_ptr<SensorType> sensor) : Entity<MessageType>(_id,_subscribe,parentNode, "SensorLidar")
-    {
-	this->addChild(actor);
-	this->addChild(sensor);
-    }
+
     
 }
