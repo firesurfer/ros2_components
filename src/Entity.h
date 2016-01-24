@@ -78,11 +78,11 @@ namespace KamaroModule
 	 * @brief addChild
 	 * @return adds a child to the childs vector
 	 */
-	virtual void addChild(std::shared_ptr<EntityBase*> child, bool autoBuildTf = false)
+	virtual void addChild(std::shared_ptr<EntityBase> child, bool autoBuildTf = false)
 	{
 		childs.push_back(child);
 	}
-	virtual std::shared_ptr<EntityBase*> getChild(int index)
+	virtual std::shared_ptr<EntityBase> getChild(int index)
 	{
 	    if(childs.size() < index)
 		throw std::runtime_error("Index out of bounds");
@@ -111,11 +111,11 @@ namespace KamaroModule
 	/**
 	 * Contains children of this entity -> used for building some kind of tree 
 	 */
-	std::vector<std::shared_ptr<EntityBase*>> childs;
+	std::vector<std::shared_ptr<EntityBase>> childs;
 	/**
 	 * Parent of this entity
 	 */
-	std::shared_ptr<EntityBase*> parent;
+	std::shared_ptr<EntityBase> parent;
 	
     private:
 	/**

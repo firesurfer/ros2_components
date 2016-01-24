@@ -32,16 +32,17 @@ namespace KamaroModule
     public:
 	Unit( uint16_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name,std::shared_ptr<ActorType> actor, std::shared_ptr<SensorType> sensor) : Entity<MessageType>(_id,_subscribe,parentNode, name)
 	{
-	   // this->addChild(actor);
-	    //this->addChild(sensor);
+	  
+	    this->addChild(actor);
+	    this->addChild(sensor);
 	}
 	std::shared_ptr<ActorType> getActor()
 	{
-	    //auto ch = this->getChild(0);
+	    return this->getChild(0);
 	}
 	std::shared_ptr<SensorType> getSensor()
 	{
-	   // auto ch = this->getChild(1);
+	    return this->getChild(1);
 	}
     
 	
