@@ -24,7 +24,7 @@ namespace KamaroModule
     class Part : public Entity<MessageType>
     {
     public:
-	Part( uint16_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name, std::vector<std::shared_ptr<EntityBase>> _childs) : Entity<MessageType>(_id,_subscribe,parentNode, name)
+	Part( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name, std::vector<std::shared_ptr<EntityBase>> _childs) : Entity<MessageType>(_id,_subscribe,parentNode, name)
 	{
 	    for(auto & child: _childs)
 	    {

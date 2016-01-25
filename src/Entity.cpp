@@ -1,7 +1,7 @@
 #include "Entity.h"
 namespace KamaroModule {
   
-  EntityBase::EntityBase(uint16_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className)
+  EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className)
   {
     this->id = _id;
     this->subscriber = _subscribe;

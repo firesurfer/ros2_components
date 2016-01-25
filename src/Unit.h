@@ -30,7 +30,7 @@ namespace KamaroModule
     class Unit :  public Entity<MessageType>
     {
     public:
-	Unit( uint16_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name,std::shared_ptr<ActorType> actor, std::shared_ptr<SensorType> sensor) : Entity<MessageType>(_id,_subscribe,parentNode, name)
+	Unit( int32_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name,std::shared_ptr<ActorType> actor, std::shared_ptr<SensorType> sensor) : Entity<MessageType>(_id,_subscribe,parentNode, name)
 	{
 	  
 	    this->addChild(actor);

@@ -32,7 +32,7 @@ namespace KamaroModule
     
     class EntityBase {
     public:
-	EntityBase(uint16_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className);
+	EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className);
 	
 	/**
 	 * @brief getId
@@ -149,7 +149,7 @@ namespace KamaroModule
 	 * @brief Constructor of Entity
 	 * @param className is used together with the id to itentify topics, etc. of this entity
 	 */
-	Entity(uint16_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> parentNode, std::string className) : EntityBase(_id, _subscribe, parentNode, className)
+	Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> parentNode, std::string className) : EntityBase(_id, _subscribe, parentNode, className)
 	{
 	    //Some ROS2 QOS Configuration -> Taken from an example
 	    custom_qos_profile = rmw_qos_profile_default;
