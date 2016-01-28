@@ -16,28 +16,31 @@
 using namespace std;
 
 class Element{
-   public:
+public:
     string key;
     
     
     virtual void print(){}
-    virtual rclcpp::parameter::ParameterVariant  getParameterVariant(){}
-    virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix){}
     
+    
+    
+    virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
+    virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
+   
     
 };
 template <class T>
 class SpecificElement : public Element{
     
-   static_assert(std::is_same<T, double>::value || std::is_same<T, int64_t>::value || std::is_same<T, bool>::value || std::is_same<T, std::string>::value || std::is_same<T, std::vector<uint8_t>>::value,
-                "The Reflection api only accepts the following types: double, int64_t, boo, string, std::vector<uint8_t>");
-   public: 
+    static_assert(std::is_same<T, double>::value || std::is_same<T, int64_t>::value || std::is_same<T, bool>::value || std::is_same<T, std::string>::value || std::is_same<T, std::vector<uint8_t>>::value,
+		  "The Reflection api only accepts the following types: double, int64_t, boo, string, std::vector<uint8_t>");
+public: 
     T &data;
     SpecificElement(string _key,T &_data):data(_data){
-      key=_key;
+	key=_key;
     }
     virtual void print(){
-      cout<<"<"<<key<<"> ="<<data<<endl;
+	cout<<"<"<<key<<"> ="<<data<<endl;
     }
     virtual void setValue(T val)
     {
