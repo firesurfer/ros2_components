@@ -10,7 +10,7 @@
 #define ASTRINGZ(x) STRINGZ(x)
 #define STRINGZ(x)  #x
 #define REFLECT(a)  addElement(ASTRINGZ(a) , a);
-
+#define UNUSED(x) (void)(x)
 
 
 using namespace std;

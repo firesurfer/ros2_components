@@ -256,7 +256,10 @@ namespace KamaroModule
 	 */
 	virtual void listenerCallback(const typename MessageType::SharedPtr  msg)
 	{
-	   // std::cout << "New message in: "<< std::endl;
+	    //To ignore warning
+	   
+	    UNUSED(msg);
+	    
 	}
 	
 	
