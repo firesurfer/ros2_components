@@ -18,7 +18,7 @@
 #ifndef UNIT_H
 #define UNIT_H
 
-#include "Entity.h"
+#include "ros2_components/Entity.h"
 /**
  * This class represents a unit of an actor and a sensor. Usefull e.g. if you have a part of your robot e.g. a joint
  * that can be used for setting commands to the hardware and reading parameter from the hardware
@@ -32,7 +32,7 @@ namespace KamaroModule
     public:
 	Unit( int32_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name,std::shared_ptr<ActorType> actor, std::shared_ptr<SensorType> sensor) : Entity<MessageType>(_id,_subscribe,parentNode, name)
 	{
-	  
+	    
 	    this->addChild(actor);
 	    this->addChild(sensor);
 	}
@@ -44,7 +44,15 @@ namespace KamaroModule
 	{
 	    return this->getChild(1);
 	}
-    
+	virtual bool publish()
+	{
+	    for(auto & child : this->childs)
+	    {
+		if(!child->isSubscriber())
+		    child->publish();
+	    }
+	    return true;
+	}
 	
 	
     };

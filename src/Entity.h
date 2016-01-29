@@ -20,7 +20,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/subscription.hpp"
-
+//#include "ros2_components_msg/srv/list_childs.hpp"
 #include <memory>
 #include "Reflect.h"
 
@@ -95,6 +95,11 @@ namespace KamaroModule
 	    if(childs.size() < index)
 		throw std::runtime_error("Index out of bounds");
 	    return childs[index];
+	}
+	virtual std::vector<std::shared_ptr<EntityBase>> getAllChilds(){return childs;}
+	virtual uint64_t countChilds()
+	{
+		return childs.size();
 	}
 	/**
 	 * @brief publish

@@ -1,5 +1,28 @@
 cmake_minimum_required(VERSION 2.8.3)
 
+project(ros2_components_msg)
+
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+endif()
+
+find_package(ament_cmake REQUIRED)
+
+find_package(builtin_interfaces REQUIRED)
+
+find_package(rosidl_default_generators REQUIRED)
+
+file(GLOB SERVICE_FILES
+    "srv/*.srv"
+)
+
+rosidl_generate_interfaces(${PROJECT_NAME}_msgs
+  #${MESSAGE_FILES}
+  ${SERVICE_FILES}
+  DEPENDENCIES builtin_interfaces
+)
+
+
 project(ros2_components)
 
 if(NOT WIN32)
@@ -21,8 +44,10 @@ macro(targets)
 	if(NOT "${target_suffix} " STREQUAL " ")
 	  get_rclcpp_information("${rmw_implementation}" "rclcpp${target_suffix}")
 	endif()
+
+	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+	)
 	
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 	file(GLOB SRC_FILES
 	    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c*"
 	    
@@ -30,18 +55,22 @@ macro(targets)
 	add_library(ros2_components${target_suffix}
 		${SRC_FILES}
 	)
+
 	ament_target_dependencies(ros2_components${target_suffix}
         	"rclcpp"
 		"geometry_msgs"
 		"tf2"
 		"tf2_msgs"
 		"tf2_ros"
+
 	)
 
-    	ament_export_libraries(ros2_components${target_suffix})
+    	ament_export_libraries(ros2_components${target_suffix}
+)
 
 	install(TARGETS ros2_components${target_suffix}
                 DESTINATION lib)
+
 
 endmacro()
 
