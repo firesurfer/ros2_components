@@ -39,6 +39,9 @@ struct ListChilds_Response_
   }
 
   // field types and members
+  using _listsize_type =
+      int64_t;
+  _listsize_type listsize;
   using _childids_type =
       std::vector<int64_t, typename ContainerAllocator::template rebind<int64_t>::other>;
   _childids_type childids;
@@ -47,6 +50,12 @@ struct ListChilds_Response_
   _childtypes_type childtypes;
 
   // setters for named parameter idiom
+  Type * set__listsize(
+    const int64_t & _arg)
+  {
+    this->listsize = _arg;
+    return this;
+  }
   Type * set__childids(
     const std::vector<int64_t, typename ContainerAllocator::template rebind<int64_t>::other> & _arg)
   {
@@ -102,6 +111,9 @@ struct ListChilds_Response_
   // comparison operators
   bool operator==(const ListChilds_Response_ & other) const
   {
+    if (this->listsize != other.listsize) {
+      return false;
+    }
     if (this->childids != other.childids) {
       return false;
     }

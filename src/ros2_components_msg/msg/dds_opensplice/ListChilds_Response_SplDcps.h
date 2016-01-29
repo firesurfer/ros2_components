@@ -22,6 +22,7 @@ struct _ros2_components_msg_srv_dds__ListChilds_Response_ ;
 extern  c_bool __ros2_components_msg_srv_dds__ListChilds_Response___copyIn(c_base base, struct ros2_components_msg::srv::dds_::ListChilds_Response_ *from, struct _ros2_components_msg_srv_dds__ListChilds_Response_ *to);
 extern  void __ros2_components_msg_srv_dds__ListChilds_Response___copyOut(void *_from, void *_to);
 struct _ros2_components_msg_srv_dds__ListChilds_Response_ {
+    c_longlong listsize_;
     c_sequence childids_;
     c_sequence childtypes_;
 };

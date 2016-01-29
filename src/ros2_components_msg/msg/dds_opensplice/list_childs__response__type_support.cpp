@@ -72,6 +72,9 @@ ROSIDL_TYPESUPPORT_OPENSPLICE_CPP_EXPORT_ros2_components_msg
 void
 convert_ros_message_to_dds(const __ros_msg_type & ros_message, __dds_msg_type & dds_message)
 {
+  // field.name listsize
+  dds_message.listsize_ = ros_message.listsize;
+
   // field.name childids
   {
     size_t size = ros_message.childids.size();
@@ -149,6 +152,10 @@ ROSIDL_TYPESUPPORT_OPENSPLICE_CPP_EXPORT_ros2_components_msg
 void
 convert_dds_message_to_ros(const __dds_msg_type & dds_message, __ros_msg_type & ros_message)
 {
+  // field.name listsize
+  ros_message.listsize =
+    dds_message.listsize_;
+
   // field.name childids
   {
     size_t size = dds_message.childids_.length();

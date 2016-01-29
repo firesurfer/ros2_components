@@ -745,9 +745,10 @@ ros2_components_msg::srv::dds_::Sample_ListChilds_Response_DataReaderView_impl::
 
 
 const char * ::ros2_components_msg::srv::dds_::Sample_ListChilds_Response_TypeSupport::metaDescriptor[] = {"<MetaData version=\"1.0.0\"><Module name=\"ros2_components_msg\"><Module name=\"srv\"><Module name=\"dds_\">",
-"<Struct name=\"ListChilds_Response_\"><Member name=\"childids_\"><Sequence><LongLong/></Sequence></Member>",
-"<Member name=\"childtypes_\"><Sequence><String/></Sequence></Member></Struct><Struct name=\"Sample_ListChilds_Response_\">",
-"<Member name=\"client_guid_0_\"><ULongLong/></Member><Member name=\"client_guid_1_\"><ULongLong/></Member>",
-"<Member name=\"sequence_number_\"><LongLong/></Member><Member name=\"response_\"><Type name=\"ListChilds_Response_\"/>",
-"</Member></Struct></Module></Module></Module></MetaData>"};
-const ::DDS::ULong (::ros2_components_msg::srv::dds_::Sample_ListChilds_Response_TypeSupport::metaDescriptorArrLength) = 6;
+"<Struct name=\"ListChilds_Response_\"><Member name=\"listsize_\"><LongLong/></Member><Member name=\"childids_\">",
+"<Sequence><LongLong/></Sequence></Member><Member name=\"childtypes_\"><Sequence><String/></Sequence></Member>",
+"</Struct><Struct name=\"Sample_ListChilds_Response_\"><Member name=\"client_guid_0_\"><ULongLong/></Member>",
+"<Member name=\"client_guid_1_\"><ULongLong/></Member><Member name=\"sequence_number_\"><LongLong/></Member>",
+"<Member name=\"response_\"><Type name=\"ListChilds_Response_\"/></Member></Struct></Module></Module></Module>",
+"</MetaData>"};
+const ::DDS::ULong (::ros2_components_msg::srv::dds_::Sample_ListChilds_Response_TypeSupport::metaDescriptorArrLength) = 7;

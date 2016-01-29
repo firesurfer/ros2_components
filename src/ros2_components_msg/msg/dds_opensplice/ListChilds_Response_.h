@@ -4,7 +4,7 @@
 //  
 //  File name: ListChilds_Response_.h
 //  Source: /home/firesurfer/workspace/kairo3_ws/src/kairo3/ros2_components/build/build/ros2_components/rosidl_generator_dds_idl/ros2_components_msg/srv/dds_opensplice/ListChilds_Response_.idl
-//  Generated: Fri Jan 29 10:58:42 2016
+//  Generated: Fri Jan 29 14:40:04 2016
 //  OpenSplice V6.4.140407OSS
 //  
 //******************************************************************
@@ -33,6 +33,7 @@ namespace ros2_components_msg
                typedef DDS_DCPSUStrSeqT <struct _childtypes__seq_uniq_> _childtypes__seq;
                typedef DDS_DCPSUStrSeq_var < _childtypes__seq> _childtypes__seq_var;
                typedef DDS_DCPSUStrSeq_out < _childtypes__seq> _childtypes__seq_out;
+               DDS::LongLong listsize_;
                _childids__seq childids_;
                _childtypes__seq childtypes_;
          };

@@ -17,6 +17,7 @@
 /// Struct of message ros2_components_msg/ListChilds_Response
 typedef struct ros2_components_msg__srv__ListChilds_Response
 {
+  int64_t listsize;
   rosidl_generator_c__int64__Array childids;
   rosidl_generator_c__String__Array childtypes;
 } ros2_components_msg__srv__ListChilds_Response;

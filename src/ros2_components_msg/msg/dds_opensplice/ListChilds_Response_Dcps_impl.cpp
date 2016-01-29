@@ -745,7 +745,7 @@ ros2_components_msg::srv::dds_::ListChilds_Response_DataReaderView_impl::lookup_
 
 
 const char * ::ros2_components_msg::srv::dds_::ListChilds_Response_TypeSupport::metaDescriptor[] = {"<MetaData version=\"1.0.0\"><Module name=\"ros2_components_msg\"><Module name=\"srv\"><Module name=\"dds_\">",
-"<Struct name=\"ListChilds_Response_\"><Member name=\"childids_\"><Sequence><LongLong/></Sequence></Member>",
-"<Member name=\"childtypes_\"><Sequence><String/></Sequence></Member></Struct></Module></Module></Module>",
-"</MetaData>"};
+"<Struct name=\"ListChilds_Response_\"><Member name=\"listsize_\"><LongLong/></Member><Member name=\"childids_\">",
+"<Sequence><LongLong/></Sequence></Member><Member name=\"childtypes_\"><Sequence><String/></Sequence></Member>",
+"</Struct></Module></Module></Module></MetaData>"};
 const ::DDS::ULong (::ros2_components_msg::srv::dds_::ListChilds_Response_TypeSupport::metaDescriptorArrLength) = 4;
