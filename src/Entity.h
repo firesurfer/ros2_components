@@ -20,7 +20,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/subscription.hpp"
-//#include "ros2_components_msg/srv/list_childs.hpp"
+#include "ros2_components_msg/srv/list_childs.hpp"
 #include <memory>
 #include "Reflect.h"
 
@@ -208,9 +208,12 @@ namespace KamaroModule
 	    parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
 	    listeners = t.listeners;
 	   
-	    
+	   
 	    if(!isSubscriber())
+	    {
 		kamaroPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+		 parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", handleListChildRequest);
+	    }
 	    else
 	    {
 		using namespace std::placeholders;
@@ -267,7 +270,23 @@ namespace KamaroModule
 	    
 	}
 	
-	
+	virtual void handleListChildRequest(const std::shared_ptr<rmw_request_id_t> request_header,
+					    const std::shared_ptr<ros2_components_msg::srv::ListChilds::Request> request,
+				     std::shared_ptr<ros2_components_msg::srv::ListChilds::Response> response)
+	{
+	    UNUSED(request_header);
+	    UNUSED(request);
+	    std::vector<std::string> types;
+	    std::vector<int64_t> ids;
+	    
+	    for(auto & child: childs)
+	    {
+		types.push_back(child->getName());
+		ids.push_back(child->getId());
+	    }
+	    response->childids = ids;
+	    response->childtypes = types;
+	}
 	
 	//ROS 2 Stuff
 	rmw_qos_profile_t custom_qos_profile;

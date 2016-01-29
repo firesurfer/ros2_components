@@ -22,7 +22,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}_msgs
   DEPENDENCIES builtin_interfaces
 )
 
-
+#target_link_libraries(${PROJECT_NAME}_msgs)
 project(ros2_components)
 
 if(NOT WIN32)
