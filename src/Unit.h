@@ -38,11 +38,17 @@ namespace KamaroModule
 	}
 	std::shared_ptr<ActorType> getActor()
 	{
-	    return this->getChild(0);
+	    std::shared_ptr<ActorType> actor = dynamic_pointer_cast<ActorType>(this->getChild(0));
+	    if(actor == NULL)
+		throw std::runtime_error("Could not cast actor");
+	    return  actor;
 	}
 	std::shared_ptr<SensorType> getSensor()
 	{
-	    return this->getChild(1);
+	     std::shared_ptr<SensorType> sensor = dynamic_pointer_cast<SensorType>(this->getChild(1));
+	    if(sensor == NULL)
+		throw std::runtime_error("Could not cast sensor");
+	    return  sensor;
 	}
 	virtual bool publish()
 	{
