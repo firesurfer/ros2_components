@@ -21,9 +21,6 @@ public:
     
     
     virtual void print(){}
-    
-    
-    
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
     

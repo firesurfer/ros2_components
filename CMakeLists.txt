@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ros2_components_msg)
 
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -g")
 endif()
 
 find_package(ament_cmake REQUIRED)
@@ -11,6 +11,8 @@ find_package(ament_cmake REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 
 find_package(rosidl_default_generators REQUIRED)
+
+
 
 file(GLOB SERVICE_FILES
     "srv/*.srv"
@@ -30,49 +32,44 @@ if(NOT WIN32)
 endif()
 
 find_package(ament_cmake REQUIRED)
-
+find_package(Qt5Core REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
-find_package(tf2 REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(tf2_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
+#find_package(tf2 REQUIRED)
+#find_package(tf2_ros REQUIRED)
+#find_package(tf2_msgs REQUIRED)
+#find_package(geometry_msgs REQUIRED)
 
-macro(targets)
-	if(NOT "${target_suffix} " STREQUAL " ")
-	  get_rclcpp_information("${rmw_implementation}" "rclcpp${target_suffix}")
-	endif()
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${rclcpp_INCLUDE_DIRS}
+    ${rmw_INCLUDE_DIRS}
+    ${rmw_implementation_INCLUDE_DIRS}
 
-	include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
-	)
-	
-	file(GLOB SRC_FILES
-	    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c*"
-	    
-	)
-	add_library(ros2_components${target_suffix}
-		${SRC_FILES}
-	)
-
-	ament_target_dependencies(ros2_components${target_suffix}
-        	"rclcpp"
-		"geometry_msgs"
-		"tf2"
-		"tf2_msgs"
-		"tf2_ros"
-
-	)
-
-    	ament_export_libraries(ros2_components${target_suffix}
+    ${Qt5Core_INCLUDE_DIRS}
 )
+file(GLOB SRC_FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.c*"
+)
+add_library(ros2_components${target_suffix}
+    ${SRC_FILES}
+)
+#qt5_use_modules(ros2_components Core)
 
-	install(TARGETS ros2_components${target_suffix}
-                DESTINATION lib)
+target_link_libraries(ros2_components
+    ${rclcpp_LIBRARIES}
+    ${rmw_LIBRARIES}
+    ${rmw_implementation_LIBRARIES}
+    -pthread
+    Qt5::Core
 
-
-endmacro()
+)
 
 file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*"
@@ -83,6 +80,7 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components)
 
 
 
-call_for_each_rmw_implementation(targets GENERATE_DEFAULT)
+ament_export_include_directories(include)
+ament_export_libraries(${PROJECT_NAME})
 
 ament_package()
