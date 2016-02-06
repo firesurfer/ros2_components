@@ -40,6 +40,22 @@ namespace KamaroModule
 		    throw std::runtime_error("Wrong type - can't cast");
 		return con_ch;
 	}
+	template<typename T>
+	std::shared_ptr<T> getConcreteChildById(int id)
+	{
+	    std::shared_ptr<T> con_ch;
+	    for(auto & child: this->getAllChilds())
+	    {
+		if(child->getId() == id)
+		{
+		    con_ch = dynamic_pointer_cast<T>(child);
+		    if(con_ch == NULL)
+			throw std::runtime_error("Wrong type - can't cast");
+		    return con_ch;
+		}
+	    }
+	}
+	
     };
     
 }
