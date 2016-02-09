@@ -192,9 +192,10 @@ public:
 
 
         //Some ROS2 QOS Configuration -> Taken from an example
-        custom_qos_profile = rmw_qos_profile_default;
-        custom_qos_profile.depth = 7;
+        custom_qos_profile = rmw_qos_profile_sensor_data;
+        //custom_qos_profile.depth = 2;
 
+        //custom_qos_profile.history = hist_pol;
         //Create a new parameterClient
         //The client is used for storing meta information about a component
         this->parameterClient = std::make_shared<rclcpp::parameter_client::AsyncParametersClient>(parentNode, "ParameterServer");

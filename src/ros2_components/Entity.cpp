@@ -38,7 +38,7 @@ string EntityBase::getClassName()
 void EntityBase::addChild(std::shared_ptr<EntityBase> child)
 {
     childs.push_back(child);
-    //child->SetParent(shared_from_this());
+    child->SetParent(std::shared_ptr<EntityBase>(this));
 }
 
 std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)
