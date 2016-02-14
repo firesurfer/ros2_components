@@ -1,5 +1,5 @@
 #include "Entity.h"
-namespace KamaroModule {
+namespace ros2_components {
 
 EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, string _className)
 {

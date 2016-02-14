@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace std::placeholders;
-namespace KamaroModule
+namespace ros2_components
 {
 
 class EntityBase : public QObject
@@ -207,8 +207,8 @@ public:
 
         if(!isSubscriber())
         {
-            kamaroPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-            pubBase = kamaroPublisher;
+            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            pubBase = entityPublisher;
             using namespace std::placeholders;
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
             std::cout << "Started service with name:"<< getName()+"_srv"<< std::endl;
@@ -216,8 +216,8 @@ public:
         else
         {
             using namespace std::placeholders;
-            kamaroSubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
-            subBase = kamaroSubscription;
+            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            subBase = entitySubscription;
         }
         std::cout << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
         //updateParameters();
@@ -237,13 +237,13 @@ public:
 
         if(!isSubscriber())
         {
-            kamaroPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
         }
         else
         {
             using namespace std::placeholders;
-            kamaroSubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
         }
         //updateParameters();
     }
@@ -316,8 +316,8 @@ protected:
     //ROS 2 Stuff
     rmw_qos_profile_t custom_qos_profile;
 
-    std::shared_ptr<rclcpp::publisher::Publisher<MessageType>> kamaroPublisher;
-    std::shared_ptr<rclcpp::subscription::Subscription<MessageType>> kamaroSubscription;
+    std::shared_ptr<rclcpp::publisher::Publisher<MessageType>> entityPublisher;
+    std::shared_ptr<rclcpp::subscription::Subscription<MessageType>> entitySubscription;
     rclcpp::subscription::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameterEventSubscription;
 
 

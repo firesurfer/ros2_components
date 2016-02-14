@@ -18,7 +18,7 @@
 #ifndef PART_H
 #define PART_H
 #include "Entity.h"
-namespace KamaroModule
+namespace ros2_components
 {
     template <typename MessageType>
     class Part : public Entity<MessageType>

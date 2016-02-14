@@ -24,7 +24,7 @@
  * that can be used for setting commands to the hardware and reading parameter from the hardware
  * The unit itself can also publish a message and can contain meta information
  */
-namespace KamaroModule
+namespace ros2_components
 {
     template <typename MessageType, typename ActorType, typename SensorType>
     class Unit :  public Entity<MessageType>
