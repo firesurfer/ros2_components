@@ -38,7 +38,8 @@ string EntityBase::getClassName()
 void EntityBase::addChild(std::shared_ptr<EntityBase> child)
 {
     childs.push_back(child);
-    child->SetParent(std::shared_ptr<EntityBase>(this));
+    child->setParent(std::shared_ptr<EntityBase>(this));
+    emit childAdded(child);
 }
 
 std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)
@@ -46,6 +47,32 @@ std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)
     if(childs.size() < index)
         throw std::runtime_error("Index out of bounds");
     return childs[index];
+}
+
+std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
+{
+    for(auto & child: childs)
+    {
+        if(child->getId() == id)
+            return child;
+    }
+    throw std::runtime_error("Child with id: " + std::to_string(id) + " not found");
+}
+
+uint64_t EntityBase::countChilds()
+{
+
+    return childs.size();
+}
+
+std::shared_ptr<EntityBase> EntityBase::getParent()
+{
+    return this->parent;
+}
+
+void EntityBase::setParent(std::shared_ptr<EntityBase> par)
+{
+    this->parent = par;
 }
 
 string EntityBase::getTopicName()
@@ -156,7 +183,7 @@ void EntityBase::updateParameters()
             }
         }
     }
-
+    emit parametersUpdated();
 }
 
 void EntityBase::publishMetaInformation()

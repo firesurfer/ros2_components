@@ -167,11 +167,8 @@ public:
 
         return robotIds;
     }
-    void addOnConnectedCallback(std::function<void(int)> func)
-    {
-        if(func)
-            onConnectedCallbacks.push_back(func);
-    }
+ signals:
+   void hardwareConnection(EntityBase::SharedPtr seg);
 protected:
     std::string printMyColor(ConsoleColor color)
     {
@@ -182,7 +179,7 @@ private:
 
 
 
-    std::vector<std::function<void(int)>> onConnectedCallbacks;
+   //std::vector<std::function<void(int)>> onConnectedCallbacks;
 
 
 };
