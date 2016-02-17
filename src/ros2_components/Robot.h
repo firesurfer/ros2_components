@@ -116,14 +116,14 @@ public:
 
     }
 
-    static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode)//rclcpp::parameter_client::AsyncParametersClient::SharedPtr parameters_client )
+    static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "")//rclcpp::parameter_client::AsyncParametersClient::SharedPtr parameters_client )
     {
         auto parameters_client = std::make_shared<rclcpp::parameter_client::AsyncParametersClient>(_parentNode,"ParameterServer");
         std::vector<int64_t> robotIds;
         std::vector<std::string> possiblePrefixes;
         for(int i = 100; i < 20000;i++)
         {
-            possiblePrefixes.push_back("Robot"+ std::to_string(i));
+            possiblePrefixes.push_back(prefix+"Robot"+ std::to_string(i));
         }
         auto parameter_list_future = parameters_client->list_parameters(possiblePrefixes, 10);
 
@@ -152,8 +152,11 @@ public:
                 {
 
                     int64_t myId = parameter.as_int();
-                    auto activePar = parameters_client->get_parameters({"Robot"+std::to_string(myId)+".active"});
-                    rclcpp::spin_until_future_complete(_parentNode, activePar);
+                    auto activePar = parameters_client->get_parameters({prefix+"Robot"+std::to_string(myId)+".active"});
+                    if(rclcpp::spin_until_future_complete(_parentNode, activePar) != rclcpp::executor::FutureReturnCode::SUCCESS)
+                        throw std::runtime_error("Could not contact parameterServer");
+                    if(activePar.get().size() <1)
+                        throw std::runtime_error("Could not contact parameterServer");
                     if(activePar.get()[0].as_bool())
                     {
                         robotIds.push_back(myId);
