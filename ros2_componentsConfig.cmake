@@ -12,9 +12,9 @@ file(GLOB LIB_FILES
 
 )
 
-set(ROS2_COMPONENTS_LIBRARIES ${LIB_FILES})
+set(ros2_components_LIBRARIES ${LIB_FILES})
 
-set(ROS2_COMPONENTS_INCLUDE_DIRS  
+set(ros2_components_INCLUDE_DIRS  
 	${ROS2_COMPONENTS_DIR}/src
 
 )

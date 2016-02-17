@@ -32,7 +32,7 @@ class Robot :  public Entity<std_msgs::msg::Empty>
     Q_OBJECT
 public:
     typedef  std::shared_ptr<Robot> SharedPtr ;
-    Robot( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode):Entity(_id,_subscribe,parentNode,"Robot")
+    Robot( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode, std::string  _name):Entity(_id,_subscribe,parentNode,_name)
     {
 
     }
