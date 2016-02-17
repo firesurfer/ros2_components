@@ -77,7 +77,7 @@ file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
 message(STATUS "FILES TO INSTALL (ROS2_COMPONENTS)")
 message(STATUS ${INCLUDE_FILES})
 install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components) 
-
+install(TARGETS ros2_components DESTINATION lib)
 
 
 ament_export_include_directories(include)
