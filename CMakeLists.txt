@@ -72,7 +72,7 @@ target_link_libraries(ros2_components
 )
 
 file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.h*"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.h*"
 )
 message(STATUS "FILES TO INSTALL (ROS2_COMPONENTS)")
 message(STATUS ${INCLUDE_FILES})
@@ -81,6 +81,6 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components)
 
 
 ament_export_include_directories(include)
-ament_export_libraries(${PROJECT_NAME})
+ament_export_libraries(ros2_components)
 
 ament_package()
