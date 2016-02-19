@@ -349,7 +349,7 @@ protected:
         int i =0;
         for(auto & child: childs)
         {
-            response->childtypes.push_back(child->getName());
+            response->childtypes.push_back(child->getClassName());
             //std::cout << "Writing child name: "<< child->getName() << " :" <<child->getId()<<std::endl;
             response->childids.push_back(child->getId());
             i++;

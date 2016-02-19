@@ -17,7 +17,7 @@ void EntityFactory::AddQObject(QObject *obj)
 std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string className,QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3)
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
-        throw std::runtime_error("Class not registered");
+        throw std::runtime_error("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
     std::cout << "Class name from staticMetaObject: " << meta->className() << std::endl;
@@ -32,7 +32,7 @@ std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string classNa
 std::shared_ptr<QMetaObject> EntityFactory::GetQMetaObject(string className)
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
-        throw std::runtime_error("Class not registered");
+        throw std::runtime_error("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
     std::cout << "Class name from staticMetaObject: " << meta->className() << std::endl;
