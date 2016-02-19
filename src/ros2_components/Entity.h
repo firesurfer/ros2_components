@@ -34,6 +34,12 @@ public:
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
 
+
+
+    Q_PROPERTY(bool active)
+    Q_PROPERTY(int64_t id)
+    Q_PROPERTY(std::string className)
+    Q_PROPERTY(Bool virtualEntity)
     /**
      * @brief getId
      * @return The Component ID
