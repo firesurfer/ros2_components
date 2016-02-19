@@ -61,8 +61,8 @@ public:
     {
         for(auto & child: this->getAllChilds())
         {
-            std::shared_ptr<SensorType> sensor = dynamic_pointer_cast<SensorType>(this->getChild(1));
-            if(sensor == NULL)
+            std::shared_ptr<SensorType> sensor = dynamic_pointer_cast<SensorType>(child);
+            if(sensor != NULL)
                 return  sensor;
         }
         throw std::runtime_error("Could not find any sensor");
