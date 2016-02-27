@@ -196,7 +196,7 @@ protected:
 signals:
     void childAdded(EntityBase::SharedPtr child);
     void parametersUpdated();
-    virtual void newData();
+    void newData();
 
 private:
     /**
