@@ -21,7 +21,7 @@ std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string classNa
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
     std::cout << "Class name from staticMetaObject: " << meta->className() << std::endl;
-    std::cout << meta->constructor(0).methodSignature().toStdString() << std::endl;
+    //std::cout << meta->constructor(0).methodSignature().toStdString() << std::endl;
 
     QObject *o = meta->newInstance(arg1,arg2,arg3);
     EntityBase* ptr = dynamic_cast<EntityBase*>(o);
