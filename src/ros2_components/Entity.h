@@ -20,7 +20,7 @@
 
 #include <QObject>
 #include <QMetaObject>
-
+#include <QMetaProperty>
 using namespace std;
 using namespace std::placeholders;
 namespace ros2_components
@@ -36,10 +36,10 @@ public:
 
 
 
-    Q_PROPERTY(bool active)
-    Q_PROPERTY(int64_t id)
-    Q_PROPERTY(std::string className)
-    Q_PROPERTY(Bool virtualEntity)
+    Q_PROPERTY(bool active READ isActive)
+    Q_PROPERTY(int64_t id READ getId)
+    Q_PROPERTY(std::string className READ getClassName)
+    Q_PROPERTY(bool virtualEntity READ isVirtual)
     /**
      * @brief getId
      * @return The Component ID
@@ -134,6 +134,11 @@ public:
      * push the local metainformation (marked with REFLECT) to the parameter Server
      */
     virtual void publishMetaInformation();
+    /**
+     * @brief IterateThroughAllProperties
+     * @param func
+     */
+    void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
 protected:
     /**
       * @brief setParent
