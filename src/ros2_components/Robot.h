@@ -19,7 +19,7 @@
 #define ROBOT_H
 #include "ros2_components/Entity.h"
 #include "std_msgs/msg/empty.hpp"
-
+#include "ros2_components_msg/msg/new_component_added.hpp"
 
 #include "ConsoleColor.h"
 
@@ -27,7 +27,7 @@
 namespace ros2_components
 {
 
-class Robot :  public Entity<std_msgs::msg::Empty>
+class Robot :  public Entity<ros2_components_msg::msg::NewComponentAdded>
 {
     Q_OBJECT
 public:
@@ -82,7 +82,7 @@ public:
         };
         IterateThroughAllChilds(callbackFunc);
     }
-
+    void RegisterAllChildAddedEvents();
 
     void virtual  PrintTree();
 
@@ -95,6 +95,8 @@ protected:
         std::string col = "\033[" + std::to_string(color) + "m";
         return col;
     }
+protected slots:
+    void on_child_added(std::shared_ptr<EntityBase> child);
 private:
 
 
