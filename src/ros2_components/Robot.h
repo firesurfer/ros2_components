@@ -27,7 +27,7 @@
 namespace ros2_components
 {
 
-class Robot :  public Entity<ros2_components_msg::msg::NewComponentAdded>
+class Robot :  public Entity< ros2_components_msg::msg::NewComponentAdded>
 {
     Q_OBJECT
 public:
@@ -101,7 +101,7 @@ private:
 
 
 
-   //std::vector<std::function<void(int)>> onConnectedCallbacks;
+
 
 
 };

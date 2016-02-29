@@ -9,12 +9,12 @@ Robot::Robot(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> p
 
 void Robot::RegisterAllChildAddedEvents()
 {
-    QObject::disconnect(this, SIGNAL(childAdded(std::shared_ptr<EntityBase>)),this, SLOT(on_child_added(std::shared_ptr<EntityBase>)));
-    QObject::connect(this, SIGNAL(childAdded(std::shared_ptr<EntityBase>)),this, SLOT(on_child_added(std::shared_ptr<EntityBase>)));
+    QObject::disconnect(this,&EntityBase::childAdded,this, &Robot::on_child_added);
+    QObject::connect(this,&EntityBase::childAdded,this, &Robot::on_child_added);
     auto func = [&](std::shared_ptr<EntityBase> child)
     {
-        QObject::disconnect(child.get(), SIGNAL(childAdded(std::shared_ptr<EntityBase>)),this, SLOT(on_child_added(std::shared_ptr<EntityBase>)));
-        QObject::connect(child.get(), SIGNAL(childAdded(std::shared_ptr<EntityBase>)),this, SLOT(on_child_added(std::shared_ptr<EntityBase>)));
+        QObject::disconnect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
+        QObject::connect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
 
     };
     IterateThroughAllChilds(func);
@@ -112,8 +112,8 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child)
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();
-    if(!this->isSubscriber())
-        this->entityPublisher->publish(msg);
+    //if(!this->isSubscriber())
+       // this->entityPublisher->publish(msg);
 }
 
 }

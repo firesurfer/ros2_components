@@ -1,5 +1,0 @@
-
----
-int64 listsize
-int64[] childids
-string[] childtypes
