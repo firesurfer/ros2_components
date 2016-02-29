@@ -112,8 +112,9 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child)
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();
-    //if(!this->isSubscriber())
-       // this->entityPublisher->publish(msg);
+    msg->parentid = child->getParent()->getId();
+    if(!this->isSubscriber())
+        this->entityPublisher->publish(msg);
 }
 
 }

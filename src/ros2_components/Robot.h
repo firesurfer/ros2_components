@@ -20,7 +20,7 @@
 #include "ros2_components/Entity.h"
 #include "std_msgs/msg/empty.hpp"
 #include "ros2_components_msg/msg/new_component_added.hpp"
-
+#include "ros2_components/EntityFactory.h"
 #include "ConsoleColor.h"
 
 
@@ -95,6 +95,30 @@ protected:
         std::string col = "\033[" + std::to_string(color) + "m";
         return col;
     }
+    virtual void listenerCallback(const ros2_components_msg::msg::NewComponentAdded::SharedPtr  msg)
+    {
+        int64_t parentId = msg->parentid;
+        int64_t componentId = msg->componentid;
+        std::string componentType = msg->componenttype;
+
+        EntityBase::SharedPtr parentComp;
+        auto func = [&](EntityBase::SharedPtr child)
+        {
+            if(child->getId()== parentId)
+            {
+                parentComp = child;
+                return;
+            }
+        };
+        IterateThroughAllChilds(func);
+        QGenericArgument idArg = Q_ARG(int64_t, componentId);
+        QGenericArgument subscribeArg = Q_ARG(bool, true);
+        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, parentNode);
+
+        EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
+        parentComp->addChild(comp);
+    }
+
 protected slots:
     void on_child_added(std::shared_ptr<EntityBase> child);
 private:
