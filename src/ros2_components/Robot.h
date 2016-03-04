@@ -82,13 +82,13 @@ public:
         };
         IterateThroughAllChilds(callbackFunc);
     }
-    void RegisterAllChildAddedEvents();
+    void RegisterAllChildEvents();
 
     void virtual  PrintTree();
 
     static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "");
- signals:
-   void hardwareConnection(EntityBase::SharedPtr seg);
+signals:
+    void hardwareConnection(EntityBase::SharedPtr seg);
 protected:
     std::string printMyColor(ConsoleColor color)
     {
@@ -100,8 +100,10 @@ protected:
         int64_t parentId = msg->parentid;
         int64_t componentId = msg->componentid;
         std::string componentType = msg->componenttype;
+        bool added = msg->added;
 
         EntityBase::SharedPtr parentComp;
+        EntityBase::SharedPtr localComp;
         auto func = [&](EntityBase::SharedPtr child)
         {
             if(child->getId()== parentId)
@@ -109,20 +111,34 @@ protected:
                 parentComp = child;
                 return;
             }
+            if(!added && child->getId() == componentId)
+            {
+                localComp = child;
+            }
         };
         IterateThroughAllChilds(func);
-        QGenericArgument idArg = Q_ARG(int64_t, componentId);
-        QGenericArgument subscribeArg = Q_ARG(bool, true);
-        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, parentNode);
+        if(added)
+        {
+            QGenericArgument idArg = Q_ARG(int64_t, componentId);
+            QGenericArgument subscribeArg = Q_ARG(bool, true);
+            QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, parentNode);
 
-        EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
-        parentComp->addChild(comp);
+            EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
+            parentComp->addChild(comp);
+            emit remote_entity_added(comp);
+        }
+        else
+        {
+            parentComp->removeChild(localComp);
+        }
     }
 
 protected slots:
     void on_child_added(std::shared_ptr<EntityBase> child);
+    void on_child_removed(std::shared_ptr<EntityBase> child);
 private:
-
+signals:
+    void remote_entity_added(std::shared_ptr<EntityBase> child);
 
 
 

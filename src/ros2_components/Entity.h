@@ -76,12 +76,17 @@ public:
      * @brief addChild
      * @return adds a child to the childs vector
      */
-
     virtual void addChild(std::shared_ptr<EntityBase> child);
+    /**
+     * @brief removeChild Removes the given child
+     * @param child child to remote
+     */
+    virtual void removeChild(std::shared_ptr<EntityBase> child);
     /**
      * @brief getChild
      * @return returns the child at the specified index
      */
+    [[deprecated]]
     virtual std::shared_ptr<EntityBase> getChild(uint64_t index);
     /**
      * @brief getChildById throws exeption if id isnt available
@@ -200,6 +205,7 @@ protected:
     std::string description;
 signals:
     void childAdded(EntityBase::SharedPtr child);
+    void childRemoved(EntityBase::SharedPtr child);
     void parametersUpdated();
     void newData();
 

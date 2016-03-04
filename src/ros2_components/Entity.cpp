@@ -42,6 +42,17 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child)
     emit childAdded(child);
 }
 
+void EntityBase::removeChild(std::shared_ptr<EntityBase> child)
+{
+    auto iteratorPos = std::find(childs.begin(), childs.end(), child) ;
+    if(iteratorPos != childs.end())
+    {
+        childs.erase(iteratorPos);
+    }
+    else
+        throw std::runtime_error("Can't remove given child - child not found!");
+}
+
 std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)
 {
     if(childs.size() < index)
