@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef VIRTUALROBOT_H
-#define VIRTUALROBOT_H
+#pragma once
 
 #include "Robot.h"
 
@@ -70,4 +69,4 @@ protected:
 };
 
 }
-#endif // VIRTUALROBOT_H
+

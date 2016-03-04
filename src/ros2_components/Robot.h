@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef ROBOT_H
-#define ROBOT_H
+#pragma once
 #include "ros2_components/Entity.h"
 #include "std_msgs/msg/empty.hpp"
 #include "ros2_components_msg/msg/new_component_added.hpp"
@@ -147,4 +146,4 @@ signals:
 };
 
 }
-#endif // ROBOT_H
+

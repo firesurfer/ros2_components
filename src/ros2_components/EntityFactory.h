@@ -1,5 +1,4 @@
-#ifndef ENTITYFACTORY_H
-#define ENTITYFACTORY_H
+#pragma once
 
 #include <QObject>
 #include <QCoreApplication>
@@ -57,4 +56,4 @@ private:
 };
 }
 
-#endif // ENTITYFACTORY_H
+

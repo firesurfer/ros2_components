@@ -14,9 +14,7 @@
  * limitations under the License.
  *
  */
-
-#ifndef UNIT_H
-#define UNIT_H
+#pragma once
 
 #include "Entity.h"
 /**
@@ -82,4 +80,4 @@ public:
 };
 
 }
-#endif // UNIT_H
+

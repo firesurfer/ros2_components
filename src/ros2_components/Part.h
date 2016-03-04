@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef PART_H
-#define PART_H
+#pragma once
 #include "Entity.h"
 namespace ros2_components
 {
@@ -60,4 +59,4 @@ public:
 
 }
 
-#endif // PART_H
+
