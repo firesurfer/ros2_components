@@ -7,7 +7,7 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
 #Uncomment this line if you want to build locally without ament
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
+#set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(builtin_interfaces REQUIRED)
