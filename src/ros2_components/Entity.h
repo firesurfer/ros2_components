@@ -220,9 +220,12 @@ protected:
      * used defined description
      */
     std::string description;
+protected slots:
+     virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
+     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
 signals:
-    void childAdded(EntityBase::SharedPtr child);
-    void childRemoved(EntityBase::SharedPtr child);
+    void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth);
+    void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth);
     void parametersUpdated();
     void newData();
 
@@ -272,10 +275,9 @@ public:
         //Create a new parameterClient
         //The client is used for storing meta information about a component
         this->parameterClient = std::make_shared<rclcpp::parameter_client::AsyncParametersClient>(parentNode, "ParameterServer");
-        // std::cout << "Created parameter client" << std::endl;
+
         //Register the client on an event that is thrown in case a parameter has changed
         parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
-        //std::cout << "Registered event on parameter client" << std::endl;
 
 
         if(!isSubscriber())
@@ -284,7 +286,7 @@ public:
             pubBase = entityPublisher;
             using namespace std::placeholders;
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
-            std::cout << "Started service with name:"<< getName()+"_srv"<< std::endl;
+            //std::cout << "Started service with name:"<< getName()+"_srv"<< std::endl;
         }
         else
         {
@@ -293,7 +295,7 @@ public:
             subBase = entitySubscription;
         }
         std::cout << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
-        //updateParameters();
+
 
     }
     /**

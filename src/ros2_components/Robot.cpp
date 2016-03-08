@@ -7,8 +7,8 @@ Robot::Robot(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> p
     if(!_subscribe)
     {
         using namespace std::placeholders;
-        entitySubscription = parentNode->create_subscription<ros2_components_msg::msg::NewComponentAdded>(getName(), std::bind(&Robot::listenerCallback, this,_1), custom_qos_profile);
-        subBase = entitySubscription;
+        //entitySubscription = parentNode->create_subscription<ros2_components_msg::msg::NewComponentAdded>(getName(), std::bind(&Robot::listenerCallback, this,_1), custom_qos_profile);
+        //subBase = entitySubscription;
     }
     else
     {
@@ -18,26 +18,6 @@ Robot::Robot(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> p
     }
 }
 
-void Robot::RegisterAllChildEvents()
-{
-    QObject::disconnect(this,&EntityBase::childAdded,this, &Robot::on_child_added);
-    QObject::connect(this,&EntityBase::childAdded,this, &Robot::on_child_added);
-
-    QObject::disconnect(this,&EntityBase::childRemoved,this, &Robot::on_child_removed);
-    QObject::connect(this,&EntityBase::childRemoved,this, &Robot::on_child_removed);
-
-    auto func = [&](std::shared_ptr<EntityBase> child)
-    {
-        QObject::disconnect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
-        QObject::connect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
-
-        QObject::disconnect(child.get(),&EntityBase::childRemoved,this, &Robot::on_child_removed);
-        QObject::connect(child.get(),&EntityBase::childRemoved,this, &Robot::on_child_removed);
-
-    };
-    IterateThroughAllChilds(func);
-
-}
 
 void Robot::PrintTree()
 {
@@ -120,8 +100,9 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
     return robotIds;
 }
 
-void Robot::on_child_added(std::shared_ptr<EntityBase> child)
+void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
 {
+    std::lock_guard<std::mutex> lock(childAdded_mutex);
     std::cout << "new child was added: " << child->getName() << std::endl;
     //RegisterAllChildEvents();
     QObject::connect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added,Qt::DirectConnection);
@@ -134,8 +115,9 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child)
         this->entityPublisher->publish(msg);
 }
 
-void Robot::on_child_removed(std::shared_ptr<EntityBase> child)
+void Robot::on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
 {
+    std::lock_guard<std::mutex> lock(childAdded_mutex);
     std::cout << "child was removed: " << child->getName() << std::endl;
     //RegisterAllChildEvents();
     QObject::disconnect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);

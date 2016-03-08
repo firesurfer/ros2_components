@@ -21,7 +21,7 @@
 #include "ros2_components_msg/msg/new_component_added.hpp"
 #include "ros2_components/EntityFactory.h"
 #include "ConsoleColor.h"
-
+#include <mutex>
 
 namespace ros2_components
 {
@@ -81,7 +81,6 @@ public:
         };
         IterateThroughAllChilds(callbackFunc);
     }
-    void RegisterAllChildEvents();
 
     void virtual  PrintTree();
 
@@ -134,9 +133,10 @@ protected:
     }
 
 protected slots:
-    void on_child_added(std::shared_ptr<EntityBase> child);
-    void on_child_removed(std::shared_ptr<EntityBase> child);
+    virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
+    virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
 private:
+     std::mutex childAdded_mutex;
 signals:
     void remote_entity_added(std::shared_ptr<EntityBase> child);
     void remote_entity_removed(std::shared_ptr<EntityBase> child);
