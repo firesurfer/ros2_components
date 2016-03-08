@@ -85,6 +85,7 @@ public:
     void virtual  PrintTree();
 
     static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "");
+
 signals:
     void hardwareConnection(EntityBase::SharedPtr seg);
 protected:

@@ -30,8 +30,6 @@ string EntityBase::getClassName()
 
     std::string localClassName = metaObject->className();
     localClassName.erase(0, localClassName.find_last_of(":")+1);
-    // std::cout << "Local: " << localClassName << std::endl;
-    //std::cout << "test: " << this->objectName().toStdString() << std::endl;
     return className;
 }
 
@@ -41,6 +39,7 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child)
     childs.push_back(child);
     child->setParent(std::shared_ptr<EntityBase>(this));
     connect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added,Qt::DirectConnection);
+    connect(child.get(), &EntityBase::childRemoved,this, &EntityBase::on_child_removed,Qt::DirectConnection);
     emit childAdded(child,child->getParent(),0);
 }
 
@@ -55,13 +54,6 @@ void EntityBase::removeChild(std::shared_ptr<EntityBase> child)
         throw std::runtime_error("Can't remove given child - child not found!");
     disconnect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added);
     emit childRemoved(child,child->getParent(),0);
-}
-
-std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)
-{
-    if(childs.size() < index)
-        throw std::runtime_error("Index out of bounds");
-    return childs[index];
 }
 
 std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
@@ -135,9 +127,7 @@ void EntityBase::updateParameters()
 
             }
             for (auto & parameter : parameters.get()) {
-                // std::cout << "Parameter name: " << parameter.get_name() << std::endl;
-                // std::cout << "Parameter value (" << parameter.get_type_name() << "): " <<
-                //                             parameter.value_to_string() << std::endl;
+
 
                 for (auto & internal_val : internalmap)
                 {
@@ -146,13 +136,13 @@ void EntityBase::updateParameters()
 
 
                         /*
-                 * uint8 PARAMETER_NOT_SET=0
-                 * uint8 PARAMETER_BOOL=1
-                 * uint8 PARAMETER_INTEGER=2
-                 * uint8 PARAMETER_DOUBLE=3
-                 * uint8 PARAMETER_STRING=4
-                 * uint8 PARAMETER_BYTES=5
-                 */
+                         * uint8 PARAMETER_NOT_SET=0
+                         * uint8 PARAMETER_BOOL=1
+                         * uint8 PARAMETER_INTEGER=2
+                         * uint8 PARAMETER_DOUBLE=3
+                         * uint8 PARAMETER_STRING=4
+                         * uint8 PARAMETER_BYTES=5
+                         */
 
                         switch(parameter.get_type())
                         {
@@ -234,6 +224,8 @@ void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_pt
 
 void EntityBase::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth)
 {
+
+    std::cout << "child"<<child->getName()<< "removed from: " <<parent->getName() << " depth: " << depth << std::endl;
     emit childRemoved(child,parent, depth+1);
 }
 

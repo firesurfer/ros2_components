@@ -100,12 +100,6 @@ public:
      */
     virtual void removeChild(std::shared_ptr<EntityBase> child);
     /**
-     * @brief getChild
-     * @return returns the child at the specified index
-     */
-    [[deprecated]]
-    virtual std::shared_ptr<EntityBase> getChild(uint64_t index);
-    /**
      * @brief getChildById throws exeption if id isnt available
      * @param id
      * @return the child with the given id
@@ -249,6 +243,7 @@ private:
      * @brief Name of the implementing class
      */
     std::string className;
+    bool updated = false;
 
 };
 
@@ -399,6 +394,7 @@ protected:
 
 
 private:
+
     std::vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
     /**
      * @brief calls the rest of the registerd listeners

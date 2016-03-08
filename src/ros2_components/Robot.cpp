@@ -100,6 +100,8 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
     return robotIds;
 }
 
+
+
 void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
 {
     std::lock_guard<std::mutex> lock(childAdded_mutex);

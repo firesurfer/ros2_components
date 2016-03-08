@@ -29,7 +29,7 @@ public:
 
     }
 
-    template<typename T>
+    /*template<typename T>
     std::shared_ptr<T> getConcreteChild(int index)
     {
         auto ch = this->getChild(index);
@@ -37,7 +37,7 @@ public:
         if(con_ch == NULL)
             throw std::runtime_error("Wrong type - can't cast");
         return con_ch;
-    }
+    }*/
 
     template<typename T>
     std::shared_ptr<T> getConcreteChildById(int id)
