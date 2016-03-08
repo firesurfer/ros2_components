@@ -51,6 +51,7 @@ void EntityBase::removeChild(std::shared_ptr<EntityBase> child)
     }
     else
         throw std::runtime_error("Can't remove given child - child not found!");
+    emit childRemoved(child);
 }
 
 std::shared_ptr<EntityBase> EntityBase::getChild(uint64_t index)

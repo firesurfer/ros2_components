@@ -96,9 +96,6 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
         }
 
         for (auto & parameter : parameters.get()) {
-            //std::cout << "Parameter name: " << parameter.get_name() << std::endl;
-            //std::cout << "Parameter value (" << parameter.get_type_name() << "): " <<
-            //parameter.value_to_string() << std::endl;
 
             if(parameter.get_name().find(".id") != std::string::npos)
             {
@@ -126,7 +123,8 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
 void Robot::on_child_added(std::shared_ptr<EntityBase> child)
 {
     std::cout << "new child was added: " << child->getName() << std::endl;
-    RegisterAllChildEvents();
+    //RegisterAllChildEvents();
+    QObject::connect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added,Qt::DirectConnection);
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();
@@ -139,7 +137,8 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child)
 void Robot::on_child_removed(std::shared_ptr<EntityBase> child)
 {
     std::cout << "child was removed: " << child->getName() << std::endl;
-    RegisterAllChildEvents();
+    //RegisterAllChildEvents();
+    QObject::disconnect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();

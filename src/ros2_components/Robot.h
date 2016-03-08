@@ -129,6 +129,7 @@ protected:
         else
         {
             parentComp->removeChild(localComp);
+            emit remote_entity_removed(localComp);
         }
     }
 
@@ -138,6 +139,7 @@ protected slots:
 private:
 signals:
     void remote_entity_added(std::shared_ptr<EntityBase> child);
+    void remote_entity_removed(std::shared_ptr<EntityBase> child);
 
 
 
