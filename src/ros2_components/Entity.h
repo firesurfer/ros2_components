@@ -155,6 +155,7 @@ public:
      * @param func
      */
     void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
+    bool WasMetaInformationUpdated(){return updated;}
 protected:
     /**
       * @brief setParent

@@ -10,7 +10,7 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
 #Uncomment the following lines if you want to build locally without ament
-#findPackageInWorkspace(ros2_components_msg)
+findPackageInWorkspace(ros2_components_msg)
 #########################################################################
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)

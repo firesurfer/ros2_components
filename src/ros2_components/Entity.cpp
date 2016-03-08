@@ -61,7 +61,11 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
     for(auto & child: childs)
     {
         if(child->getId() == id)
+        {
+            if(!child->WasMetaInformationUpdated())
+                child->updateParameters();
             return child;
+        }
     }
     throw std::runtime_error("Child with id: " + std::to_string(id) + " not found");
 }
@@ -96,6 +100,7 @@ void EntityBase::updateParameters()
 {
 
     std::cout << "Updating Parameters" << std::endl;
+    updated = true;
     std::vector<std::string> myParameters;
     for(auto & par: internalmap)
     {
