@@ -20,7 +20,7 @@
 #include "std_msgs/msg/empty.hpp"
 #include "ros2_components_msg/msg/new_component_added.hpp"
 #include "ros2_components/EntityFactory.h"
-#include "ConsoleColor.h"
+#include "ros2_simple_logger/ConsoleColor.h"
 #include <mutex>
 
 namespace ros2_components
@@ -89,11 +89,7 @@ public:
 signals:
     void hardwareConnection(EntityBase::SharedPtr seg);
 protected:
-    std::string printMyColor(ConsoleColor color)
-    {
-        std::string col = "\033[" + std::to_string(color) + "m";
-        return col;
-    }
+
     virtual void listenerCallback(const ros2_components_msg::msg::NewComponentAdded::SharedPtr  msg)
     {
         int64_t parentId = msg->parentid;

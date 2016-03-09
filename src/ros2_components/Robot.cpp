@@ -34,14 +34,14 @@ void Robot::PrintTree()
                 else
                     std::cout << "-";
             }
-            std::cout  << printMyColor(ConsoleColor::FG_GREEN)<< child->getName()  << printMyColor(ConsoleColor::FG_DEFAULT)<< " Topic: " << child->getTopicName()<< " Previous: " << ent->getName()<< std::endl;
+            std::cout  << printInColor(child->getName(), ConsoleColor::BG_GREEN)<< " Topic: " << child->getTopicName()<< " Previous: " << ent->getName()<< std::endl;
 
             Print(child.get());
             printDepth--;
         }
     };
 
-    std::cout <<"-"<< printMyColor(ConsoleColor::FG_BLUE) << this->getName() << printMyColor(ConsoleColor::FG_DEFAULT) << std::endl;
+    std::cout <<"-"<< printInColor(this->getName(), ConsoleColor::BG_BLUE) << std::endl;
     printDepth = 2;
 
     Print(this);
@@ -115,6 +115,8 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<Ent
     msg->added = true;
     if(!this->isSubscriber())
         this->entityPublisher->publish(msg);
+    UNUSED(parent);
+    UNUSED(depth);
 }
 
 void Robot::on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
@@ -130,6 +132,8 @@ void Robot::on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<E
     msg->added = false;
     if(!this->isSubscriber())
         this->entityPublisher->publish(msg);
+    UNUSED(parent);
+    UNUSED(depth);
 }
 
 }

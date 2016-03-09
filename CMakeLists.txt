@@ -11,6 +11,7 @@ if(NOT WIN32)
 endif()
 #Uncomment the following lines if you want to build locally without ament
 findPackageInWorkspace(ros2_components_msg)
+findPackageInWorkspace(ros2_simple_logger)
 #########################################################################
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
@@ -19,6 +20,7 @@ find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(ros2_components_msg REQUIRED)
+find_package(ros2_simple_logger REQUIRED)
 #find_package(tf2 REQUIRED)
 #find_package(tf2_ros REQUIRED)
 #find_package(tf2_msgs REQUIRED)
@@ -33,7 +35,8 @@ include_directories(
     ${rclcpp_INCLUDE_DIRS}
     ${rmw_INCLUDE_DIRS}
     ${rmw_implementation_INCLUDE_DIRS}
- ${ros2_components_msg_INCLUDE_DIRS}
+    ${ros2_components_msg_INCLUDE_DIRS}
+    ${ros2_simple_logger_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
 )
 file(GLOB SRC_FILES
@@ -48,7 +51,8 @@ target_link_libraries(ros2_components
     ${rclcpp_LIBRARIES}
     ${rmw_LIBRARIES}
     ${rmw_implementation_LIBRARIES}
-${ros2_components_msg_LIBRARIES}
+    ${ros2_components_msg_LIBRARIES}
+    ${ros2_simple_logger_LIBRARIES}
     -pthread
     Qt5::Core
 
