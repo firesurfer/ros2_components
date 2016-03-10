@@ -9,6 +9,8 @@ include(findPackageInWorkspace.cmake)
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra")
 endif()
+
+#use cmake -DLocalBuild=ON
 option(LocalBuild "LocalBuild" OFF)
 if(LocalBuild)
 findPackageInWorkspace(ros2_components_msg)
