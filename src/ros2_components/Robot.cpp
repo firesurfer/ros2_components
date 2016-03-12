@@ -105,9 +105,12 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
 void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
 {
     std::lock_guard<std::mutex> lock(childAdded_mutex);
-    std::cout << "new child was added: " << child->getName() << std::endl;
-    //RegisterAllChildEvents();
-    QObject::connect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added,Qt::DirectConnection);
+    std::cout << "new child was added: " << child->getName() <<" sender:" << ((EntityBase*)QObject::sender())->getName() << " depth:"<< depth<< std::endl;
+
+
+
+
+
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();
@@ -122,9 +125,10 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<Ent
 void Robot::on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
 {
     std::lock_guard<std::mutex> lock(childAdded_mutex);
+
     std::cout << "child was removed: " << child->getName() << std::endl;
-    //RegisterAllChildEvents();
-    QObject::disconnect(child.get(), &EntityBase::childAdded,this, &Robot::on_child_added);
+
+
     ros2_components_msg::msg::NewComponentAdded::SharedPtr msg = std::make_shared<ros2_components_msg::msg::NewComponentAdded>();
     msg->componentid =child->getId();
     msg->componenttype= child->getClassName();
