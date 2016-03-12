@@ -112,6 +112,7 @@ protected:
             }
         };
         IterateThroughAllChilds(func);
+
         if(added)
         {
             QGenericArgument idArg = Q_ARG(int64_t, componentId);
@@ -120,6 +121,7 @@ protected:
 
             EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
             parentComp->addChild(comp);
+
             emit remote_entity_added(comp);
         }
         else

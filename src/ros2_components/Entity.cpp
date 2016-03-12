@@ -62,8 +62,9 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
     {
         if(child->getId() == id)
         {
-            if(!child->WasMetaInformationUpdated())
-                child->updateParameters();
+            //Do to bug in ROS 2 this might throw an exception
+            //if(!child->WasMetaInformationUpdated())
+                //child->updateParameters();
             return child;
         }
     }

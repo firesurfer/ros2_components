@@ -48,7 +48,7 @@ public:
         for(auto & child: this->getAllChilds())
         {
             std::shared_ptr<ActorType> actor = dynamic_pointer_cast<ActorType>(child);
-            auto dummyForUpdate = this->getChildById(actor->getId());
+            //auto dummyForUpdate = this->getChildById(actor->getId());
             if(actor != NULL)
                 return  actor;
         }
@@ -61,7 +61,7 @@ public:
         for(auto & child: this->getAllChilds())
         {
             std::shared_ptr<SensorType> sensor = dynamic_pointer_cast<SensorType>(child);
-             auto dummyForUpdate = this->getChildById(sensor->getId());
+             //auto dummyForUpdate = this->getChildById(sensor->getId());
             if(sensor != NULL)
                 return  sensor;
         }

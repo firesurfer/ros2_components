@@ -34,14 +34,14 @@ void Robot::PrintTree()
                 else
                     std::cout << "-";
             }
-            std::cout  << printInColor(child->getName(), ConsoleColor::BG_GREEN)<< " Topic: " << child->getTopicName()<< " Previous: " << ent->getName()<< std::endl;
+            std::cout  << printInColor(child->getName(), ConsoleColor::FG_GREEN)<< " Topic: " << child->getTopicName()<< " Previous: " << ent->getName()<< std::endl;
 
             Print(child.get());
             printDepth--;
         }
     };
 
-    std::cout <<"-"<< printInColor(this->getName(), ConsoleColor::BG_BLUE) << std::endl;
+    std::cout <<"-"<< printInColor(this->getName(), ConsoleColor::FG_BLUE) << std::endl;
     printDepth = 2;
 
     Print(this);
