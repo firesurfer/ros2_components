@@ -59,8 +59,7 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
     }
     auto parameter_list_future = parameters_client->list_parameters(possiblePrefixes, 10);
 
-    if (rclcpp::spin_until_future_complete(_parentNode, parameter_list_future) !=
-            rclcpp::executor::FutureReturnCode::SUCCESS)
+    if (parameter_list_future.wait_for(5_s) != std::future_status::ready)
     {
         throw std::runtime_error("Could not contact parameterServer");
     }
@@ -68,8 +67,7 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
     for (auto & name : parameter_list.names) {
 
         auto parameters = parameters_client->get_parameters({name});
-        if (rclcpp::spin_until_future_complete(_parentNode, parameters) !=
-                rclcpp::executor::FutureReturnCode::SUCCESS)
+        if (parameters.wait_for(5_s) != std::future_status::ready)
         {
 
             throw std::runtime_error("Could not contact parameterServer");

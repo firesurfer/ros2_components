@@ -38,6 +38,7 @@
 #include <QObject>
 #include <QMetaObject>
 #include <QMetaProperty>
+#include "ros2_simple_logger/Logger.h"
 using namespace std;
 using namespace std::placeholders;
 namespace ros2_components
@@ -290,6 +291,7 @@ public:
             entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
             subBase = entitySubscription;
         }
+
         std::cout << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
 
 
