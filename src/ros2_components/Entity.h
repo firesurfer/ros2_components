@@ -94,12 +94,12 @@ public:
      * @brief addChild
      * @return adds a child to the childs vector
      */
-    virtual void addChild(std::shared_ptr<EntityBase> child);
+    virtual void addChild(std::shared_ptr<EntityBase> child, bool remote =false);
     /**
      * @brief removeChild Removes the given child
      * @param child child to remote
      */
-    virtual void removeChild(std::shared_ptr<EntityBase> child);
+    virtual void removeChild(std::shared_ptr<EntityBase> child, bool remote = false);
     /**
      * @brief getChildById throws exeption if id isnt available
      * @param id
@@ -217,11 +217,11 @@ protected:
      */
     std::string description;
 protected slots:
-     virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
-     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
+     virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
+     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
 signals:
-    void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth);
-    void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth);
+    void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
+    void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void parametersUpdated();
     void newData();
 

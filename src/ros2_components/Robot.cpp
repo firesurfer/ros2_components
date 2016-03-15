@@ -100,8 +100,10 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
 
 
 
-void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
+void Robot::on_child_added(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
 {
+    if(remote)
+        return;
     std::lock_guard<std::mutex> lock(childAdded_mutex);
     std::cout << "new child was added: " << child->getName() <<" sender:" << ((EntityBase*)QObject::sender())->getName() << " depth:"<< depth<< std::endl;
 
@@ -120,8 +122,10 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<Ent
     UNUSED(depth);
 }
 
-void Robot::on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth)
+void Robot::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
 {
+    if(remote)
+        return;
     std::lock_guard<std::mutex> lock(childAdded_mutex);
 
     std::cout << "child was removed: " << child->getName() << std::endl;

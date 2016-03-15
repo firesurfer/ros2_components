@@ -120,7 +120,7 @@ protected:
             QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, parentNode);
 
             EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
-            parentComp->addChild(comp);
+            parentComp->addChild(comp, true);
 
             emit remote_entity_added(comp);
         }
@@ -132,8 +132,8 @@ protected:
     }
 
 protected slots:
-    virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
-    virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth);
+    virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
+    virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
 private:
      std::mutex childAdded_mutex;
 signals:
