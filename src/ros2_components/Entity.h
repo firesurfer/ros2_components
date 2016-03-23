@@ -318,7 +318,7 @@ public:
             using namespace std::placeholders;
             entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
         }
-        //updateParameters();
+
     }
 
     virtual ~Entity() {

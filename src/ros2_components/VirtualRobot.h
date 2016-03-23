@@ -59,7 +59,13 @@ public:
      * @return the amount of stored robot entities
      */
     int  virtual CountRobots() = 0;
-
+    /**
+     * @brief ListKnownVirtualRobots
+     * @param _parentNode
+     * @param prefix
+     * @return Vector of virtual robots ids in the parameter server
+     */
+    static std::vector<int64_t> ListKnownVirtualRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "");
 
 
 
