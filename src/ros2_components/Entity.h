@@ -39,6 +39,10 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 #include "ros2_simple_logger/Logger.h"
+
+Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)
+Q_DECLARE_METATYPE(std::string)
+
 using namespace std;
 using namespace std::placeholders;
 namespace ros2_components
@@ -52,8 +56,7 @@ public:
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
 
-
-
+   
     Q_PROPERTY(bool active READ isActive)
     Q_PROPERTY(int64_t id READ getId)
     Q_PROPERTY(std::string className READ getClassName)
