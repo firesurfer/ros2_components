@@ -20,7 +20,7 @@ std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string classNa
         throw std::runtime_error("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
-    std::cout << "Class name from staticMetaObject: " << meta->className() << std::endl;
+    LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;
 
     QObject *o = meta->newInstance(arg1,arg2,arg3);
     EntityBase* ptr = dynamic_cast<EntityBase*>(o);
@@ -36,7 +36,7 @@ std::shared_ptr<QMetaObject> EntityFactory::GetQMetaObject(string className)
         throw std::runtime_error("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
-    std::cout << "Class name from staticMetaObject: " << meta->className() << std::endl;
+    LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;
     return std::shared_ptr<QMetaObject>(const_cast<QMetaObject*>(meta));
 }
 }

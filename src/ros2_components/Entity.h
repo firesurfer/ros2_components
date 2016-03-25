@@ -295,7 +295,7 @@ public:
             subBase = entitySubscription;
         }
 
-        std::cout << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
+        LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
 
 
     }
