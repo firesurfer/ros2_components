@@ -141,7 +141,7 @@ public:
      */
     virtual bool isActive(){return active;}
     void setActive(bool act){this->active = act;}
-    virtual std::string getDescription(){return this->getDescription();}
+    virtual std::string getDescription(){return this->description;}
     virtual void setDescription(std::string des){this->description = des;}
 
     /**
