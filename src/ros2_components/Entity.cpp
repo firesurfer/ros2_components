@@ -102,18 +102,17 @@ string EntityBase::getTopicName()
 void EntityBase::updateParameters()
 {
 
-    std::cout << "Updating Parameters" << std::endl;
+    LOG(LogLevel::Info) << "Updating Parameters" << std::endl;
     updated = true;
     std::vector<std::string> myParameters;
     for(auto & par: internalmap)
     {
         myParameters.push_back(getName()+ "."+par->key);
-        //std::cout << "Key: " << par->key<<std::endl;
     }
-    auto parameter_list_future = parameterClient->list_parameters(myParameters, 10);
+    auto parameter_list_future = parameterClient->list_parameters(myParameters, 3);
     if (parameter_list_future.wait_for(10_s) != std::future_status::ready)
     {
-        std::cout <<"list_parameters service call failed"<< std::endl;
+        LOG(LogLevel::Fatal) <<"list_parameters service call failed"<< std::endl;
         return;
     }
     auto parameter_list = parameter_list_future.get();
@@ -129,7 +128,8 @@ void EntityBase::updateParameters()
             auto parameters = parameterClient->get_parameters({name});
             if (parameters.wait_for(10_s) != std::future_status::ready)
             {
-                printf("get_parameters service call failed. Exiting example.\n");
+                LOG(LogLevel::Fatal) <<"get parameters service call failed"<< std::endl;
+                return;
 
             }
             for (auto & parameter : parameters.get()) {

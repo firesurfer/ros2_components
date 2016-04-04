@@ -27,6 +27,7 @@ std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string classNa
     if(ptr == NULL)
         throw std::runtime_error("Could not cast QObject* to EntityBase* - The EntityFactory is for Entities only");
     std::shared_ptr<EntityBase> sptr(ptr);
+    LOG(LogLevel::Debug) << "Successfully created new entity: " << sptr->getName() << std::endl;
     return sptr;
 }
 
