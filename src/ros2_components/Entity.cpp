@@ -12,7 +12,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     REFLECT(virtualEntity);
     REFLECT(className);
     REFLECT(active)
-    qRegisterMetaType<int64_t>("int64_t");
+            qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
 }
 
@@ -28,7 +28,7 @@ string EntityBase::getName()
 
 string EntityBase::getClassName()
 {
-   /* const QMetaObject* metaObject = this->metaObject();
+    /* const QMetaObject* metaObject = this->metaObject();
 
     std::string localClassName = metaObject->className();
     localClassName.erase(0, localClassName.find_last_of(":")+1);*/
@@ -66,7 +66,7 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
         {
             //Do to bug in ROS 2 this might throw an exception
             //if(!child->WasMetaInformationUpdated())
-                //child->updateParameters();
+            //child->updateParameters();
             return child;
         }
     }
@@ -109,39 +109,27 @@ void EntityBase::updateParameters()
     {
         myParameters.push_back(getName()+ "."+par->key);
     }
-    auto parameter_list_future = parameterClient->list_parameters(myParameters, 3);
-    if (parameter_list_future.wait_for(10_s) != std::future_status::ready)
+
+    auto parameters = parameterClient->get_parameters({myParameters});
+
+    if (parameters.wait_for(10_s) != std::future_status::ready)
     {
-        LOG(LogLevel::Fatal) <<"list_parameters service call failed"<< std::endl;
+        LOG(LogLevel::Fatal) <<"get parameters service call failed"<< std::endl;
         return;
+
     }
-    auto parameter_list = parameter_list_future.get();
-    for (auto & name : parameter_list.names) {
-        std::string reducedParameter = name;
+    for (auto & parameter : parameters.get())
+    {
+
+        std::string reducedParameter = parameter.get_name();
         reducedParameter.erase(0,reducedParameter.find_last_of(".")+1);
-
-        // std::cout << "Name: " << name << " Reduced: " << reducedParameter << std::endl;
-
-        if(std::find(myParameters.begin(), myParameters.end(), name) != myParameters.end() )
+        for (auto & internal_val : internalmap)
         {
-            //std::cout << "Found it!" << std::endl;
-            auto parameters = parameterClient->get_parameters({name});
-            if (parameters.wait_for(10_s) != std::future_status::ready)
+            if(internal_val->key == reducedParameter)
             {
-                LOG(LogLevel::Fatal) <<"get parameters service call failed"<< std::endl;
-                return;
-
-            }
-            for (auto & parameter : parameters.get()) {
 
 
-                for (auto & internal_val : internalmap)
-                {
-                    if(internal_val->key == reducedParameter)
-                    {
-
-
-                        /*
+                /*
                          * uint8 PARAMETER_NOT_SET=0
                          * uint8 PARAMETER_BOOL=1
                          * uint8 PARAMETER_INTEGER=2
@@ -150,51 +138,51 @@ void EntityBase::updateParameters()
                          * uint8 PARAMETER_BYTES=5
                          */
 
-                        switch(parameter.get_type())
-                        {
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_BOOL:
-                        {
-                            SpecificElement<bool>* elem = static_cast<SpecificElement<bool>*>(internal_val);
-                            elem->setValue(parameter.as_bool());
-                            break;
-                        }
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_INTEGER:
-                        {
-                            SpecificElement<int64_t>* elem = static_cast<SpecificElement<int64_t>*>(internal_val);
-                            elem->setValue(parameter.as_int());
-                            break;
-                        }
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE:
-                        {
-                            SpecificElement<double>* elem = static_cast<SpecificElement<double>*>(internal_val);
-                            elem->setValue(parameter.as_double());
-                            break;
-                        }
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_STRING:
-                        {
-                            SpecificElement<std::string>* elem = static_cast<SpecificElement<std::string>*>(internal_val);
-                            elem->setValue(parameter.as_string());
-                            break;
-                        }
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_BYTES:
-                        {
-                            SpecificElement<std::vector<uint8_t>>* elem = static_cast<SpecificElement<std::vector<uint8_t>>*>(internal_val);
-                            elem->setValue(parameter.as_bytes());
-                            break;
-                        }
-                        case rcl_interfaces::msg::ParameterType::PARAMETER_NOT_SET:
-                        {
-                            break;
-                        }
-
-                        }
-
-                    }
+                switch(parameter.get_type())
+                {
+                case rcl_interfaces::msg::ParameterType::PARAMETER_BOOL:
+                {
+                    SpecificElement<bool>* elem = static_cast<SpecificElement<bool>*>(internal_val);
+                    elem->setValue(parameter.as_bool());
+                    break;
                 }
+                case rcl_interfaces::msg::ParameterType::PARAMETER_INTEGER:
+                {
+                    SpecificElement<int64_t>* elem = static_cast<SpecificElement<int64_t>*>(internal_val);
+                    elem->setValue(parameter.as_int());
+                    break;
+                }
+                case rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE:
+                {
+                    SpecificElement<double>* elem = static_cast<SpecificElement<double>*>(internal_val);
+                    elem->setValue(parameter.as_double());
+                    break;
+                }
+                case rcl_interfaces::msg::ParameterType::PARAMETER_STRING:
+                {
+                    SpecificElement<std::string>* elem = static_cast<SpecificElement<std::string>*>(internal_val);
+                    elem->setValue(parameter.as_string());
+                    break;
+                }
+                case rcl_interfaces::msg::ParameterType::PARAMETER_BYTES:
+                {
+                    SpecificElement<std::vector<uint8_t>>* elem = static_cast<SpecificElement<std::vector<uint8_t>>*>(internal_val);
+                    elem->setValue(parameter.as_bytes());
+                    break;
+                }
+                case rcl_interfaces::msg::ParameterType::PARAMETER_NOT_SET:
+                {
+                    break;
+                }
+
+                }
+
             }
         }
     }
-    emit parametersUpdated();
+
+
+emit parametersUpdated();
 }
 
 void EntityBase::publishMetaInformation()
@@ -210,7 +198,7 @@ void EntityBase::publishMetaInformation()
     auto set_parameters_results = this->parameterClient->set_parameters(params);
     if (set_parameters_results.wait_for(20_s) != std::future_status::ready)
     {
-       throw std::runtime_error("Couldn't access parameter server!");
+        throw std::runtime_error("Couldn't access parameter server!");
 
     }
 
@@ -230,7 +218,7 @@ string EntityBase::getAutogeneratedClassName()
 void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent,int depth, bool remote)
 {
     if(parent != NULL && child != NULL)
-       LOG(LogLevel::Info) << "child"<<child->getName()<< "added to: " <<parent->getName() << " depth: " << depth << std::endl;
+        LOG(LogLevel::Info) << "child"<<child->getName()<< "added to: " <<parent->getName() << " depth: " << depth << std::endl;
     emit childAdded(child,parent, depth+1,remote);
 }
 
