@@ -226,7 +226,7 @@ signals:
     void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void parametersUpdated();
-    void newData();
+    void newData(EntityBase* ent);
 
 private:
     /**
@@ -326,6 +326,7 @@ public:
 
     virtual ~Entity() {
 
+        LOG(LogLevel::Info) << "Destroying: " << this->getName() << std::endl;
         this->active = false;
         publishMetaInformation();
     }
@@ -411,7 +412,7 @@ private:
         if(msg)
         {
             listenerCallback(msg);
-            emit newData();
+            emit newData(this);
             for(auto listener : listeners) {
                 listener(msg);
             }
