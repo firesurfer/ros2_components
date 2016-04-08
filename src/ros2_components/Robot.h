@@ -86,6 +86,83 @@ public:
 
     static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "");
 
+    template<typename T>
+    static std::shared_ptr<T> RebuildRobotFromId(int64_t id, std::shared_ptr<rclcpp::node::Node> _parentNode )
+    {
+        std::cout << "Building Robot from id: " << id <<std::endl;
+
+
+        auto reqFunc = [&] (int64_t _id, std::shared_ptr<rclcpp::node::Node> _node, std::string basename) -> ros2_components_msg::srv::ListChilds::Response::SharedPtr
+        {
+            std::string name = basename+std::to_string(_id)+"_srv";
+            std::cout << "Looking for service with name: " << name << std::endl;
+            auto client = _node->create_client<ros2_components_msg::srv::ListChilds>(name);
+
+            auto request = std::make_shared<ros2_components_msg::srv::ListChilds::Request>();
+            auto result = client->async_send_request(request);
+
+            // Wait for the result.
+
+            if (result.wait_for(15_s) == std::future_status::ready)
+            {
+                return result.get();
+            }
+            else
+                throw std::runtime_error("Could not contact robot");
+
+
+        };
+
+
+        QGenericArgument idArg = Q_ARG(int64_t, id);
+        QGenericArgument subscribeArg = Q_ARG(bool, true);
+        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, _parentNode);
+
+        std::shared_ptr<T> robot =std::make_shared<T>(id,true,_parentNode);
+        EntityBase::SharedPtr robotAsBaseEntity = dynamic_pointer_cast<T>(robot);
+        //dynamic_pointer_cast<T>(EntityFactory::CreateInstanceFromName(robotType, idArg, subscribeArg, nodeArg));
+
+        std::function<void(std::shared_ptr<ros2_components_msg::srv::ListChilds::Response> ,EntityBase::SharedPtr )> rec_req = [&](std::shared_ptr<ros2_components_msg::srv::ListChilds::Response> response,EntityBase::SharedPtr parent)
+        {
+            for(uint64_t i = 0; i< response->childids.size(); i++)
+            {
+
+                int64_t compId = response->childids[i];
+                idArg = Q_ARG(int64_t, compId);
+                std::cout <<response->childtypes[i]<< std::endl;
+                if(response->childtypes[i].find("Actor") != std::string::npos)
+                {
+                    std::cout << "Created  actor with id:" << compId << std::endl;
+                    subscribeArg = Q_ARG(bool, false);
+
+                }
+                else
+                {
+                    std::cout << "Creating sensor with id:" << compId << std::endl;
+                    subscribeArg = Q_ARG(bool, true);
+                }
+
+                EntityBase::SharedPtr child = EntityFactory::CreateInstanceFromName(response->childtypes[i], idArg,subscribeArg,nodeArg);
+
+                parent->addChild(child);
+                auto nextRes = reqFunc(compId, _parentNode, response->childtypes[i]);
+                rec_req(nextRes, child);
+            }
+
+        };
+        auto res = reqFunc(id, _parentNode, robotAsBaseEntity->getClassName());
+        rec_req(res,robot);
+
+
+        auto func = [&](EntityBase::SharedPtr base)
+        {
+            base->updateParameters();
+        };
+        robot->IterateThroughAllChilds(func);
+        std::cout << "Creation of robot finished - have fun!" << std::endl;
+        return robot;
+    }
+
 signals:
     void hardwareConnection(EntityBase::SharedPtr seg);
 protected:
