@@ -48,7 +48,7 @@ using namespace std::placeholders;
 namespace ros2_components
 {
 
-class EntityBase : public QObject
+class EntityBase : public QObject, public std::enable_shared_from_this<EntityBase>
 {
     Q_OBJECT
 public:
@@ -250,6 +250,7 @@ private:
     std::string className;
     bool updated = false;
 
+
 };
 
 
@@ -326,9 +327,9 @@ public:
 
     virtual ~Entity() {
 
-        LOG(LogLevel::Info) << "Destroying: " << this->getName() << std::endl;
-        this->active = false;
-        publishMetaInformation();
+       // LOG(LogLevel::Info) << "Destroying: " << this->getName() << std::endl;
+        //this->active = false;
+        //publishMetaInformation();
     }
 
     /**

@@ -14,6 +14,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     REFLECT(active)
             qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
+
 }
 
 int64_t EntityBase::getId()
@@ -39,7 +40,7 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
 {
     LOG(LogLevel::Info) << "addChild called with: " << child->getName() << std::endl;
     childs.push_back(child);
-    child->setParent(std::shared_ptr<EntityBase>(this));
+    child->setParent(shared_from_this());
     connect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added,Qt::DirectConnection);
     connect(child.get(), &EntityBase::childRemoved,this, &EntityBase::on_child_removed,Qt::DirectConnection);
     emit childAdded(child,child->getParent(),0,remote);
