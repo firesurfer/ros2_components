@@ -89,13 +89,13 @@ public:
     template<typename T>
     static std::shared_ptr<T> RebuildRobotFromId(int64_t id, std::shared_ptr<rclcpp::node::Node> _parentNode )
     {
-        std::cout << "Building Robot from id: " << id <<std::endl;
+        LOG(LogLevel::Info) << "Building Robot from id: " << id <<std::endl;
 
 
         auto reqFunc = [&] (int64_t _id, std::shared_ptr<rclcpp::node::Node> _node, std::string basename) -> ros2_components_msg::srv::ListChilds::Response::SharedPtr
         {
             std::string name = basename+std::to_string(_id)+"_srv";
-            std::cout << "Looking for service with name: " << name << std::endl;
+            LOG(LogLevel::Debug) << "Looking for service with name: " << name << std::endl;
             auto client = _node->create_client<ros2_components_msg::srv::ListChilds>(name);
 
             auto request = std::make_shared<ros2_components_msg::srv::ListChilds::Request>();
@@ -129,16 +129,16 @@ public:
 
                 int64_t compId = response->childids[i];
                 idArg = Q_ARG(int64_t, compId);
-                std::cout <<response->childtypes[i]<< std::endl;
+                LOG(LogLevel::Debug) <<response->childtypes[i]<< std::endl;
                 if(response->childtypes[i].find("Actor") != std::string::npos)
                 {
-                    std::cout << "Created  actor with id:" << compId << std::endl;
+                    LOG(LogLevel::Debug) << "Created  actor with id:" << compId << std::endl;
                     subscribeArg = Q_ARG(bool, false);
 
                 }
                 else
                 {
-                    std::cout << "Creating sensor with id:" << compId << std::endl;
+                    LOG(LogLevel::Debug) << "Creating sensor with id:" << compId << std::endl;
                     subscribeArg = Q_ARG(bool, true);
                 }
 
@@ -159,7 +159,7 @@ public:
             base->updateParameters();
         };
         robot->IterateThroughAllChilds(func);
-        std::cout << "Creation of robot finished - have fun!" << std::endl;
+        LOG(LogLevel::Info) << "Creation of robot finished: "<<robot->getName() << std::endl;
         return robot;
     }
 
@@ -197,6 +197,8 @@ protected:
             QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, parentNode);
 
             EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
+            if(comp == NULL)
+                throw std::runtime_error("Could not rebuild new component");
             parentComp->addChild(comp, true);
 
             emit remote_entity_added(comp);
@@ -212,7 +214,7 @@ protected slots:
     virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
 private:
-     std::mutex childAdded_mutex;
+    std::mutex childAdded_mutex;
 signals:
     void remote_entity_added(std::shared_ptr<EntityBase> child);
     void remote_entity_removed(std::shared_ptr<EntityBase> child);
