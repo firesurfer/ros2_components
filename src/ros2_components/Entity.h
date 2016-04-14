@@ -338,7 +338,7 @@ public:
      */
     virtual bool publish()
     {
-        std::cout << "Entity:Please override publish function" << std::endl;
+        LOG(Error) << "Entity:Please override publish function" << std::endl;
         return true;
 
     }
@@ -349,7 +349,7 @@ public:
     void addListener(std::function<void(typename MessageType::SharedPtr)> listener)
     {
         listeners.push_back(listener);
-        std::cout << "added listener to: "<< this << std::endl;
+        LOG(Debug) << "added listener to: "<< this << std::endl;
     }
     /**
      * @brief tell the word we have new meta information (Like is a lidar mounted upside down)

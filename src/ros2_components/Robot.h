@@ -189,7 +189,12 @@ protected:
             }
         };
         IterateThroughAllChilds(func);
-
+        if(parentComp == NULL)
+        {
+            LOG(Warning) << "Could not find parent component to new reported component: " << componentId << " : " << componentType << " : " << "Parent should have id: " << parentId << std::endl;
+            LOG(Fatal) << "This could result into a not correctly rebuild robot model" << std::endl;
+            return;
+        }
         if(added)
         {
             QGenericArgument idArg = Q_ARG(int64_t, componentId);
@@ -199,6 +204,7 @@ protected:
             EntityBase::SharedPtr comp = EntityFactory::CreateInstanceFromName(componentType, idArg, subscribeArg, nodeArg);
             if(comp == NULL)
                 throw std::runtime_error("Could not rebuild new component");
+
             parentComp->addChild(comp, true);
 
             emit remote_entity_added(comp);
