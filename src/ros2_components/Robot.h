@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 <copyright holder> <email>
+ * Copyright 2016 <Lennart Nachtigall> <firesurfer65@yahoo.de>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #pragma once
 #include "ros2_components/Entity.h"
 #include "std_msgs/msg/empty.hpp"
@@ -69,6 +68,7 @@ public:
             rec_func(seg);
         }
     }
+
     template<typename T>
     void IterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
     {
