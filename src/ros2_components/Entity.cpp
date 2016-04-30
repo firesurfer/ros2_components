@@ -268,9 +268,15 @@ void EntityBase::Advertise(AdvertisementType type)
         msg->advertisementtype = (int)type;
         msg->id = getId();
         if(getParent() != NULL)
+        {
             msg->parent = getParent()->getId();
+            msg->parenttype = getParent()->getClassName();
+        }
         else
+        {
             msg->parent = -1;
+            msg->parenttype = "";
+        }
         msg->type = this->className;
         builtin_interfaces::msg::Time time;
         simpleLogger::set_now(time);
