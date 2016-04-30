@@ -200,7 +200,7 @@ void EntityBase::updateParameters()
     }
 
 
-emit parametersUpdated();
+    emit parametersUpdated();
 }
 
 void EntityBase::publishMetaInformation()
@@ -257,6 +257,36 @@ void EntityBase::IterateThroughAllProperties(std::function<void(QMetaProperty)> 
             func(metaObj->property(i));
         }
         metaObj = metaObj->superClass();
+    }
+}
+
+void EntityBase::Advertise(AdvertisementType type)
+{
+    if(this->advertisementPublisher != NULL)
+    {
+        ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg = std::make_shared<ros2_components_msg::msg::EntityAdvertisement>();
+        msg->advertisementtype = (int)type;
+        msg->id = getId();
+        if(getParent() != NULL)
+            msg->parent = getParent()->getId();
+        else
+            msg->parent = -1;
+        msg->type = this->className;
+        builtin_interfaces::msg::Time time;
+        simpleLogger::set_now(time);
+        msg->stamp = time;
+
+        std::vector<int64_t> ids;
+        for(auto & child: childs)
+        {
+            msg->childtypes.push_back(child->getClassName());
+            ids.push_back(child->getId());
+
+        }
+        msg->childids = ids;
+        msg->name = getName();
+        advertisementPublisher->publish(msg);
+
     }
 }
 
