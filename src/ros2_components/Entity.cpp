@@ -237,12 +237,15 @@ void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_pt
 {
     if(parent != NULL && child != NULL)
         LOG(LogLevel::Info) << "child"<<child->getName()<< "added to: " <<parent->getName() << " depth: " << depth << std::endl;
+    if(!isSubscriber() && advertised)
+        Advertise(Change);
     emit childAdded(child,parent, depth+1,remote);
 }
 
 void EntityBase::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
 {
-
+    if(!isSubscriber() && advertised)
+        Advertise(Change);
     LOG(LogLevel::Info) << "child"<<child->getName()<< "removed from: " <<parent->getName() << " depth: " << depth << std::endl;
     emit childRemoved(child,parent, depth+1,remote);
 }
@@ -264,6 +267,7 @@ void EntityBase::Advertise(AdvertisementType type)
 {
     if(this->advertisementPublisher != NULL)
     {
+        advertised = true;
         ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg = std::make_shared<ros2_components_msg::msg::EntityAdvertisement>();
         msg->advertisementtype = (int)type;
         msg->id = getId();

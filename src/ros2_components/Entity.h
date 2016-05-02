@@ -257,6 +257,7 @@ private:
      */
     std::string className;
     bool updated = false;
+    bool advertised = false;
 
 
 };
@@ -292,9 +293,11 @@ public:
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", custom_qos_profile);
             pubBase = entityPublisher;
             using namespace std::placeholders;
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
+
             //std::cout << "Started service with name:"<< getName()+"_srv"<< std::endl;
         }
         else

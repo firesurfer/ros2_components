@@ -221,6 +221,7 @@ protected slots:
     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
 private:
     std::mutex childAdded_mutex;
+
 signals:
     void remote_entity_added(std::shared_ptr<EntityBase> child);
     void remote_entity_removed(std::shared_ptr<EntityBase> child);
