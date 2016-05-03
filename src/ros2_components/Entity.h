@@ -58,7 +58,7 @@ public:
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
 
-
+    Q_ENUM(AdvertisementType)
     Q_PROPERTY(bool active READ isActive)
     Q_PROPERTY(int64_t id READ getId)
     Q_PROPERTY(std::string className READ getClassName)

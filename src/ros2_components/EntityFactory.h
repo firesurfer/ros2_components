@@ -64,6 +64,13 @@ public:
      * @return
      */
     static std::shared_ptr<QMetaObject> GetQMetaObject(std::string className);
+    /**
+     * @brief Contains
+     * @param className
+     * @return True if the given className is available
+     */
+    static bool Contains(std::string className);
+
 signals:
 
 public slots:

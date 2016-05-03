@@ -10,5 +10,6 @@ typedef enum
 
 }AdvertisementType;
 
+
 #endif // ADVERTISEMENTTYPE_H
 

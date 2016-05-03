@@ -57,4 +57,13 @@ std::shared_ptr<QMetaObject> EntityFactory::GetQMetaObject(string className)
     LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;
     return std::shared_ptr<QMetaObject>(const_cast<QMetaObject*>(meta));
 }
+
+bool EntityFactory::Contains(string className)
+{
+    QString name = QString::fromStdString(className);
+    if(metaObjs.contains(name))
+        return true;
+    else
+        return false;
+}
 }
