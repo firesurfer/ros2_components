@@ -34,6 +34,11 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
 
 }
 
+EntityBase::~EntityBase()
+{
+    std::cout << "Destroying: " << getName() << std::endl;
+}
+
 int64_t EntityBase::getId()
 {
     return id;
@@ -55,7 +60,7 @@ string EntityBase::getClassName()
 
 void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
 {
-    LOG(LogLevel::Info) << "addChild called with: " << child->getName() << std::endl;
+    LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << "From: " << getName()<< std::endl;
     childs.push_back(child);
     child->setParent(shared_from_this());
     connect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added,Qt::DirectConnection);
@@ -237,8 +242,13 @@ void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_pt
 {
     if(parent != NULL && child != NULL)
         LOG(LogLevel::Info) << "child"<<child->getName()<< "added to: " <<parent->getName() << " depth: " << depth << std::endl;
+
+
     if(!isSubscriber() && advertised)
+    {
+
         Advertise(Change);
+    }
     emit childAdded(child,parent, depth+1,remote);
 }
 
@@ -267,6 +277,7 @@ void EntityBase::Advertise(AdvertisementType type)
 {
     if(this->advertisementPublisher != NULL)
     {
+        LOG(Debug) << "Advertising:" << getName() << std::endl;
         advertised = true;
         ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg = std::make_shared<ros2_components_msg::msg::EntityAdvertisement>();
         msg->advertisementtype = (int)type;

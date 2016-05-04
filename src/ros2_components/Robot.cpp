@@ -120,7 +120,7 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child, std::shared_ptr<En
     if(remote)
         return;
     std::lock_guard<std::mutex> lock(childAdded_mutex);
-    LOG(LogLevel::Info) << "new child was added: " << child->getName() <<" sender:" << ((EntityBase*)QObject::sender())->getName() << " depth:"<< depth<< std::endl;
+    LOG(LogLevel::Info) << "In Robot: " <<"new child was added: " << child->getName() <<" sender:" << ((EntityBase*)QObject::sender())->getName() << " depth:"<< depth<< std::endl;
 
 
 

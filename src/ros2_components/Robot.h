@@ -30,7 +30,7 @@ class Robot :  public Entity< ros2_components_msg::msg::NewComponentAdded>
     Q_OBJECT
 public:
     typedef  std::shared_ptr<Robot> SharedPtr ;
-    Robot( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode, std::string  _name);
+    Q_INVOKABLE Robot( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode, std::string  _name);
 
     template<typename T>
     std::vector<std::shared_ptr<T>> GetAllChildsOfType()
