@@ -58,7 +58,7 @@ public:
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
     virtual ~EntityBase();
-    Q_ENUM(AdvertisementType)
+    //Q_ENUM(AdvertisementType::Enum)
     Q_PROPERTY(bool active READ isActive)
     Q_PROPERTY(int64_t id READ getId)
     Q_PROPERTY(std::string className READ getClassName)
@@ -162,7 +162,7 @@ public:
      */
     void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
     bool WasMetaInformationUpdated(){return updated;}
-    void Advertise(AdvertisementType type = AdvertisementType::Unknown);
+    void Advertise(AdvertisementType::Enum type = AdvertisementType::Enum::Unknown);
 protected:
     /**
       * @brief setParent

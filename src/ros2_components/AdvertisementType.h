@@ -1,6 +1,8 @@
 #ifndef ADVERTISEMENTTYPE_H
 #define ADVERTISEMENTTYPE_H
 
+namespace AdvertisementType
+{
 typedef enum
 {
     Unknown = 0,
@@ -8,7 +10,8 @@ typedef enum
     Change = 2,
     Delete = 3
 
-}AdvertisementType;
+}Enum;
+}
 
 
 #endif // ADVERTISEMENTTYPE_H

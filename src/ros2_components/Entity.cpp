@@ -247,7 +247,7 @@ void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_pt
     if(!isSubscriber() && advertised)
     {
 
-        Advertise(Change);
+        Advertise(AdvertisementType::Enum::Change);
     }
     emit childAdded(child,parent, depth+1,remote);
 }
@@ -255,7 +255,7 @@ void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_pt
 void EntityBase::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
 {
     if(!isSubscriber() && advertised)
-        Advertise(Change);
+        Advertise(AdvertisementType::Enum::Change);
     LOG(LogLevel::Info) << "child"<<child->getName()<< "removed from: " <<parent->getName() << " depth: " << depth << std::endl;
     emit childRemoved(child,parent, depth+1,remote);
 }
@@ -273,7 +273,7 @@ void EntityBase::IterateThroughAllProperties(std::function<void(QMetaProperty)> 
     }
 }
 
-void EntityBase::Advertise(AdvertisementType type)
+void EntityBase::Advertise(AdvertisementType::Enum type)
 {
     if(this->advertisementPublisher != NULL)
     {
