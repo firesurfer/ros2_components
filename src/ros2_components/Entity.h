@@ -37,9 +37,13 @@
 #include <memory>
 #include "Reflect.h"
 
+
 #include <QObject>
 #include <QMetaObject>
 #include <QMetaProperty>
+#include <QHostAddress>
+#include <QHostInfo>
+#include <QNetworkInterface>
 
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)

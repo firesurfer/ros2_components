@@ -206,7 +206,7 @@ protected:
                 throw std::runtime_error("Could not rebuild new component");
 
             parentComp->addChild(comp, true);
-
+           
             emit remote_entity_added(comp);
         }
         else

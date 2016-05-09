@@ -18,6 +18,7 @@ findPackageInWorkspace(ros2_simple_logger)
 endif()
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
+find_package(Qt5Network REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
@@ -37,7 +38,8 @@ include_directories(
     ${rmw_implementation_INCLUDE_DIRS}
     ${ros2_components_msg_INCLUDE_DIRS}
     ${ros2_simple_logger_INCLUDE_DIRS}
-    ${Qt5Core_INCLUDE_DIRS}
+    ${Qt5Core_INCLUDE_DIRS} 
+    ${Qt5Network_INCLUDE_DIRS}
 )
 file(GLOB SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.c*"
@@ -55,6 +57,7 @@ target_link_libraries(ros2_components
     ${ros2_simple_logger_LIBRARIES}
     -pthread
     Qt5::Core
+    Qt5::Network
 
 )
 

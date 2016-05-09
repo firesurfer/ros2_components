@@ -117,6 +117,7 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
 
 void Robot::on_child_added(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
 {
+
     if(remote)
         return;
     std::lock_guard<std::mutex> lock(childAdded_mutex);
@@ -135,6 +136,7 @@ void Robot::on_child_added(std::shared_ptr<EntityBase> child, std::shared_ptr<En
         this->entityPublisher->publish(msg);
     UNUSED(parent);
     UNUSED(depth);
+    EntityBase::on_child_added(child,parent,depth,remote);
 }
 
 void Robot::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
@@ -155,6 +157,7 @@ void Robot::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<
         this->entityPublisher->publish(msg);
     UNUSED(parent);
     UNUSED(depth);
-}
+    EntityBase::on_child_removed(child,parent,depth,remote);
 
+}
 }
