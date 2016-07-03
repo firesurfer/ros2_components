@@ -306,7 +306,7 @@ void EntityBase::Advertise(AdvertisementType::Enum type)
             }
         }
 
-
+        msg->nodename = this->parentNode->get_name();
         msg->advertisementtype = (int)type;
         msg->id = getId();
         msg->machineip = ipAddr;
@@ -334,7 +334,7 @@ void EntityBase::Advertise(AdvertisementType::Enum type)
         }
         msg->childids = ids;
         msg->componentname = getName();
-
+        LOG(Debug) << "Publishing advertisementmessage in " << getName() << " now" << std::endl;
         advertisementPublisher->publish(msg);
 
     }

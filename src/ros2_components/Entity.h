@@ -294,10 +294,11 @@ public:
         parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
 
 
+
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", custom_qos_profile);
+            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", rmw_qos_profile_default);
             pubBase = entityPublisher;
             using namespace std::placeholders;
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
