@@ -98,6 +98,21 @@ public:
     {
         return Components;
     }
+    ComponentInfo GetInfoToId(uint64_t id, bool& success)
+    {
+        success = true;
+        for(auto & comp  : Components)
+        {
+            if(id == comp.id)
+            {
+                success= true;
+                return comp;
+            }
+        }
+        ComponentInfo dummy;
+        return dummy;
+    }
+
     //TODO create function that help sorting the component infos
 
 private:

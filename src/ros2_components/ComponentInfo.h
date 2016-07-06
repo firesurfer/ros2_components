@@ -9,8 +9,8 @@ struct ComponentInfo
 
 public:
     ComponentInfo();
-
-    int64_t id;
+    ComponentInfo(const ComponentInfo &info);
+    uint64_t id;
     std::string type;
     std::string name;
     int64_t parentId;
