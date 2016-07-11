@@ -15,14 +15,14 @@ include_directories(
 
 add_executable(ros2_components_create_robot_test create_robot.cpp)
 target_link_libraries(ros2_components_create_robot_test
-	ros2_components
+        ros2_components
  	${rclcpp_LIBRARIES}
     	${rmw_LIBRARIES}
     	${rmw_implementation_LIBRARIES}
-    	${ros2_components_msg_LIBRARIES}
-    	${ros2_simple_logger_LIBRARIES}
-    	-pthread
-    	Qt5::Core
-    	Qt5::Network
+        #${ros2_components_msg_LIBRARIES}
+        #${ros2_simple_logger_LIBRARIES}
+        -pthread
+        Qt5::Core
+        Qt5::Network
 )
 install(TARGETS ros2_components_create_robot_test DESTINATION tests)
