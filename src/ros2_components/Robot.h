@@ -60,10 +60,13 @@ public:
     void virtual  PrintTree();
 
     static std::vector<int64_t> ListKnownRobots(std::shared_ptr<rclcpp::node::Node> _parentNode,std::string prefix = "");
-
+    /**
+     *  Rebuilds a robot from an given ID - This method is deprecated and should be used any more - See ComponentManager RebuildFromId oder RebuildFromInfo instead
+     */
     template<typename T>
     static std::shared_ptr<T> RebuildRobotFromId(int64_t id, std::shared_ptr<rclcpp::node::Node> _parentNode )
     {
+        LOG(Warning) << "Robot::RebuildRobotFromId is deprecated use the componentManager instead " << std::endl;
         LOG(LogLevel::Info) << "Building Robot from id: " << id <<std::endl;
 
 
