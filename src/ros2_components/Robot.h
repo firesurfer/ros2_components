@@ -24,6 +24,10 @@
 
 namespace ros2_components
 {
+/**
+ * @brief The Robot class
+ *
+ */
 
 class Robot :  public Entity< ros2_components_msg::msg::NewComponentAdded>
 {
@@ -51,36 +55,7 @@ public:
         return elements;
     }
 
-    void IterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func)
-    {
-        std::function<void(EntityBase::SharedPtr)> rec_func = [&](EntityBase::SharedPtr base){
-            for(auto &  child : base->getAllChilds())
-            {
-                func(child);
-                rec_func(child);
 
-            }
-
-        };
-        for(auto & seg: getAllChilds())
-        {
-            func(seg);
-            rec_func(seg);
-        }
-    }
-
-    template<typename T>
-    void IterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
-    {
-        auto callbackFunc = [&](EntityBase::SharedPtr item)
-        {
-            std::shared_ptr<T> ch = dynamic_pointer_cast<T>(item);
-            if(ch != NULL)
-                func(ch);
-
-        };
-        IterateThroughAllChilds(callbackFunc);
-    }
 
     void virtual  PrintTree();
 

@@ -72,7 +72,7 @@ std::vector<int64_t> Robot::ListKnownRobots(std::shared_ptr<rclcpp::node::Node> 
     {
         possiblePrefixes.push_back(prefix+"Robot"+ std::to_string(i));
     }
-    auto parameter_list_future = parameters_client->list_parameters(possiblePrefixes, 10);
+    auto parameter_list_future = parameters_client->list_parameters({}, 10);
 
     if (parameter_list_future.wait_for(5_s) != std::future_status::ready)
     {
