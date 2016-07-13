@@ -26,7 +26,7 @@ int main(int argc, char** argv)
     rclcpp::init(argc, argv);
     node = rclcpp::node::Node::make_shared("create_robot_test");
     std::thread spinner(&spin);
-    //INIT_LOGGER(node);
+    INIT_LOGGER(node);
     //LOG(Info) << "Creating test Robot with id 100" << std::endl;
     //Robot::SharedPtr testRobot = std::make_shared<Robot>(100,false,node,"Robot");
    // LOG(Info) << "Advertising testRobot to the system" << std::endl;

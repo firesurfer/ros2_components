@@ -20,6 +20,8 @@ target_link_libraries(ros2_components
     ${rclcpp_LIBRARIES}
     ${rmw_LIBRARIES}
     ${rmw_implementation_LIBRARIES}
+    ${std_msgs_LIBRARIES}
+    ${builtin_interfaces_LIBRARIES}
     ${ros2_components_msg_LIBRARIES}
     ${ros2_simple_logger_LIBRARIES}
     -pthread
