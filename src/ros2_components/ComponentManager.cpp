@@ -56,6 +56,7 @@ void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::Ent
                 else
                 {
                     LOG(Fatal) << "Id already used in system -> this might result in unpredictable behaviour - I'm not going to interpret this ad: "<< info.name << " ID is used by: " <<myInfo.name<< std::endl;
+                    return;
 
                 }
             }

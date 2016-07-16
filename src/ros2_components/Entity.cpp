@@ -325,14 +325,15 @@ void EntityBase::Advertise(AdvertisementType::Enum type)
         simpleLogger::set_now(time);
         msg->stamp = time;
 
-        std::vector<int64_t> ids;
+
         for(auto & child: childs)
         {
             msg->childtypes.push_back(child->getClassName());
-            ids.push_back(child->getId());
+            msg->childids.push_back(child->getId());
 
         }
-        msg->childids = ids;
+
+
         msg->componentname = getName();
         LOG(Debug) << "Publishing advertisementmessage in " << getName() << " now" << std::endl;
         advertisementPublisher->publish(msg);
