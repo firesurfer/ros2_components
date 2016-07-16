@@ -14,7 +14,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
 
 void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg)
 {
-
+    //Any Advertisement message that gets caught will be processed in this function
     if(msg->nodename == this->localNode->get_name())
         return;
     ComponentInfo info;
@@ -27,7 +27,7 @@ void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::Ent
     info.parentId = msg->parent;
     info.machineip = msg->machineip;
 
-    LOG(Info) << "Got new advertisement: " << info.id << std::endl;
+    LOG(Debug) << "Got new advertisement: " << info.id << std::endl;
     //TODO Replace if with switch statement
     if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::New)
     {

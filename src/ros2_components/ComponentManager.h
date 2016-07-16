@@ -8,7 +8,7 @@
 #include "ros2_components/AdvertisementType.h"
 #include "ros2_simple_logger/Logger.h"
 #include "ros2_components/EntityFactory.h"
-
+#include <functional>
 
 #include <cstdlib>
 #include <iostream>
@@ -16,15 +16,27 @@
 namespace ros2_components
 {
 /**
- * @brief The ComponentManager class - Collects component/entity advertisements in the systems and represents orderered to the user
+ * @brief The ComponentManager class - Collects component/entity advertisements in the systems and represents them ordered to the user
  */
 class ComponentManager:public QObject
 {
     Q_OBJECT
 public:
+    //Typedef for easy to use SharedPtr
     typedef std::shared_ptr<ComponentManager> SharedPtr;
+    /**
+     * @brief ComponentManager
+     * @param _localNode - The ros node that should be used
+     */
     ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
-    bool IDAlreadyInUse(int64_t id)
+    /**
+     * @brief IDAlreadyInUse
+     * @param id
+     * @return true if id is already in use
+     *
+     * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return true even if the id is in use.
+     */
+    bool IDAlreadyInUse(uint64_t id)
     {
         for(auto & myInfo: Components)
         {
@@ -33,22 +45,13 @@ public:
         }
         return false;
     }
-    int64_t GetFreeId()
-    {
-        int64_t id = 0;
 
-        id = std::rand();
-        while(IDAlreadyInUse(id))
-        {
-            id = std::rand();
-        }
-    }
 
     /**
-     * Rebuild a component from an id
+     *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(int64_t id)
+    std::shared_ptr<T> RebuildComponent(int64_t id,bool rebuildHierarchy = false)
     {
         ComponentInfo relavantInfo;
         bool found = false;
@@ -62,13 +65,13 @@ public:
         }
         if(!found)
             throw std::runtime_error("Could not find a component with the given id");
-        return RebuildComponent<T>(relavantInfo);
+        return RebuildComponent<T>(relavantInfo,rebuildHierarchy);
     }
     /**
      * Rebuild a component from a ComponentInfo object using the EntityFactory
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(ComponentInfo & info)
+    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
     {
         if(!EntityFactory::Contains(info.type))
             throw std::runtime_error("Can't auto-rebuild this component - did register it to the EntityFactory");
@@ -82,6 +85,8 @@ public:
             subscribeArg = Q_ARG(bool, false);
         QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, localNode);
 
+
+
         QObject * obj = EntityFactory::CreateInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
         T* ent = dynamic_cast<T*>(obj);
         if(ent == NULL)
@@ -91,21 +96,74 @@ public:
             throw std::runtime_error("Could cast created object to the given type - WTF?!");
         }
         std::shared_ptr<T> secEnt(ent);
+
+        //The following line recusivly rebuild the tree structure that was published before
+        if(rebuildHierarchy)
+        {
+            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo& parentInfo)
+            {
+                for(auto & child_id: parentInfo.childIds)
+                {
+                    bool success = false;
+                    ComponentInfo childInfo = GetInfoToId(child_id,&success);
+                    if(!success)
+                        continue;
+                    idArg = Q_ARG(int64_t, childInfo.id);
+                    if(childInfo.name.find("Sensor") != std::string::npos)
+                        subscribeArg = Q_ARG(bool, true);
+                    else
+                        subscribeArg = Q_ARG(bool, false);
+                    QObject * child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
+                    EntityBase* child_ent = dynamic_cast<EntityBase*>(child_obj);
+                    if(child_ent == NULL)
+                    {
+                        delete child_obj;
+                        throw std::runtime_error("Could not cast created child object to EntityBase - This is a fatal error");
+                    }
+                    std::shared_ptr<EntityBase> sh_child_ent(child_ent);
+                    parentEntity->addChild(sh_child_ent);
+                    rec_build(sh_child_ent,childInfo);
+                }
+            };
+            std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(secEnt);
+            rec_build(parentEnt,info);
+
+
+            auto func = []( std::shared_ptr<EntityBase> ent){
+                ent->updateParameters();
+            };
+            parentEnt->updateParameters();
+            parentEnt->IterateThroughAllChilds(func);
+
+        }
+
         return secEnt;
 
     }
+    /**
+     * @brief ListComponents
+     * @return vector of all currently listed components
+     */
     std::vector<ComponentInfo>& ListComponents()
     {
         return Components;
     }
-    ComponentInfo GetInfoToId(uint64_t id, bool& success)
+    /**
+     * @brief GetInfoToId
+     * @param id
+     * @param success
+     * @return ComponentInfo to the given id
+     */
+    ComponentInfo GetInfoToId(uint64_t id, bool* success = 0)
     {
-        success = true;
+        if(success != NULL)
+            *success = false;
         for(auto & comp  : Components)
         {
             if(id == comp.id)
             {
-                success= true;
+                if(success != NULL)
+                    *success= true;
                 return comp;
             }
         }
@@ -116,10 +174,15 @@ public:
     //TODO create function that help sorting the component infos
 
 private:
+    /*Ros2 stuff*/
     rclcpp::node::Node::SharedPtr localNode;
     std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::EntityAdvertisement>> AdvertisementSubscription;
 
     void AdvertisementCallback(ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg);
+    /**
+     * @brief Components
+     * Stored components
+     */
     std::vector<ComponentInfo> Components;
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system

@@ -2,6 +2,12 @@
 #define COMPONENTINFO_H
 
 #include <QObject>
+/**
+ * Represents information about a certain component (e.g a motor)
+ * These information allow to  definitely identify any component/entity in the system
+ *
+ * TODO Move the name from ComponentInfo to EntityInfo
+ */
 namespace ros2_components
 {
 struct ComponentInfo
@@ -9,6 +15,7 @@ struct ComponentInfo
 
 public:
     ComponentInfo();
+    //Copy constructor
     ComponentInfo(const ComponentInfo &info);
     uint64_t id;
     std::string type;

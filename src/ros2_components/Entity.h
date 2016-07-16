@@ -165,8 +165,54 @@ public:
      * @param func
      */
     void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
+    /**
+     * @brief WasMetaInformationUpdated
+     * @return
+     */
     bool WasMetaInformationUpdated(){return updated;}
+    /**
+     * @brief Advertise
+     * @param type
+     */
     void Advertise(AdvertisementType::Enum type = AdvertisementType::Enum::Unknown);
+
+    /**
+     * @brief IterateThroughAllChilds
+     * @param func
+     */
+    void IterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func)
+    {
+        std::function<void(EntityBase::SharedPtr)> rec_func = [&](EntityBase::SharedPtr base){
+            for(auto &  child : base->getAllChilds())
+            {
+                func(child);
+                rec_func(child);
+
+            }
+
+        };
+        for(auto & seg: getAllChilds())
+        {
+            func(seg);
+            rec_func(seg);
+        }
+    }
+
+    /**
+     *
+     */
+    template<typename T>
+    void IterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
+    {
+        auto callbackFunc = [&](EntityBase::SharedPtr item)
+        {
+            std::shared_ptr<T> ch = dynamic_pointer_cast<T>(item);
+            if(ch != NULL)
+                func(ch);
+
+        };
+        IterateThroughAllChilds(callbackFunc);
+    }
 protected:
     /**
       * @brief setParent
@@ -371,7 +417,6 @@ public:
     /**
      * @brief tell the word we have new meta information (Like is a lidar mounted upside down)
      */
-
 
 
 protected:
