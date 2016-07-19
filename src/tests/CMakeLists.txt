@@ -1,5 +1,12 @@
 find_package("std_msgs" REQUIRED)
 
+enable_testing()
+find_package(GTest REQUIRED)
+
+if(NOT ${GTEST_FOUND})
+    MESSAGE("Did not find googletest - not building tests")
+    return()
+endif()
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/src/ros2_components
@@ -12,6 +19,8 @@ include_directories(
     ${ros2_simple_logger_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
+
+    ${GTEST_INCLUDE_DIRS}
     )
 
 add_executable(create_robot_test create_robot.cpp)
@@ -21,11 +30,14 @@ add_executable(static_class_test static_class_shared_ptr_test.cpp static_class_s
 
 target_link_libraries(create_robot_test
     ros2_components
+    ${GTEST_BOTH_LIBRARIES}
     )
 target_link_libraries(create_robot_and_rebuild_test
+    ${GTEST_BOTH_LIBRARIES}
     ros2_components
     )
 target_link_libraries(check_advertisements_test
+    ${GTEST_BOTH_LIBRARIES}
     ros2_components
     )
 target_link_libraries(static_class_test
@@ -36,6 +48,11 @@ target_link_libraries(static_class_test
     ${builtin_interfaces_LIBRARIES}
     -pthread
     )
+
+add_test(AllTestsInCreateRobotTest create_robot_test)
+add_test(AllTestsInCreateRobotAndRebuildTest create_robot_and_rebuild_test)
+add_test(AllTestsInFCheckAdvertisementsTest check_advertisements_test)
+
 install(TARGETS create_robot_test DESTINATION tests/ros2_components)
 install(TARGETS create_robot_and_rebuild_test DESTINATION tests/ros2_components)
 
