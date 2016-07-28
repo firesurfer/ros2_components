@@ -1,7 +1,7 @@
 find_package("std_msgs" REQUIRED)
 
 enable_testing()
-find_package(GTest REQUIRED)
+find_package(GTest)
 
 if(NOT ${GTEST_FOUND})
     MESSAGE("Did not find googletest - not building tests")
