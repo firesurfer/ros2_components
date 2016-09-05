@@ -344,7 +344,11 @@ public:
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", rmw_qos_profile_default);
+
+            //rmw_qos_profile_services_default
+            rmw_qos_profile_t component_manager_profile = rmw_qos_profile_default;
+            component_manager_profile.depth = 10000;
+            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", component_manager_profile);
             pubBase = entityPublisher;
             using namespace std::placeholders;
             parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
@@ -365,7 +369,7 @@ public:
     /**
      * @brief Copy Constructor
      */
-    Entity(const Entity &t):EntityBase(t)
+   /* Entity(const Entity &t):EntityBase(t)
     {
 
         custom_qos_profile = t.custom_qos_profile;
@@ -386,7 +390,7 @@ public:
             entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
         }
 
-    }
+    }*/
 
     virtual ~Entity() {
 

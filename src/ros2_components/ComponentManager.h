@@ -184,6 +184,9 @@ private:
      * Stored components
      */
     std::vector<ComponentInfo> Components;
+    void ProcessNewAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
+    void ProcessChangeAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
+    void ProcessDeleteAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
     void NewComponentAvailable(ComponentInfo &info);
