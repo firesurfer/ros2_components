@@ -9,8 +9,8 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     this->localNode = _localNode;
     using namespace std::placeholders;
     //rmw_qos_profile_services_default
-    rmw_qos_profile_t component_manager_profile = rmw_qos_profile_default;
-    component_manager_profile.depth = 10000;
+    rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
+    component_manager_profile.depth = 1000;
     this->AdvertisementSubscription = localNode->create_subscription<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", std::bind(&ComponentManager::AdvertisementCallback, this,_1), component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
 }

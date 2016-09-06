@@ -144,7 +144,7 @@ public:
      * @brief ListComponents
      * @return vector of all currently listed components
      */
-    std::vector<ComponentInfo>& ListComponents()
+    std::vector<ComponentInfo> ListComponents()
     {
         return Components;
     }
