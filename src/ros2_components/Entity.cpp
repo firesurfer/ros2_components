@@ -135,7 +135,7 @@ void EntityBase::updateParameters()
 
     auto parameters = parameterClient->get_parameters({myParameters});
 
-    if (parameters.wait_for(10_s) != std::future_status::ready)
+    if (parameters.wait_for(std::chrono::seconds(10)) != std::future_status::ready)
     {
         LOG(LogLevel::Fatal) <<"get parameters service call failed"<< std::endl;
         return;
@@ -219,7 +219,7 @@ void EntityBase::publishMetaInformation()
         //(*it)->print();
     }
     auto set_parameters_results = this->parameterClient->set_parameters(params);
-    if (set_parameters_results.wait_for(20_s) != std::future_status::ready)
+    if (set_parameters_results.wait_for(std::chrono::seconds(20)) != std::future_status::ready)
     {
         throw std::runtime_error("Couldn't access parameter server!");
 

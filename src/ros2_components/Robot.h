@@ -81,7 +81,7 @@ public:
 
             // Wait for the result.
 
-            if (result.wait_for(15_s) == std::future_status::ready)
+            if (result.wait_for(std::chrono::seconds(15)) == std::future_status::ready)
             {
                 return result.get();
             }

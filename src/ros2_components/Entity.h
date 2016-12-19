@@ -27,6 +27,7 @@
 #include <string>
 
 
+
 #include "ros2_simple_logger/Logger.h"
 #include "AdvertisementType.h"
 #include "rclcpp/rclcpp.hpp"
@@ -51,6 +52,7 @@ Q_DECLARE_METATYPE(std::string)
 
 using namespace std;
 using namespace std::placeholders;
+
 namespace ros2_components
 {
 
@@ -348,7 +350,7 @@ public:
             //rmw_qos_profile_services_default
             rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
             component_manager_profile.depth = 1000;
-            component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
+            //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
             advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", component_manager_profile);
             pubBase = entityPublisher;
             using namespace std::placeholders;

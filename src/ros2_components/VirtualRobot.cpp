@@ -27,7 +27,7 @@ std::vector<int64_t> ros2_components::VirtualRobot::ListKnownVirtualRobots(std::
     }
     auto parameter_list_future = parameters_client->list_parameters(possiblePrefixes, 10);
 
-    if (parameter_list_future.wait_for(5_s) != std::future_status::ready)
+    if (parameter_list_future.wait_for(std::chrono::seconds(15)) != std::future_status::ready)
     {
         throw std::runtime_error("Could not contact parameterServer");
     }
@@ -35,7 +35,7 @@ std::vector<int64_t> ros2_components::VirtualRobot::ListKnownVirtualRobots(std::
     for (auto & name : parameter_list.names) {
 
         auto parameters = parameters_client->get_parameters({name});
-        if (parameters.wait_for(5_s) != std::future_status::ready)
+        if (parameters.wait_for(std::chrono::seconds(5)) != std::future_status::ready)
         {
 
             throw std::runtime_error("Could not contact parameterServer");
