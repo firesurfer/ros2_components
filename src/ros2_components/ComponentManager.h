@@ -53,16 +53,20 @@ public:
      *
      * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return true even if the id is in use.
      */
-    bool IDAlreadyInUse(uint64_t id)
-    {
-        for(auto & myInfo: Components)
-        {
-            if(myInfo.id == id)
-                return true;
-        }
-        return false;
-    }
-
+    bool IDAlreadyInUse(uint64_t id);
+    /**
+     * @brief ListComponents
+     * @return vector of all currently listed components
+     * TODO think of a better way to access all components
+     */
+    std::vector<ComponentInfo> ListComponents();
+    /**
+     * @brief GetInfoToId
+     * @param id
+     * @param success
+     * @return ComponentInfo to the given id
+     */
+    ComponentInfo GetInfoToId(uint64_t id, bool* success = 0);
 
     /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
@@ -157,38 +161,9 @@ public:
         return secEnt;
 
     }
-    /**
-     * @brief ListComponents
-     * @return vector of all currently listed components
-     */
-    std::vector<ComponentInfo> ListComponents()
-    {
-        return Components;
-    }
-    /**
-     * @brief GetInfoToId
-     * @param id
-     * @param success
-     * @return ComponentInfo to the given id
-     */
-    ComponentInfo GetInfoToId(uint64_t id, bool* success = 0)
-    {
-        if(success != NULL)
-            *success = false;
-        for(auto & comp  : Components)
-        {
-            if(id == comp.id)
-            {
-                if(success != NULL)
-                    *success= true;
-                return comp;
-            }
-        }
-        ComponentInfo dummy;
-        return dummy;
-    }
 
-    //TODO create function that help sorting the component infos
+
+
 
 private:
     /*Ros2 stuff*/

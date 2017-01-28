@@ -33,6 +33,38 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     std::srand(std::time(0)); // use current time as seed for random generator
 }
 
+bool ComponentManager::IDAlreadyInUse(uint64_t id)
+{
+    for(auto & myInfo: Components)
+    {
+        if(myInfo.id == id)
+            return true;
+    }
+    return false;
+}
+
+std::vector<ComponentInfo> ComponentManager::ListComponents()
+{
+    return Components;
+}
+
+ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
+{
+    if(success != NULL)
+        *success = false;
+    for(auto & comp  : Components)
+    {
+        if(id == comp.id)
+        {
+            if(success != NULL)
+                *success= true;
+            return comp;
+        }
+    }
+    ComponentInfo dummy;
+    return dummy;
+}
+
 void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg, ComponentInfo info)
 {
     LOG(Debug) << "Got type " <<"New"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
