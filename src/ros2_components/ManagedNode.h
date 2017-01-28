@@ -33,7 +33,6 @@
 /**
  * @brief The ManagedNode class
  * This class represents a managed lifecycle node.
- * For an example of usage see the iboss_hardware_control:main.cpp file.
  */
 namespace ros2_components {
 
