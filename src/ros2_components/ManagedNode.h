@@ -61,6 +61,11 @@ public:
      * Furthermore it will initilise the logger
      */
     virtual void Start(bool multithreaded = true);
+    /**
+     * @brief Setup
+     * Do basic setup tasks after creating a node
+     */
+    virtual void Setup();
 
 
 protected:
@@ -91,6 +96,11 @@ protected:
      * One component manager per node
      */
     ComponentManager::SharedPtr CompManager;
+    /**
+     * @brief BaseEntity
+     * The basic entity where the abstraction structure of this node starts from
+     */
+    EntityBase::SharedPtr BaseEntity;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;

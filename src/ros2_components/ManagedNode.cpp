@@ -101,5 +101,12 @@ void ManagedNode::Start(bool multithreaded)
     INIT_LOGGER(RosNode);
     LOGLEVEL(Debug);
 }
+void ManagedNode::Setup()
+{
+    //Create base entity
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
+}
 
 }
+
+

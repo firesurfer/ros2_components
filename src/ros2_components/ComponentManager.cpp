@@ -20,7 +20,7 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity)
 {
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
     this->localNode = _localNode;

@@ -45,7 +45,7 @@ public:
      * @brief ComponentManager
      * @param _localNode - The ros node that should be used
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
     /**
      * @brief IDAlreadyInUse
      * @param id

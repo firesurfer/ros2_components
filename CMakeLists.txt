@@ -25,7 +25,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 
 file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.h*"
