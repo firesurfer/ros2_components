@@ -23,7 +23,7 @@ namespace ros2_components
 ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity)
 {
     //Variable Assignments
-    this->BaseEntity = _baseEntity;
+    this->BaseEntity = _baseEntity; //TODO register to components add and change callbacks
     this->RosNode = _localNode;
 
     //Qos Profile
@@ -82,7 +82,33 @@ ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
 void ComponentManager::UpdateComponentsList()
 {
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
+    request->nodename = RosNode->get_name();
     this->ListComponentsRequestPublisher->publish(request);
+}
+
+void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
+{
+    std::string nodename = msg->nodename;
+    if(RosNode->get_name() != msg->nodename)
+    {
+        //TODO answer with own components list
+        //TODO this needs to be done asynchronous
+    }
+}
+
+void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
+{
+    for(auto & myInfo: Components)
+    {
+        if(myInfo.id == msg->id)
+        {
+            myInfo.childids = msg->childids;
+            myInfo.childtypes = msg->childtypes;
+            //TODO other fields
+        }
+    }
+
+    //TODO go through components list and add new component if necessary or replace old component
 }
 
 void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
@@ -181,7 +207,6 @@ void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::
 
     if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Change)
     {
-
         ProcessChangeAdvertisment(msg,info);
     }
     else if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Delete)
