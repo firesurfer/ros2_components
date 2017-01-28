@@ -38,7 +38,6 @@ public:
             rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
             component_manager_profile.depth = 1000;
             //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
-            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", component_manager_profile);
             pubBase = entityPublisher;
 
         }
@@ -79,11 +78,8 @@ public:
     void addListener(std::function<void(typename MessageType::SharedPtr)> listener)
     {
         listeners.push_back(listener);
-        LOG(Debug) << "added listener to: "<< this << std::endl;
     }
-    /**
-     * @brief tell the word we have new meta information (Like is a lidar mounted upside down)
-     */
+
 
 
 protected:

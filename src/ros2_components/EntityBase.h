@@ -33,8 +33,6 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/subscription.hpp"
-#include "ros2_components_msg/srv/list_childs.hpp"
-#include "ros2_components_msg/msg/entity_advertisement.hpp"
 #include <memory>
 #include "Reflect.h"
 
@@ -173,12 +171,6 @@ public:
      */
     bool WasMetaInformationUpdated(){return updated;}
     /**
-     * @brief Advertise
-     * @param type
-     */
-    void Advertise(AdvertisementType::Enum type = AdvertisementType::Enum::Unknown);
-
-    /**
      * @brief IterateThroughAllChilds
      * @param func
      */
@@ -201,7 +193,7 @@ public:
     }
 
     /**
-     *
+     * @brief IterateThroughAllChildsOfType
      */
     template<typename T>
     void IterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
@@ -274,11 +266,6 @@ protected:
      * used defined description
      */
     std::string description;
-    /**
-     * @brief advertisementPublisher
-     * Used for advertising this entity to the system
-     */
-    std::shared_ptr<rclcpp::publisher::Publisher<ros2_components_msg::msg::EntityAdvertisement>> advertisementPublisher;
 protected slots:
     virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
@@ -286,7 +273,7 @@ signals:
     void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void parametersUpdated();
-    void newData(EntityBase* ent);
+    void newData(EntityBase* ent); //TODO SharedPtr ?
 
 private:
     /**

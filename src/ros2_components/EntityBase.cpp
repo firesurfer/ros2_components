@@ -263,11 +263,4 @@ void EntityBase::IterateThroughAllProperties(std::function<void(QMetaProperty)> 
 
 
 
-
-
-
-
-
-
-
 }
