@@ -22,15 +22,29 @@ namespace ros2_components
 {
 ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity)
 {
-    LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
-    this->localNode = _localNode;
-    using namespace std::placeholders;
+    //Variable Assignments
+    this->BaseEntity = _baseEntity;
+    this->RosNode = _localNode;
+
+    //Qos Profile
     //rmw_qos_profile_services_default
     rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
     component_manager_profile.depth = 1000;
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
-    this->AdvertisementSubscription = localNode->create_subscription<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", std::bind(&ComponentManager::AdvertisementCallback, this,_1), component_manager_profile);
+
+    //Subscriptions
+    using namespace std::placeholders;
+    this->ComponentChangedSubscription = RosNode->create_subscription<ros2_components_msg::msg::ComponentChanged>("ComponentChanged", std::bind(&ComponentManager::ComponentChangedCallback, this,_1), component_manager_profile);
+    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
+    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
+
+    //Publishers
+    this->ComponentChangedPublisher = RosNode->create_publisher<ros2_components_msg::msg::ComponentChanged>("ComponentChanged",component_manager_profile);
+    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
+    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsRequest",component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
+
+    LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
@@ -65,7 +79,13 @@ ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
     return dummy;
 }
 
-void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg, ComponentInfo info)
+void ComponentManager::UpdateComponentsList()
+{
+    ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
+    this->ListComponentsRequestPublisher->publish(request);
+}
+
+void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
 {
     LOG(Debug) << "Got type " <<"New"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
     for(auto & myInfo: Components)
@@ -99,10 +119,10 @@ void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::En
     }
     Components.push_back(info);
 
-    emit NewComponentAvailable(info);
+
 }
 
-void ComponentManager::ProcessChangeAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg, ComponentInfo info)
+void ComponentManager::ProcessChangeAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
 {
     LOG(Debug) << "Got type " <<"Change"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
     int i = 0;
@@ -125,7 +145,7 @@ void ComponentManager::ProcessChangeAdvertisment(const ros2_components_msg::msg:
     }
 }
 
-void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg, ComponentInfo info)
+void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
 {
     LOG(Debug) << "Got type " <<"Delete"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
     int i = 0;
@@ -142,10 +162,10 @@ void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg:
     emit ComponentDeleted(info);
 }
 
-void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg)
+void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
 {
     //Any Advertisement message that gets caught will be processed in this function
-    if(msg->nodename == this->localNode->get_name())
+    if(msg->nodename == this->RosNode->get_name())
         return;
     ComponentInfo info;
     info.nodename = msg->nodename;
@@ -158,12 +178,8 @@ void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::Ent
     info.machineip = msg->machineip;
 
     LOG(Debug) << "Got new advertisement: " << info.id << std::endl;
-    //TODO Replace if with switch statement
-    if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::New)
-    {
-        ProcessNewAdvertisment(msg,info);
-    }
-    else if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Change)
+
+    if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Change)
     {
 
         ProcessChangeAdvertisment(msg,info);

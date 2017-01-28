@@ -20,7 +20,9 @@
 
 #include <QObject>
 #include "rclcpp/rclcpp.hpp"
-#include "ros2_components_msg/msg/entity_advertisement.hpp"
+#include "ros2_components_msg/msg/component_changed.hpp"
+#include "ros2_components_msg/msg/list_components_request.hpp"
+#include "ros2_components_msg/msg/list_components_response.hpp"
 #include "ComponentInfo.h"
 #include "ros2_components/AdvertisementType.h"
 #include "ros2_simple_logger/Logger.h"
@@ -69,6 +71,11 @@ public:
     ComponentInfo GetInfoToId(uint64_t id, bool* success = 0);
 
     /**
+     * @brief UpdateComponentsList
+     * Publishes a message to the ListComponentsRequest topic.
+     */
+    void UpdateComponentsList();
+    /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      */
     template<typename T>
@@ -104,7 +111,7 @@ public:
             subscribeArg = Q_ARG(bool, true);
         else
             subscribeArg = Q_ARG(bool, false);
-        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, localNode);
+        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
 
 
 
@@ -167,21 +174,74 @@ public:
 
 private:
     /*Ros2 stuff*/
-    rclcpp::node::Node::SharedPtr localNode;
-    std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::EntityAdvertisement>> AdvertisementSubscription;
+    /**
+     * @brief RosNode
+     */
+    rclcpp::node::Node::SharedPtr RosNode;
+    /**
+     * @brief ComponentChangedSubscription
+     * This topic keeps you informed about changes to components (entities) in the system - but not about new components
+     */
+    std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::ComponentChanged>> ComponentChangedSubscription;
+    /**
+     * @brief ListComponentsRequestSubscription
+     * On this topic a component manager can publish a request to all other component manager instances in the system in order to have them publish all their managed components to the
+     * ListComponentResponse topic
+     */
+    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr ListComponentsRequestSubscription;
+    /**
+     * @brief ListComponentsResponseSubscription
+     * On this topic the answer to the ListComponentsRequest is published
+     */
+    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponseSubscription;
+    /**
+     * @brief ComponentChangedPublisher
+     * @see ComponentChangedSubscription
+     */
+    rclcpp::publisher::Publisher<ros2_components_msg::msg::ComponentChanged>::SharedPtr ComponentChangedPublisher;
+    /**
+     * @brief ListComponentsRequestPublisher
+     * @see ListComponentsRequestSubscription
+     */
+    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr ListComponentsRequestPublisher;
+    /**
+     * @brief ListComponentsResponsePublisher
+     * @see ListComponentsResponseSubscription
+     */
+    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponsePublisher;
 
-    void AdvertisementCallback(ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg);
+    /**
+     * @brief ComponentChangedCallback
+     * @param msg
+     * Gets called if a new message on the ComponentChanged topic is available
+     */
+    void ComponentChangedCallback(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
+    /**
+     * @brief ListComponentsRequestCallback
+     * @param msg
+     * Gets called if a new message on the ListComponentsRequest topic is available
+     */
+    void ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg);
+    /**
+     * @brief ListComponentsResponseCallback
+     * @param msg
+     * Gets called if a new message on the ListComponentsResponse topic is available
+     */
+    void ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
+
+    void ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info);
+    void ProcessChangeAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
+    void ProcessDeleteAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
+
     /**
      * @brief Components
      * Stored components
      */
     std::vector<ComponentInfo> Components;
-    void ProcessNewAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
-    void ProcessChangeAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
-    void ProcessDeleteAdvertisment(const ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg,ComponentInfo info);
+    EntityBase::SharedPtr BaseEntity;
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
-    void NewComponentAvailable(ComponentInfo &info);
+
     void ComponentDeleted(ComponentInfo &info);
     void ComponentChanged(ComponentInfo &info);
 
