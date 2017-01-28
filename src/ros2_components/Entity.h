@@ -353,10 +353,7 @@ public:
             //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
             advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", component_manager_profile);
             pubBase = entityPublisher;
-            using namespace std::placeholders;
-            parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
 
-            //std::cout << "Started service with name:"<< getName()+"_srv"<< std::endl;
         }
         else
         {
@@ -369,31 +366,7 @@ public:
 
 
     }
-    /**
-     * @brief Copy Constructor
-     */
-   /* Entity(const Entity &t):EntityBase(t)
-    {
 
-        custom_qos_profile = t.custom_qos_profile;
-        this->parameterClient = std::make_shared<rclcpp::parameter_client::AsyncParametersClient>(parentNode, "ParameterServer");
-        parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
-        listeners = t.listeners;
-
-
-        if(!isSubscriber())
-        {
-            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-            parentNode->create_service<ros2_components_msg::srv::ListChilds>(getName()+"_srv", std::bind(&Entity::handleListChildRequest,this,_1,_2,_3));
-            advertisementPublisher = parentNode->create_publisher<ros2_components_msg::msg::EntityAdvertisement>("EntityAdvertisement", custom_qos_profile);
-        }
-        else
-        {
-            using namespace std::placeholders;
-            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
-        }
-
-    }*/
 
     virtual ~Entity() {
 
@@ -438,27 +411,6 @@ protected:
 
     }
 
-    virtual void handleListChildRequest(const std::shared_ptr<rmw_request_id_t> request_header,
-                                        const std::shared_ptr<ros2_components_msg::srv::ListChilds::Request> request,
-                                        std::shared_ptr<ros2_components_msg::srv::ListChilds::Response> response)
-    {
-
-        UNUSED(request_header);
-        UNUSED(request);
-        std::vector<std::string> types;
-        std::vector<int64_t> ids;
-
-        int i =0;
-        for(auto & child: childs)
-        {
-            response->childtypes.push_back(child->getClassName());
-            //std::cout << "Writing child name: "<< child->getName() << " :" <<child->getId()<<std::endl;
-            response->childids.push_back(child->getId());
-            i++;
-        }
-        response->listsize = i;
-
-    }
 
     //ROS 2 Stuff
     rmw_qos_profile_t custom_qos_profile;
