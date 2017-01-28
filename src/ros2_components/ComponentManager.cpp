@@ -143,5 +143,73 @@ void ComponentManager::AdvertisementCallback(const ros2_components_msg::msg::Ent
 
 }
 
+//void EntityBase::Advertise(AdvertisementType::Enum type)
+//{
+//    if(!advertised && type != AdvertisementType::Enum::New)
+//        return;
+//    if(advertised && type == AdvertisementType::Enum::New)
+//        return;
+//    if(this->advertisementPublisher != NULL)
+//    {
+//        LOG(Debug) << "Advertising:" << getName()<< " Type:" << type << std::endl;
+
+//        advertised = true;
+//        ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg = std::make_shared<ros2_components_msg::msg::EntityAdvertisement>();
+
+//        int64_t ipAddr =0;
+//        foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+//        {
+//            if(!interface.name().contains("vmnet"))
+//            {
+//                foreach (const QHostAddress &address, interface.allAddresses())
+//                {
+//                    if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+//                    {
+//                        //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
+//                        if(!address.isLoopback())
+//                        {
+//                            ipAddr = address.toIPv4Address();
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+
+//        msg->nodename = this->parentNode->get_name();
+//        msg->advertisementtype = (int)type;
+//        msg->id = getId();
+//        msg->machineip = ipAddr;
+//        if(getParent() != NULL)
+//        {
+//            msg->parent = getParent()->getId();
+//            msg->parenttype = getParent()->getClassName();
+//        }
+//        else
+//        {
+//            msg->parent = -1;
+//            msg->parenttype = "";
+//        }
+//        msg->type = this->className;
+//        builtin_interfaces::msg::Time time;
+//        simpleLogger::set_now(time);
+//        msg->stamp = time;
+
+
+//        for(auto & child: childs)
+//        {
+//            msg->childtypes.push_back(child->getClassName());
+//            msg->childids.push_back(child->getId());
+
+//        }
+
+
+//        msg->componentname = getName();
+//        LOG(Debug) << "Publishing advertisementmessage in " << getName() << " now" << std::endl;
+//        advertisementPublisher->publish(msg);
+
+//    }
+//}
+
 }
 

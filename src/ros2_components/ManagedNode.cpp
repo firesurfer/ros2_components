@@ -98,12 +98,21 @@ void ManagedNode::Start(bool multithreaded)
     if(multithreaded)
         WorkThread = std::make_shared<std::thread>(std::bind(&ManagedNode::AsyncWorker,this));
 
-    INIT_LOGGER(RosNode);
-    LOGLEVEL(Debug);
+
 }
 void ManagedNode::Setup()
 {
-    //Create base entity
+    Setup(LogLevel::Info);
+}
+void ManagedNode::Setup(LogLevel logLevel)
+{
+    //Create base entity in derived class
+    if(!this->BaseEntity || !this->RosNode)
+        throw std::runtime_error("BaseEntity and RosNode may not be null - cant proceed with setup");
+
+    INIT_LOGGER(RosNode);
+    LOGLEVEL(logLevel);
+
     this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
 }
 

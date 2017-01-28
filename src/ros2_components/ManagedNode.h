@@ -33,6 +33,40 @@
 /**
  * @brief The ManagedNode class
  * This class represents a managed lifecycle node.
+ *
+ * Example Usage:
+ *
+ * Inherit from ManagedNode (MyManagedNode and override DoWork and Setup
+ * In the Setup function you should create your the correct BaseEntity (In most cases your robot frame)
+ *
+ * Afterwards in your main function:
+ *
+ * std::shared_ptr<MyManagedNode> node = std::make_shared<MyManagedNode>(<nodename>, argc, argv);
+ * node->Setup(..);
+ *
+ * //The following lines are either or
+ * //For asynchronous spinning:
+ * node->Start();
+ * while(rclcpp::ok())
+ * {
+ *     node->DoWork();
+ * }
+ *
+ * //For asnychronous spinning and working:
+ * node->Start(true);
+ * while(rclcpp::ok())
+ * {
+ *     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+ * }
+ *
+ * //For synchronous spinning:
+ * while(rclcpp::ok())
+ * {
+ *      node->Spin();
+ *      node->DoWork();
+ *      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+ *      //Or use rclcpp::loop_rate
+ * }
  */
 namespace ros2_components {
 
@@ -58,15 +92,24 @@ public:
      * @brief Start
      * @param multithreaded
      * Start the spin function and in case mutlithreaded==true DoWork will be called in a seperate thread.
-     * Furthermore it will initilise the logger
+     * For synchronous spinning call Spin yourself and dont call start
      */
     virtual void Start(bool multithreaded = true);
     /**
      * @brief Setup
      * Do basic setup tasks after creating a node
      */
-    virtual void Setup();
-
+    void Setup();
+    /**
+     * @brief Setup
+     * @param logLevel
+     * Initiate the logger with a specific log level instead of LogLevel::Info @see Setup
+     */
+    virtual void Setup(LogLevel logLevel);
+    /**
+     * @brief Spin
+     */
+    virtual void Spin();
 
 protected:
     /**
@@ -74,10 +117,7 @@ protected:
      * Contains the given command line arguments
      */
     std::vector<std::string> CommandLineArguments;
-    /**
-     * @brief Spin
-     */
-    virtual void Spin();
+
     /**
      * @brief Abort
      * Will be set to true in case Exit was called
