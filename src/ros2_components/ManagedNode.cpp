@@ -106,14 +106,19 @@ void ManagedNode::Setup()
 }
 void ManagedNode::Setup(LogLevel logLevel)
 {
-    //Create base entity in derived class
-    if(!this->BaseEntity || !this->RosNode)
-        throw std::runtime_error("BaseEntity and RosNode may not be null - cant proceed with setup");
+    //If you want to implement a hardware node create base entity in derived class
+    if( !this->RosNode)
+        throw std::runtime_error("RosNode may not be null - cant proceed with setup");
 
     INIT_LOGGER(RosNode);
     LOGLEVEL(logLevel);
 
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
+    //Component manager for a hardware node: Has a baseentity where to hardware modell orignates
+    if(this->BaseEntity)
+        this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
+    else
+        this->CompManager = std::make_shared<ComponentManager>(this->RosNode);
+    //Component managed für a algorithm node: Doesnt need a baseentity
 }
 
 }

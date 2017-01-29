@@ -9,7 +9,7 @@ ComponentInfoFactory::ComponentInfoFactory()
 ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
 {
     ComponentInfo info;
-    info.name = ent->getParentNode();
+    info.name = ent->getName();
     info.id = ent->getId();
 
     //TODO move this into a more general place
@@ -36,12 +36,12 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
     if(ent->getParent() != NULL)
     {
         info.parentId = ent->getParent()->getId();
-        info.parentId = ent->getParent()->getClassName();
+        info.parentType = ent->getParent()->getClassName();
     }
     else
     {
-        msg->parent = -1;
-        msg->parenttype = "";
+        info.parentId = -1;
+        info.parentType = "";
     }
     info.type = ent->getClassName();
 
@@ -56,6 +56,22 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
 }
 
 ComponentInfo ComponentInfoFactory::FromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
+{
+    ComponentInfo info;
+    info.id = msg->id;
+    info.name = msg->componentname;
+    info.parentId = msg->parent;
+    info.parentType = msg->parenttype;
+    info.childIds = msg->childids;
+    info.childTypes = msg->childtypes;
+    info.nodename = msg->nodename;
+    info.type = msg->type;
+    info.machineip = msg->machineip;
+    //TODO check if all fields are used
+    return info;
+}
+
+ComponentInfo ComponentInfoFactory::FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
 {
     ComponentInfo info;
     info.id = msg->id;

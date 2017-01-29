@@ -1,10 +1,15 @@
 #ifndef COMPONENTINFOFACTORY_H
 #define COMPONENTINFOFACTORY_H
 
+/*ros2_components*/
 #include "EntityBase.h"
 #include "ComponentInfo.h"
-#include "ros2_components_msg/msg/list_components_response.hpp"
 
+/*Message*/
+#include "ros2_components_msg/msg/list_components_response.hpp"
+#include "ros2_components_msg/msg/component_changed.hpp"
+
+/*Qt*/
 #include <QHostAddress>
 #include <QHostInfo>
 #include <QNetworkInterface>
@@ -31,8 +36,13 @@ public:
      * Creates a ComponentInfo object from a given ListComponentsResponse msg
      */
     static ComponentInfo FromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
-
-
+    /**
+     * @brief FromComponentChangedMessage
+     * @param msg
+     * @return
+     * Creates a ComponentInfo object from a given ComponentChanged
+     */
+    static ComponentInfo FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
 };
 }
 #endif // COMPONENTINFOFACTORY_H

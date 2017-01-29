@@ -18,21 +18,31 @@
 #ifndef COMPONENTMANAGER_H
 #define COMPONENTMANAGER_H
 
+/*Qt*/
 #include <QObject>
-#include "rclcpp/rclcpp.hpp"
-#include "ros2_components_msg/msg/component_changed.hpp"
-#include "ros2_components_msg/msg/list_components_request.hpp"
-#include "ros2_components_msg/msg/list_components_response.hpp"
-#include "ComponentInfo.h"
-#include "ros2_components/AdvertisementType.h"
-#include "ros2_simple_logger/Logger.h"
-#include "ros2_components/EntityFactory.h"
-#include <functional>
 
+/*stdlib*/
+#include <functional>
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+
+/*ROS2*/
+#include "rclcpp/rclcpp.hpp"
+
+/*Messages*/
+#include "ros2_components_msg/msg/component_changed.hpp"
+#include "ros2_components_msg/msg/list_components_request.hpp"
+#include "ros2_components_msg/msg/list_components_response.hpp"
+
+/*ros2_components*/
+#include "ros2_simple_logger/Logger.h"
+
+#include "AdvertisementType.h"
+#include "EntityFactory.h"
+#include "ComponentInfo.h"
 #include "ComponentInfoFactory.h"
+
 namespace ros2_components
 {
 /**
@@ -46,7 +56,15 @@ public:
     typedef std::shared_ptr<ComponentManager> SharedPtr;
     /**
      * @brief ComponentManager
-     * @param _localNode - The ros node that should be used
+     * @param _localNode
+     * Use this constructor if your having a node that doesnt need a base entity (for example an algorithm node)
+     */
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
+    /**
+     * @brief ComponentManager
+     * @param _localNode
+     * @param _baseEntity
+     * Use this constructor if your having a node that needs a base entity (for example a hardware sensor/actor node)
      */
     ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
     /**
@@ -138,6 +156,8 @@ public:
                     if(!success)
                         continue;
                     idArg = Q_ARG(int64_t, childInfo.id);
+                    //TODO make a more universal approach for publishers and subscriptions in the system
+
                     if(childInfo.name.find("Sensor") != std::string::npos)
                         subscribeArg = Q_ARG(bool, true);
                     else
@@ -210,7 +230,6 @@ private:
      * @see ListComponentsResponseSubscription
      */
     rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponsePublisher;
-
     /**
      * @brief ComponentChangedCallback
      * @param msg
@@ -240,6 +259,7 @@ private:
      */
     std::vector<ComponentInfo> Components;
     EntityBase::SharedPtr BaseEntity;
+    rmw_qos_profile_t component_manager_profile;
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
 

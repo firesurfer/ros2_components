@@ -20,31 +20,41 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
 {
     //Variable Assignments
-    this->BaseEntity = _baseEntity; //TODO register to components add and change callbacks
     this->RosNode = _localNode;
 
     //Qos Profile
     //rmw_qos_profile_services_default
-    rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
+    component_manager_profile = rmw_qos_profile_parameters;
     component_manager_profile.depth = 1000;
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
     using namespace std::placeholders;
     this->ComponentChangedSubscription = RosNode->create_subscription<ros2_components_msg::msg::ComponentChanged>("ComponentChanged", std::bind(&ComponentManager::ComponentChangedCallback, this,_1), component_manager_profile);
-    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
     this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
 
     //Publishers
-    this->ComponentChangedPublisher = RosNode->create_publisher<ros2_components_msg::msg::ComponentChanged>("ComponentChanged",component_manager_profile);
     this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
-    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsRequest",component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
-
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
+}
+
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity): ComponentManager(_localNode)
+{
+
+    //Variable Assignments
+    this->BaseEntity = _baseEntity; //TODO register to components add and change callbacks
+
+    //Subscriptions
+    using namespace std::placeholders;
+    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
+
+    //Publishers
+    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
+
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
@@ -96,19 +106,19 @@ void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::L
             this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage());
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
             {
-                 this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(ent).toRosMessage());
+                this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(ent).toRosMessage());
                 ent->IterateThroughAllChilds(iteratingFunc);
             };
             this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
         };
         std::thread * asyncResponder = new std::thread(responseFunc);
+
         //TODO have one central thread that responds to all requests
     }
 }
 
 void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
 {
-
     if(RosNode->get_name() != msg->nodename)
     {
         bool foundInList = false;
@@ -137,11 +147,11 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         }
     }
 
-    //TODO go through components list and add new component if necessary or replace old component
 }
 
 void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
 {
+    //TODO rework Process<X>Advertisement functions
     LOG(Debug) << "Got type " <<"New"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
     for(auto & myInfo: Components)
     {
@@ -245,73 +255,6 @@ void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::
 
 }
 
-//void EntityBase::Advertise(AdvertisementType::Enum type)
-//{
-//    if(!advertised && type != AdvertisementType::Enum::New)
-//        return;
-//    if(advertised && type == AdvertisementType::Enum::New)
-//        return;
-//    if(this->advertisementPublisher != NULL)
-//    {
-//        LOG(Debug) << "Advertising:" << getName()<< " Type:" << type << std::endl;
-
-//        advertised = true;
-//        ros2_components_msg::msg::EntityAdvertisement::SharedPtr msg = std::make_shared<ros2_components_msg::msg::EntityAdvertisement>();
-
-//        int64_t ipAddr =0;
-//        foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-//        {
-//            if(!interface.name().contains("vmnet"))
-//            {
-//                foreach (const QHostAddress &address, interface.allAddresses())
-//                {
-//                    if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-//                    {
-//                        //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
-//                        if(!address.isLoopback())
-//                        {
-//                            ipAddr = address.toIPv4Address();
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-//        msg->nodename = this->parentNode->get_name();
-//        msg->advertisementtype = (int)type;
-//        msg->id = getId();
-//        msg->machineip = ipAddr;
-//        if(getParent() != NULL)
-//        {
-//            msg->parent = getParent()->getId();
-//            msg->parenttype = getParent()->getClassName();
-//        }
-//        else
-//        {
-//            msg->parent = -1;
-//            msg->parenttype = "";
-//        }
-//        msg->type = this->className;
-//        builtin_interfaces::msg::Time time;
-//        simpleLogger::set_now(time);
-//        msg->stamp = time;
-
-
-//        for(auto & child: childs)
-//        {
-//            msg->childtypes.push_back(child->getClassName());
-//            msg->childids.push_back(child->getId());
-
-//        }
-
-
-//        msg->componentname = getName();
-//        LOG(Debug) << "Publishing advertisementmessage in " << getName() << " now" << std::endl;
-//        advertisementPublisher->publish(msg);
-
-//    }
-//}
 
 }
 

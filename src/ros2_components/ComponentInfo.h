@@ -23,8 +23,6 @@
 /**
  * Represents information about a certain component (e.g a motor)
  * These information allow to  definitely identify any component/entity in the system
- *
- * TODO Move the name from ComponentInfo to EntityInfo
  */
 namespace ros2_components
 {
@@ -48,6 +46,7 @@ public:
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr toRosMessage()
     {
         ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = std::make_shared<ros2_components_msg::msg::ListComponentsResponse>();
+        //TODO check if all fields are correctly mapped
         msg->id = id;
         msg->type = type;
         msg->componentname = name;
@@ -57,7 +56,7 @@ public:
         msg->childids = childIds;
         msg->machineip = machineip;
         msg->nodename = nodename;
-
+        return msg;
     }
 };
 
