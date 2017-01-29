@@ -32,6 +32,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+#include "ComponentInfoFactory.h"
 namespace ros2_components
 {
 /**

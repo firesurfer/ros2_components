@@ -16,7 +16,7 @@
  */
 
 #include "ComponentManager.h"
-#include "QVariant"
+
 
 namespace ros2_components
 {
@@ -91,8 +91,18 @@ void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::L
 
     if(RosNode->get_name() != msg->nodename)
     {
-        //TODO answer with own components list
-        //TODO this needs to be done asynchronous
+        auto responseFunc = [&]()
+        {
+            this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage());
+            std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
+            {
+                 this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(ent).toRosMessage());
+                ent->IterateThroughAllChilds(iteratingFunc);
+            };
+            this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
+        };
+        std::thread * asyncResponder = new std::thread(responseFunc);
+        //TODO have one central thread that responds to all requests
     }
 }
 
@@ -101,20 +111,29 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 
     if(RosNode->get_name() != msg->nodename)
     {
+        bool foundInList = false;
+        ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
         {
             if(myInfo.id == msg->id)
             {
-                myInfo.type = msg->type;
+                foundInList = true;
+                //TODO check if it is okay to replace the info object
+                myInfo = currentInfo;
+                /*myInfo.type = msg->type;
                 myInfo.name = msg->componentname;
                 myInfo.parentId = msg->parent;
                 myInfo.parentType = msg->parenttype;
                 myInfo.childIds = msg->childids;
                 myInfo.childTypes = msg->childtypes;
                 myInfo.machineip = msg->machineip;
-                myInfo.nodename = msg->nodename;
-                //TODO other fields
+                myInfo.nodename = msg->nodename;*/
+
             }
+        }
+        if(!foundInList)
+        {
+            Components.push_back(currentInfo);
         }
     }
 
