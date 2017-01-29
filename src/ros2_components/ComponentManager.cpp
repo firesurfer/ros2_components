@@ -88,7 +88,7 @@ void ComponentManager::UpdateComponentsList()
 
 void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
-    std::string nodename = msg->nodename;
+
     if(RosNode->get_name() != msg->nodename)
     {
         //TODO answer with own components list
@@ -98,13 +98,23 @@ void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::L
 
 void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
 {
-    for(auto & myInfo: Components)
+
+    if(RosNode->get_name() != msg->nodename)
     {
-        if(myInfo.id == msg->id)
+        for(auto & myInfo: Components)
         {
-            myInfo.childids = msg->childids;
-            myInfo.childtypes = msg->childtypes;
-            //TODO other fields
+            if(myInfo.id == msg->id)
+            {
+                myInfo.type = msg->type;
+                myInfo.name = msg->componentname;
+                myInfo.parentId = msg->parent;
+                myInfo.parentType = msg->parenttype;
+                myInfo.childIds = msg->childids;
+                myInfo.childTypes = msg->childtypes;
+                myInfo.machineip = msg->machineip;
+                myInfo.nodename = msg->nodename;
+                //TODO other fields
+            }
         }
     }
 
@@ -211,7 +221,7 @@ void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::
     }
     else if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Delete)
     {
-       ProcessDeleteAdvertisment(msg,info);
+        ProcessDeleteAdvertisment(msg,info);
     }
 
 }

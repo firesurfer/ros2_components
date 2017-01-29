@@ -58,6 +58,21 @@ string EntityBase::getClassName()
     return className;
 }
 
+bool EntityBase::isVirtual()
+{
+    return virtualEntity;
+}
+
+bool EntityBase::isSubscriber()
+{
+    return subscriber;
+}
+
+rclcpp::node::Node::SharedPtr EntityBase::getParentNode()
+{
+    return parentNode;
+}
+
 void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
 {
     LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << "From: " << getName()<< std::endl;

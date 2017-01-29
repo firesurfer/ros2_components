@@ -18,7 +18,8 @@
 #ifndef COMPONENTINFO_H
 #define COMPONENTINFO_H
 
-#include <QObject>
+
+#include "ros2_components_msg/msg/list_components_response.hpp"
 /**
  * Represents information about a certain component (e.g a motor)
  * These information allow to  definitely identify any component/entity in the system
@@ -44,6 +45,20 @@ public:
     int64_t machineip;
     std::string nodename;
 
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr toRosMessage()
+    {
+        ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = std::make_shared<ros2_components_msg::msg::ListComponentsResponse>();
+        msg->id = id;
+        msg->type = type;
+        msg->componentname = name;
+        msg->parent = parentId;
+        msg->parenttype = parentType;
+        msg->childids = childIds;
+        msg->childids = childIds;
+        msg->machineip = machineip;
+        msg->nodename = nodename;
+
+    }
 };
 
 }

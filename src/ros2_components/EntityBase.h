@@ -40,9 +40,6 @@
 #include <QObject>
 #include <QMetaObject>
 #include <QMetaProperty>
-#include <QHostAddress>
-#include <QHostInfo>
-#include <QNetworkInterface>
 
 
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)
@@ -87,18 +84,18 @@ public:
      * @brief isVirtual
      * @return In case this is a virtual Entity (A Entity without a direct hardware representation) this will be true
      */
-    bool isVirtual()
-    {
-        return virtualEntity;
-    }
+    bool isVirtual();
     /**
      * @brief isSubscriber
      * @return Is this a subscriber or a publisher
      */
-    bool isSubscriber()
-    {
-        return subscriber;
-    }
+    bool isSubscriber();
+    /**
+     * @brief getParentNode
+     * @return The rosnode associated with this entity
+     */
+    rclcpp::node::Node::SharedPtr getParentNode();
+
     /**
      * @brief addChild
      * @return adds a child to the childs vector
