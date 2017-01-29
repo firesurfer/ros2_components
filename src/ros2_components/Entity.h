@@ -1,3 +1,4 @@
+#pragma once
 #include "EntityBase.h"
 
 namespace ros2_components {
