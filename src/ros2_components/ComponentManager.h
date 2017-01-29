@@ -262,7 +262,7 @@ private:
     rmw_qos_profile_t component_manager_profile;
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
-
+    void NewComponentFound(ComponentInfo &info);
     void ComponentDeleted(ComponentInfo &info);
     void ComponentChanged(ComponentInfo &info);
 

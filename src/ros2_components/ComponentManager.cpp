@@ -144,6 +144,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         if(!foundInList)
         {
             Components.push_back(currentInfo);
+            emit NewComponentFound(currentInfo);
         }
     }
 
