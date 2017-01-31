@@ -18,7 +18,7 @@
 #ifndef MANAGEDNODE_H
 #define MANAGEDNODE_H
 
-/* Qt */
+/*Qt5*/
 #include <QObject>
 /* std lib */
 #include <iostream>

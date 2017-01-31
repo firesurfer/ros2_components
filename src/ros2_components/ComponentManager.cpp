@@ -50,10 +50,10 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
     //Subscriptions
     using namespace std::placeholders;
-    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
+    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
 
     //Publishers
-    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
+    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
 
 }
 
@@ -98,12 +98,14 @@ void ComponentManager::UpdateComponentsList()
 
 void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
-
     if(RosNode->get_name() != msg->nodename)
     {
+
         auto responseFunc = [&]()
         {
-            this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage());
+            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
+
+            this->ListComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
             {
                 this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(ent).toRosMessage());
