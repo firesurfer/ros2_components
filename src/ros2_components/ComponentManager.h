@@ -157,8 +157,8 @@ public:
                         subscribeArg = Q_ARG(bool, false);
                     std::shared_ptr<EntityBase> child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
 
-                    std::shared_ptr<T> sh_child_ent = dynamic_pointer_cast<T>(child_obj);
-                    parentEntity->addChild(sh_child_ent);
+
+                    parentEntity->addChild(child_obj);
                     rec_build(child_obj,childInfo);
                 }
             };

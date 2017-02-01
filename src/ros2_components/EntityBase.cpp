@@ -75,7 +75,7 @@ rclcpp::node::Node::SharedPtr EntityBase::getParentNode()
 
 void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
 {
-    LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << "From: " << getName()<< std::endl;
+    LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << " from: " << getName()<< std::endl;
     childs.push_back(child);
     child->setParent(shared_from_this());
     connect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added,Qt::DirectConnection);

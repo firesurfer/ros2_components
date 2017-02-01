@@ -104,11 +104,13 @@ void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::L
         auto responseFunc = [&]()
         {
             ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
-
+            msg->nodename = RosNode->get_name();
             this->ListComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
             {
-                this->ListComponentsResponsePublisher->publish(ComponentInfoFactory::FromEntity(ent).toRosMessage());
+                auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
+                respMsg->nodename = RosNode->get_name();
+                this->ListComponentsResponsePublisher->publish(respMsg);
                 ent->IterateThroughAllChilds(iteratingFunc);
             };
             this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
@@ -123,6 +125,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 {
     if(RosNode->get_name() != msg->nodename)
     {
+        LOG(Info) << RosNode->get_name() << "  " << msg->nodename << std::endl;
         bool foundInList = false;
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
