@@ -112,7 +112,8 @@ public:
         }
         if(!found)
             throw std::runtime_error("Could not find a component with the given id");
-        return RebuildComponent<T>(relavantInfo,rebuildHierarchy);
+        std::shared_ptr<T> ent = RebuildComponent<T>(relavantInfo,rebuildHierarchy);
+        return ent;
     }
     /**
      * Rebuild a component from a ComponentInfo object using the EntityFactory
@@ -126,28 +127,20 @@ public:
         QGenericArgument subscribeArg;
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
         //Determine whether it's a sensor or an actor
+        //TODO - we need to get rid of the sensor/actor stuff here
         if(info.name.find("Sensor") != std::string::npos)
             subscribeArg = Q_ARG(bool, true);
         else
             subscribeArg = Q_ARG(bool, false);
         QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
 
-
-
-        QObject * obj = EntityFactory::CreateInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
-        T* ent = dynamic_cast<T*>(obj);
-        if(ent == NULL)
-        {
-            //Clean up
-            delete obj;
-            throw std::runtime_error("Could cast created object to the given type - WTF?!");
-        }
-        std::shared_ptr<T> secEnt(ent);
+        std::shared_ptr<EntityBase> ent = EntityFactory::CreateInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
+        std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
 
         //The following line recusivly rebuild the tree structure that was published before
         if(rebuildHierarchy)
         {
-            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo& parentInfo)
+            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo parentInfo)
             {
                 for(auto & child_id: parentInfo.childIds)
                 {
@@ -162,27 +155,22 @@ public:
                         subscribeArg = Q_ARG(bool, true);
                     else
                         subscribeArg = Q_ARG(bool, false);
-                    QObject * child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
-                    EntityBase* child_ent = dynamic_cast<EntityBase*>(child_obj);
-                    if(child_ent == NULL)
-                    {
-                        delete child_obj;
-                        throw std::runtime_error("Could not cast created child object to EntityBase - This is a fatal error");
-                    }
-                    std::shared_ptr<EntityBase> sh_child_ent(child_ent);
+                    std::shared_ptr<EntityBase> child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
+
+                    std::shared_ptr<T> sh_child_ent = dynamic_pointer_cast<T>(child_obj);
                     parentEntity->addChild(sh_child_ent);
-                    rec_build(sh_child_ent,childInfo);
+                    rec_build(child_obj,childInfo);
                 }
             };
             std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(secEnt);
             rec_build(parentEnt,info);
 
-
-            auto func = []( std::shared_ptr<EntityBase> ent){
+            //TODO work on better paramter mechanism
+           /* auto func = []( std::shared_ptr<EntityBase> ent){
                 ent->updateParameters();
             };
             parentEnt->updateParameters();
-            parentEnt->IterateThroughAllChilds(func);
+            parentEnt->IterateThroughAllChilds(func);*/
 
         }
 
