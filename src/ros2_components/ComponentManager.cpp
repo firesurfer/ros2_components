@@ -125,7 +125,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 {
     if(RosNode->get_name() != msg->nodename)
     {
-        LOG(Info) << RosNode->get_name() << "  " << msg->nodename << std::endl;
+        //LOG(Info) << RosNode->get_name() << "  " << msg->nodename << std::endl;
         bool foundInList = false;
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
