@@ -122,7 +122,7 @@ public:
     std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
     {
         if(!EntityFactory::Contains(info.type))
-            throw std::runtime_error("Can't auto-rebuild this component - did register it to the EntityFactory");
+            throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory");
 
         QGenericArgument subscribeArg;
         QGenericArgument idArg = Q_ARG(int64_t, info.id);

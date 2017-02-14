@@ -8,7 +8,7 @@ class Entity : public EntityBase
 {
 
 public:
-
+    typedef MessageType RosMessageType;
     /**
      * @brief Constructor of Entity
      * @param className is used together with the id to itentify topics, etc. of this entity
@@ -120,7 +120,8 @@ private:
             listenerCallback(msg);
             emit newData(this);
             for(auto listener : listeners) {
-                listener(msg);
+                if(listener)
+                    listener(msg);
             }
         }
 
