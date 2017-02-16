@@ -141,6 +141,7 @@ public:
 
     /*
      * Some methods for setting and getting stuff
+     * TODO Document them correctly
      */
     virtual bool isActive(){return active;}
     void setActive(bool act){this->active = act;}
@@ -306,7 +307,7 @@ signals:
     void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void parametersUpdated();
-    void newData(EntityBase* ent); //TODO SharedPtr ?
+    void newData(); //TODO SharedPtr ?
 
 private:
     /**

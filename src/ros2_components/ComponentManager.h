@@ -42,6 +42,7 @@
 #include "EntityFactory.h"
 #include "ComponentInfo.h"
 #include "ComponentInfoFactory.h"
+#include "ComponentListFilter.h"
 
 namespace ros2_components
 {
@@ -81,6 +82,17 @@ public:
      * TODO think of a better way to access all components
      */
     std::vector<ComponentInfo> ListComponents();
+    /**
+     * @brief ListNodes
+     * @return List of all found nodes
+     */
+    std::vector<std::string> ListNodes();
+    /**
+     * @brief ListComponentsBy
+     * @param filter
+     * @return List of ComponentInfo objects that are matched by the given ComponentListFilter
+     */
+    std::vector<ComponentInfo> ListComponentsBy(ComponentListFilter filter);
     /**
      * @brief GetInfoToId
      * @param id

@@ -72,6 +72,16 @@ std::vector<ComponentInfo> ComponentManager::ListComponents()
     return Components;
 }
 
+std::vector<string> ComponentManager::ListNodes()
+{
+    return this->RosNode->get_node_graph_interface()->get_node_names();
+}
+
+std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilter filter)
+{
+    return filter.Filter(this->Components);
+}
+
 ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
 {
     if(success != NULL)

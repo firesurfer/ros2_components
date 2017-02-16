@@ -33,7 +33,7 @@ public:
     ComponentInfo();
     //Copy constructor
     ComponentInfo(const ComponentInfo &info);
-    uint64_t id;
+    int64_t id;
     std::string type;
     std::string name;
     int64_t parentId;

@@ -90,7 +90,6 @@ protected:
     virtual void listenerCallback(const typename MessageType::SharedPtr  msg)
     {
         //To ignore warning
-
         UNUSED(msg);
 
     }
@@ -107,24 +106,21 @@ protected:
 
 
 private:
-
     std::vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
     /**
      * @brief calls the rest of the registerd listeners
      */
     void internalListenerCallback(const typename MessageType::SharedPtr msg)
     {
-        //std::cout << "New message in: "<< getName()<< " ptr: " <<this<< " Listeners: " << listeners.size()<<std::endl;
         if(msg)
         {
             listenerCallback(msg);
-            emit newData(this);
+            emit newData();
             for(auto listener : listeners) {
                 if(listener)
                     listener(msg);
             }
         }
-
     }
 
     /**
