@@ -142,6 +142,7 @@ public:
         {
             std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo parentInfo)
             {
+                int a = 0;
                 for(auto & child_id: parentInfo.childIds)
                 {
                     bool success = false;
