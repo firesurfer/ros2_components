@@ -73,6 +73,7 @@ public:
 
     }
 
+
     /**
      * @brief add a new listener to be called when new data arrives
      */
@@ -93,7 +94,16 @@ protected:
         UNUSED(msg);
 
     }
-
+    bool publishMsg(typename MessageType::SharedPtr msg)
+    {
+        if(!this->isSubscriber())
+            if(this->entityPublisher)
+                entityPublisher->publish(msg);
+            else
+                return false;
+        else return false;
+        return true;
+    }
 
     //ROS 2 Stuff
     rmw_qos_profile_t custom_qos_profile;
