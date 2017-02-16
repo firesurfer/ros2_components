@@ -86,10 +86,15 @@ void ManagedNode::DoWork()
 
 void ManagedNode::Exit()
 {
+    //std::cout << "Calling exit" << std::endl;
     Abort = true;
+    if(WorkThread)
     WorkThread->join();
+    if(SpinThread)
     SpinThread->join();
+    //std::cout << "Thread successfully ended" << std::endl;
     rclcpp::shutdown();
+    //std::cout << "Exit successfull" << std::endl;
 }
 
 void ManagedNode::Start(bool multithreaded)
