@@ -138,9 +138,9 @@ public:
 
         QGenericArgument subscribeArg;
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
-        //Determine whether it's a sensor or an actor
-        //TODO - we need to get rid of the sensor/actor stuff here
-        if(info.name.find("Sensor") != std::string::npos)
+
+        //TODO - Check if this works
+       if(!info.subscriber)
             subscribeArg = Q_ARG(bool, true);
         else
             subscribeArg = Q_ARG(bool, false);
@@ -162,9 +162,9 @@ public:
                     if(!success)
                         continue;
                     idArg = Q_ARG(int64_t, childInfo.id);
-                    //TODO make a more universal approach for publishers and subscriptions in the system
 
-                    if(childInfo.name.find("Sensor") != std::string::npos)
+                    //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;
+                    if(!childInfo.subscriber)
                         subscribeArg = Q_ARG(bool, true);
                     else
                         subscribeArg = Q_ARG(bool, false);

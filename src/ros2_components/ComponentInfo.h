@@ -42,6 +42,7 @@ public:
     std::vector<std::string> childTypes;
     int64_t machineip;
     std::string nodename;
+    bool subscriber;
 
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr toRosMessage()
     {
@@ -56,6 +57,7 @@ public:
         msg->childids = childIds;
         msg->machineip = machineip;
         msg->nodename = nodename;
+        msg->subscriber = subscriber;
         return msg;
     }
 };

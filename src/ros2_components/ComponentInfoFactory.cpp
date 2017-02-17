@@ -51,6 +51,8 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
         info.childTypes.push_back(child->getClassName());
     }
     info.name = ent->getName();
+    info.subscriber = ent->isSubscriber();
+
     return info;
 
 }
@@ -67,6 +69,7 @@ ComponentInfo ComponentInfoFactory::FromListComponentsResponseMessage(ros2_compo
     info.nodename = msg->nodename;
     info.type = msg->type;
     info.machineip = msg->machineip;
+    info.subscriber = msg->subscriber;
     //TODO check if all fields are used
     return info;
 }
@@ -83,6 +86,7 @@ ComponentInfo ComponentInfoFactory::FromComponentChangedMessage(ros2_components_
     info.nodename = msg->nodename;
     info.type = msg->type;
     info.machineip = msg->machineip;
+    info.subscriber = msg->subscriber;
     //TODO check if all fields are used
     return info;
 }

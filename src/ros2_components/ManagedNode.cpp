@@ -102,8 +102,6 @@ void ManagedNode::Start(bool multithreaded)
     SpinThread = std::make_shared<std::thread>(std::bind(&ManagedNode::Spin,this));
     if(multithreaded)
         WorkThread = std::make_shared<std::thread>(std::bind(&ManagedNode::AsyncWorker,this));
-
-
 }
 void ManagedNode::Setup()
 {

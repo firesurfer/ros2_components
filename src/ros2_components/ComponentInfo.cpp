@@ -34,6 +34,7 @@ ComponentInfo::ComponentInfo(const ComponentInfo&  info)
     this->parentId = info.parentId;
     this->parentType = info.parentType;
     this->type = info.type;
+    this->subscriber = info.subscriber;
 }
 
 }

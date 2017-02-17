@@ -1,5 +1,5 @@
 include_directories(
-    ${CMAKE_SOURCE_DIR}/src
+    
     ${rclcpp_INCLUDE_DIRS}
     ${rmw_INCLUDE_DIRS}
     ${rmw_implementation_INCLUDE_DIRS}
@@ -7,11 +7,18 @@ include_directories(
     ${ros2_simple_logger_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS} 
     ${Qt5Network_INCLUDE_DIRS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
 
 file(GLOB COMPONENTS_SRC_FILES 
 	"${CMAKE_CURRENT_SOURCE_DIR}/*.c*"
 	"${CMAKE_CURRENT_SOURCE_DIR}/*.h*"
+	
+	"${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.c*"
+	"${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.h*"
+	
 )
 add_library(ros2_components
     ${COMPONENTS_SRC_FILES}
