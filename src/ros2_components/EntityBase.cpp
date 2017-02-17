@@ -25,6 +25,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     this->parentNode = _parentNode;
     this->className = _className;
     this->active = true;
+    //TODO rework meta mechanism
     REFLECT(id);
     REFLECT(virtualEntity);
     REFLECT(className);

@@ -1,5 +1,4 @@
-#ifndef COMPONENTNAMEFILTER_H
-#define COMPONENTNAMEFILTER_H
+#pragma once
 
 #include "ComponentListFilter.h"
 namespace ros2_components {
@@ -18,4 +17,3 @@ private:
     std::string NodeName;
 };
 }
-#endif // COMPONENTNAMEFILTER_H

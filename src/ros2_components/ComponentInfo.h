@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef COMPONENTINFO_H
-#define COMPONENTINFO_H
+#pragma once
 
 
 #include "ros2_components_msg/msg/list_components_response.hpp"
@@ -64,4 +63,4 @@ public:
 
 }
 
-#endif // COMPONENTINFO_H
+

@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef ADVERTISEMENTTYPE_H
-#define ADVERTISEMENTTYPE_H
+#pragma once
 
 namespace AdvertisementType
 {
@@ -31,5 +30,5 @@ typedef enum
 }
 
 
-#endif // ADVERTISEMENTTYPE_H
+
 

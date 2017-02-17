@@ -1,6 +1,4 @@
-#ifndef COMPONENTINFOFACTORY_H
-#define COMPONENTINFOFACTORY_H
-
+#pragma once
 /*ros2_components*/
 #include "EntityBase.h"
 #include "ComponentInfo.h"
@@ -45,4 +43,4 @@ public:
     static ComponentInfo FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
 };
 }
-#endif // COMPONENTINFOFACTORY_H
+

@@ -1,5 +1,4 @@
-#ifndef COMPONENTLISTFILTER_H
-#define COMPONENTLISTFILTER_H
+#pragma once
 
 #include "ComponentInfo.h"
 namespace ros2_components
@@ -16,4 +15,4 @@ public:
     virtual std::vector<ComponentInfo> Filter(std::vector<ComponentInfo> infos);
 };
 }
-#endif // COMPONENTLISTFILTER_H
+

@@ -15,8 +15,7 @@
  *
  */
 
-#ifndef MANAGEDNODE_H
-#define MANAGEDNODE_H
+#pragma once
 
 /*Qt5*/
 #include <QObject>
@@ -149,4 +148,4 @@ private:
 };
 
 }
-#endif // MANAGEDNODE_H
+

@@ -15,9 +15,7 @@
  *
  */
 
-#ifndef COMPONENTMANAGER_H
-#define COMPONENTMANAGER_H
-
+#pragma once
 /*Qt*/
 #include <QObject>
 
@@ -275,4 +273,4 @@ signals:
 };
 }
 
-#endif // COMPONENTMANAGER_H
+
