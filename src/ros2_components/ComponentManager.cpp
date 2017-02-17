@@ -72,6 +72,11 @@ std::vector<ComponentInfo> ComponentManager::ListComponents()
     return Components;
 }
 
+int64_t ComponentManager::CountComponents()
+{
+    return Components.size();
+}
+
 std::vector<string> ComponentManager::ListNodes()
 {
     return this->RosNode->get_node_graph_interface()->get_node_names();

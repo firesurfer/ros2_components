@@ -83,6 +83,11 @@ public:
      */
     std::vector<ComponentInfo> ListComponents();
     /**
+     * @brief CountComponents
+     * @return
+     */
+    int64_t CountComponents();
+    /**
      * @brief ListNodes
      * @return List of all found nodes
      */
