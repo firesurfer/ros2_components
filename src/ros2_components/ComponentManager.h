@@ -88,6 +88,7 @@ public:
     /**
      * @brief ListNodes
      * @return List of all found nodes
+     * @remark This functions lists _all_ ros nodes!
      */
     std::vector<std::string> ListNodes();
     /**
