@@ -20,7 +20,7 @@ namespace ros2_components
 {
 ComponentNameFilter::ComponentNameFilter(std::__cxx11::string _Name)
 {
-
+    Name = _Name;
 }
 
 std::string ComponentNameFilter::getName() const
