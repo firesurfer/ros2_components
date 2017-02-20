@@ -109,6 +109,11 @@ public:
      * @brief Spin
      */
     virtual void Spin();
+    /**
+     * @brief GetComponentManager
+     * @return The component manager
+     */
+    ComponentManager::SharedPtr GetComponentManager();
 
 protected:
     /**

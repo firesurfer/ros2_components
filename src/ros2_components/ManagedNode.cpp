@@ -67,6 +67,11 @@ void ManagedNode::Spin()
     std::cout << "Ending spin" << std::endl;
 }
 
+ComponentManager::SharedPtr ManagedNode::GetComponentManager()
+{
+    return this->CommandLineArguments;
+}
+
 void ManagedNode::AsyncWorker()
 {
     //TODO make loop_rate configurable
@@ -89,9 +94,9 @@ void ManagedNode::Exit()
     //std::cout << "Calling exit" << std::endl;
     Abort = true;
     if(WorkThread)
-    WorkThread->join();
+        WorkThread->join();
     if(SpinThread)
-    SpinThread->join();
+        SpinThread->join();
     //std::cout << "Thread successfully ended" << std::endl;
     rclcpp::shutdown();
     //std::cout << "Exit successfull" << std::endl;
