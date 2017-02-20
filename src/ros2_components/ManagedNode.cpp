@@ -69,7 +69,7 @@ void ManagedNode::Spin()
 
 ComponentManager::SharedPtr ManagedNode::GetComponentManager()
 {
-    return this->CommandLineArguments;
+    return this->CompManager;
 }
 
 void ManagedNode::AsyncWorker()
