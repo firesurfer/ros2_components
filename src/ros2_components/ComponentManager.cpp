@@ -46,7 +46,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 {
 
     //Variable Assignments
-    this->BaseEntity = _baseEntity; //TODO register to components add and change callbacks
+    this->BaseEntity = _baseEntity; //TODO register to components and add change callbacks
 
     //Subscriptions
     using namespace std::placeholders;

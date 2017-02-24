@@ -74,6 +74,7 @@ class ManagedNode: public QObject
 {
     Q_OBJECT
 public:
+    typedef std::shared_ptr<ManagedNode> SharedPtr;
     ManagedNode(std::string nodeName,int argc, char* argv[]);
     virtual ~ManagedNode();
     /**
