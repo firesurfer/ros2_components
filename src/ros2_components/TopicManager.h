@@ -1,6 +1,4 @@
-#ifndef TOPICMANAGER_H
-#define TOPICMANAGER_H
-
+#pragma once
 #include "rclcpp/rclcpp.hpp"
 #include <memory>
 #include <map>
@@ -11,10 +9,16 @@ namespace  ros2_components {
 class TopicManager
 {
 public:
-    TopicManager();
+
+    static TopicManager& getInstance()
+    {
+        static TopicManager instance;
+        return instance;
+
+    }
 
     template<typename T>
-    static typename rclcpp::publisher::Publisher<T>::SharedPtr getPublisher(std::string _topicName, rclcpp::node::Node::SharedPtr _rosNode)
+    typename rclcpp::publisher::Publisher<T>::SharedPtr getPublisher(std::string _topicName, rclcpp::node::Node::SharedPtr _rosNode)
     {
 
         for(auto it=publishers.begin(); it != publishers.end(); it++)
@@ -32,24 +36,42 @@ public:
     }
 
     template<typename T>
-    static typename rclcpp::subscription::Subscription<T>::SharedPtr getSubscription(std::string _topicName, std::function<void(std::shared_ptr<T>)> _callback, rclcpp::node::Node::SharedPtr _rosNode)
+    typename rclcpp::subscription::Subscription<T>::SharedPtr createSubscription(std::string _topicName, std::function<void(std::shared_ptr<T>)> _callback, rclcpp::node::Node::SharedPtr _rosNode)
     {
-        for(auto it=subscriptions.begin(); it != subscriptions.end();it++)
+        /*for(auto it=subscriptions.begin(); it != subscriptions.end();it++)
         {
             if(it->first == _topicName)
             {
                 typename rclcpp::subscription::Subscription<T>::SharedPtr sub = std::dynamic_pointer_cast<rclcpp::subscription::Subscription<T>>(it->second);
-                return sub;
+                std::vector<function_t> callvec = subscriptionCallbacks[sub];
+                auto c_callback = _callback.template target<void (*)(std::shared_ptr<T>)>();
+                callvec.push_back(reinterpret_cast<function_t>(c_callback));
+                return;
             }
         }
-        auto internal_callback = [&](std::shared_ptr<T> msg){};
-        //typename rclcpp::subscription::Subscription<T>::SharedPtr sub
+        auto internal_callback = [&](std::shared_ptr<T> msg){
+            for(function_t callback: subscriptionCallbacks[subscriptions[_topicName]])
+            {
+
+                void (*t_callback)(std::shared_ptr<T>)  = reinterpret_cast<void (*)(std::shared_ptr<T>)>(callback);
+                t_callback(msg);
+            }
+        };*/
+        typename rclcpp::subscription::Subscription<T>::SharedPtr sub = _rosNode->create_subscription<T>(_topicName, _callback, rmw_qos_profile_sensor_data);
+
+        subscriptions[_topicName] = sub;
+        return sub;
+        //subscriptionCallbacks[sub] = std::vector<function_t>();
     }
 
 private:
-    static std::map<std::string, rclcpp::publisher::PublisherBase::SharedPtr> publishers;
-    static std::map<std::string, rclcpp::subscription::SubscriptionBase::SharedPtr> subscriptions;
+    TopicManager(){};
+
+
+    std::map<std::string, rclcpp::publisher::PublisherBase::SharedPtr> publishers;
+    std::map<std::string, rclcpp::subscription::SubscriptionBase::SharedPtr> subscriptions;
+   // static std::map<rclcpp::subscription::SubscriptionBase::SharedPtr, std::vector<function_t>> subscriptionCallbacks;
 };
 }
 
-#endif // TOPICMANAGER_H
+

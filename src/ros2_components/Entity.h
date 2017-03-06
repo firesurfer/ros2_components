@@ -50,7 +50,7 @@ public:
 
         if(!isSubscriber())
         {
-            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            entityPublisher = TopicManager::getInstance().getPublisher<MessageType>(getName(),parentNode);//parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
 
             //rmw_qos_profile_services_default
             rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
@@ -62,7 +62,7 @@ public:
         else
         {
             using namespace std::placeholders;
-            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            entitySubscription = TopicManager::getInstance().createSubscription<MessageType>(getName(),std::bind(&Entity::internalListenerCallback, this,_1), parentNode);// parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
             subBase = entitySubscription;
         }
 

@@ -25,7 +25,7 @@
 #include <mutex>
 #include <fstream>
 #include <string>
-
+#include <memory>
 
 
 #include "ros2_simple_logger/Logger.h"
@@ -33,9 +33,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp/publisher.hpp"
 #include "rclcpp/subscription.hpp"
-#include <memory>
 #include "Reflect.h"
-
+#include "TopicManager.h"
 
 #include <QObject>
 #include <QMetaObject>

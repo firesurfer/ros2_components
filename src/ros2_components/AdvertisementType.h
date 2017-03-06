@@ -17,18 +17,12 @@
 
 #pragma once
 
-namespace AdvertisementType
-{
-typedef enum
-{
+namespace AdvertisementType {
+typedef enum {
     Unknown = 0,
     New = 1,
     Change = 2,
     Delete = 3
 
-}Enum;
+} Enum;
 }
-
-
-
-
