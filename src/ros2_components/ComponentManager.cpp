@@ -145,7 +145,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
         {
-            if(myInfo.id == msg->id)
+            if(myInfo.id == (int64_t)msg->id)
             {
                 foundInList = true;
                 //TODO check if it is okay to replace the info object

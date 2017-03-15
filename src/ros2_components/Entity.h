@@ -32,22 +32,10 @@ public:
      */
     Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> parentNode, std::string className) : EntityBase(_id, _subscribe, parentNode, className)
     {
-
-
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
         //custom_qos_profile.depth = 2;
-
         //custom_qos_profile.history = hist_pol;
-        //Create a new parameterClient
-        //The client is used for storing meta information about a component
-        this->parameterClient = std::make_shared<rclcpp::parameter_client::AsyncParametersClient>(parentNode, "ParameterServer");
-
-        //Register the client on an event that is thrown in case a parameter has changed
-        parameterEventSubscription = parameterClient->on_parameter_event(std::bind(&Entity::onParameterEvent, this, _1));
-
-
-
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
@@ -65,18 +53,12 @@ public:
             entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
             subBase = entitySubscription;
         }
-
         LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
-
-
     }
 
 
     virtual ~Entity() {
 
-        // LOG(LogLevel::Info) << "Destroying: " << this->getName() << std::endl;
-        //this->active = false;
-        //publishMetaInformation();
     }
 
     /**
@@ -87,7 +69,6 @@ public:
     {
         LOG(Error) << "Entity:Please override publish function" << std::endl;
         return true;
-
     }
 
 
@@ -146,93 +127,6 @@ private:
             for(auto listener : listeners) {
                 if(listener)
                     listener(msg);
-            }
-        }
-    }
-
-    /**
-     * @brief onParameterEvent
-     * @param event
-     * Gets called in case the meta information of the component has changed
-     */
-    void onParameterEvent(const rcl_interfaces::msg::ParameterEvent::SharedPtr event)
-    {
-        //std::cout << "New parameter event in: "<<parentNode->get_name()  << ":" <<getName() << std::endl;
-        std::vector< rclcpp::parameter::ParameterVariant> params;
-        for (auto & new_parameter : event->new_parameters)
-        {
-            if(new_parameter.name.find(getName()) != std::string::npos)
-                params.push_back(rclcpp::parameter::ParameterVariant::from_parameter(new_parameter));
-        }
-        for (auto & changed_parameter : event->changed_parameters)
-        {
-            if(changed_parameter.name.find(getName()) != std::string::npos)
-                params.push_back(rclcpp::parameter::ParameterVariant::from_parameter(changed_parameter));
-        }
-        for (auto & parameter : params)
-        {
-            //std::cout << parameter.get_name() << std::endl;
-            std::string reducedParameter = parameter.get_name();
-            reducedParameter.erase(0,reducedParameter.find_last_of(".")+1);
-            //std::cout << "Reduced parameter: " << reducedParameter << std::endl;
-            for (auto & internal_val : internalmap)
-            {
-                if(internal_val->key == reducedParameter)
-                {
-
-
-                    /*
-                     * uint8 PARAMETER_NOT_SET=0
-                     * uint8 PARAMETER_BOOL=1
-                     * uint8 PARAMETER_INTEGER=2
-                     * uint8 PARAMETER_DOUBLE=3
-                     * uint8 PARAMETER_STRING=4
-                     * uint8 PARAMETER_BYTES=5
-                     */
-
-                    switch(parameter.get_type())
-                    {
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_BOOL:
-                    {
-                        SpecificElement<bool>* elem = static_cast<SpecificElement<bool>*>(internal_val);
-                        elem->setValue(parameter.as_bool());
-                        break;
-                    }
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_INTEGER:
-                    {
-                        SpecificElement<int64_t>* elem = static_cast<SpecificElement<int64_t>*>(internal_val);
-                        elem->setValue(parameter.as_int());
-                        break;
-                    }
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_DOUBLE:
-                    {
-                        SpecificElement<double>* elem = static_cast<SpecificElement<double>*>(internal_val);
-                        elem->setValue(parameter.as_double());
-                        break;
-                    }
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_STRING:
-                    {
-                        SpecificElement<std::string>* elem = static_cast<SpecificElement<std::string>*>(internal_val);
-                        elem->setValue(parameter.as_string());
-                        break;
-                    }
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_BYTES:
-                    {
-                        SpecificElement<std::vector<uint8_t>>* elem = static_cast<SpecificElement<std::vector<uint8_t>>*>(internal_val);
-                        elem->setValue(parameter.as_bytes());
-                        break;
-                    }
-                    case rcl_interfaces::msg::ParameterType::PARAMETER_NOT_SET:
-                    {
-                        break;
-                    }
-
-                    }
-                    /*for(auto it = internalmap.begin(); it != internalmap.end(); it++)
-                    {
-                    (*it)->print();
-                    }*/
-                }
             }
         }
     }

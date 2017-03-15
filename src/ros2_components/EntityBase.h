@@ -59,11 +59,7 @@ public:
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
     virtual ~EntityBase();
-    //Q_ENUM(AdvertisementType::Enum)
-    Q_PROPERTY(bool active READ isActive)
-    Q_PROPERTY(int64_t id READ getId)
-    Q_PROPERTY(std::string className READ getClassName)
-    Q_PROPERTY(bool virtualEntity READ isVirtual)
+
     /**
      * @brief getId
      * @return The Component ID
@@ -149,25 +145,11 @@ public:
     virtual void setDescription(std::string des){this->description = des;}
 
     /**
-     * @brief updateParameters
-     * update the metainformation (marked with REFLECT) via the parameter Server
-     */
-    virtual void updateParameters();
-    /**
-     * @brief publishMetaInformation
-     * push the local metainformation (marked with REFLECT) to the parameter Server
-     */
-    virtual void publishMetaInformation();
-    /**
      * @brief IterateThroughAllProperties
      * @param func
      */
     void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
-    /**
-     * @brief WasMetaInformationUpdated
-     * @return
-     */
-    bool WasMetaInformationUpdated(){return updated;}
+
     /**
      * @brief IterateThroughAllChilds
      * @param func
@@ -285,11 +267,7 @@ protected:
      * Baseclass for the subscription -> used for determing topic name
      */
     std::shared_ptr<rclcpp::subscription::SubscriptionBase> subBase;
-    /**
-     * @brief parameterClient
-     * parameterClient used for meta information transport
-     */
-    std::shared_ptr<rclcpp::parameter_client::AsyncParametersClient> parameterClient;
+
     /**
      * @brief active
      * is this entity active?
@@ -306,7 +284,7 @@ protected slots:
 signals:
     void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
-    void parametersUpdated();
+
     void newData(); //TODO SharedPtr ?
 
 private:
@@ -324,13 +302,11 @@ private:
      * @brief subscriber
      */
     bool subscriber;
-
     /**
      * @brief Name of the implementing class
      */
     std::string className;
-    bool updated = false;
-    bool advertised = false;
+
 
 
 };
