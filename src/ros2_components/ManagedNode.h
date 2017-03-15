@@ -115,6 +115,11 @@ public:
      * @return The component manager
      */
     ComponentManager::SharedPtr GetComponentManager();
+    /**
+     * @brief GetRosNode
+     * @return The encapsulated ros node
+     */
+    rclcpp::node::Node::SharedPtr GetRosNode();
 
 protected:
     /**

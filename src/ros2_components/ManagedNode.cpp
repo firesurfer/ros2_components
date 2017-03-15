@@ -72,6 +72,11 @@ ComponentManager::SharedPtr ManagedNode::GetComponentManager()
     return this->CompManager;
 }
 
+rclcpp::node::Node::SharedPtr ManagedNode::GetRosNode()
+{
+    return this->RosNode;
+}
+
 void ManagedNode::AsyncWorker()
 {
     //TODO make loop_rate configurable
