@@ -41,8 +41,8 @@ public:
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
 
             //rmw_qos_profile_services_default
-            rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
-            component_manager_profile.depth = 1000;
+            //rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
+            //component_manager_profile.depth = 1000;
             //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
             pubBase = entityPublisher;
 
