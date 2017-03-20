@@ -120,6 +120,11 @@ public:
      * @return The encapsulated ros node
      */
     rclcpp::node::Node::SharedPtr GetRosNode();
+    /**
+     * @brief GetNodeId
+     * @return
+     */
+    int64_t GetNodeId();
 
 protected:
     /**

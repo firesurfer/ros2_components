@@ -77,6 +77,11 @@ rclcpp::node::Node::SharedPtr ManagedNode::GetRosNode()
     return this->RosNode;
 }
 
+int64_t ManagedNode::GetNodeId()
+{
+    return this->NodeId;
+}
+
 void ManagedNode::AsyncWorker()
 {
     //TODO make loop_rate configurable
