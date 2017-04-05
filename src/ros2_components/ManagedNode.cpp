@@ -64,7 +64,12 @@ void ManagedNode::Spin()
         loop_rate.sleep();
 
     }
-   // std::cout << "Ending spin" << std::endl;
+    // std::cout << "Ending spin" << std::endl;
+}
+
+bool ManagedNode::Ok()
+{
+    return rclcpp::ok();
 }
 
 ComponentManager::SharedPtr ManagedNode::GetComponentManager()

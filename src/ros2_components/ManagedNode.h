@@ -107,9 +107,14 @@ public:
      */
     virtual void Setup(LogLevel logLevel);
     /**
-     * @brief Spin
+     * @brief Spin - Spin this node (manually)
      */
     virtual void Spin();
+    /**
+     * @brief Ok
+     * @return If the node is still ok -> Otherwise you should stop spinning!
+     */
+    virtual bool Ok();
     /**
      * @brief GetComponentManager
      * @return The component manager
