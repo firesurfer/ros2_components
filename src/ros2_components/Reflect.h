@@ -36,12 +36,12 @@ using namespace std;
 class Element{
 public:
     string key;
-    
+    string type;
     
     virtual void print(){}
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
-    
+    virtual const void * getVoidPtr(uint8_t & length, std::string & _key, std::string & _type)=0;
     
 };
 template <class T>
@@ -53,6 +53,14 @@ public:
     T &data;
     SpecificElement(string _key,T &_data):data(_data){
         key=_key;
+        if(std::is_same<T, double>::value)
+            type = "double";
+        else if(std::is_same<T, int64_t>::value)
+            type = "int64_t";
+        else if(std::is_same<T, bool>::value)
+            type = "bool";
+        else if(std::is_same<T, std::vector<uint8_t>>::value)
+            type = "vector<uint8_t>";
     }
     virtual void print(){
         cout<<"<"<<key<<"> ="<<data<<endl;
@@ -69,4 +77,82 @@ public:
     {
         return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
+    virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
+    {
+        _key = key;
+        _type = type;
+
+        length = sizeof(T);
+
+        return &data;
+    }
 };
+
+template <>
+class SpecificElement<std::string> : public Element{
+public:
+    std::string &data;
+    SpecificElement(string _key,std::string &_data):data(_data){
+        key=_key;
+        type = "string";
+    }
+    virtual void print(){
+        cout<<"<"<<key<<"> ="<<data<<endl;
+    }
+    virtual void setValue(std::string val)
+    {
+        data =val;
+    }
+    virtual rclcpp::parameter::ParameterVariant getParameterVariant()
+    {
+        return rclcpp::parameter::ParameterVariant(key, data);
+    }
+    virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
+    {
+        return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
+    }
+    virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
+    {
+        _key = key;
+        _type = type;
+
+        length = ((std::string)data).length();
+        return ((std::string)data).c_str();
+
+    }
+};
+
+template <>
+class SpecificElement<std::vector<uint8_t>> : public Element{
+public:
+    std::vector<uint8_t> &data;
+    SpecificElement(string _key,std::vector<uint8_t> &_data):data(_data){
+        key=_key;
+        type = "std::vector<uint8_t>";
+    }
+    virtual void print(){
+       // cout<<"<"<<key<<"> ="<<data<<endl;
+    }
+    virtual void setValue(std::vector<uint8_t> val)
+    {
+        data =val;
+    }
+    virtual rclcpp::parameter::ParameterVariant getParameterVariant()
+    {
+        return rclcpp::parameter::ParameterVariant(key, data);
+    }
+    virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
+    {
+        return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
+    }
+    virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
+    {
+        _key = key;
+        _type = type;
+
+        length = data.size();
+        return data.data();
+
+    }
+};
+
