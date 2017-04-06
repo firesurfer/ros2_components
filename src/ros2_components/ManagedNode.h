@@ -130,7 +130,11 @@ public:
      * @return
      */
     int64_t GetNodeId();
-
+    /**
+     * @brief NodeSetupSuccessfull
+     * @return true if setup was called
+     */
+    bool NodeSetupSuccessfull();
 protected:
     /**
      * @brief CommandLineArguments
@@ -161,6 +165,10 @@ protected:
      * The basic entity where the abstraction structure of this node starts from
      */
     EntityBase::SharedPtr BaseEntity;
+    /**
+     * @brief isSetup - was the setup function called
+     */
+    bool isSetup = false;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;

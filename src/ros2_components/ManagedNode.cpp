@@ -55,6 +55,8 @@ ManagedNode::~ManagedNode()
 
 void ManagedNode::Spin()
 {
+    if(!isSetup)
+        throw std::runtime_error("Node wasn't setup yet");
     rclcpp::executors::SingleThreadedExecutor executor;
     executor.add_node(RosNode);
     rclcpp::WallRate loop_rate(80);
@@ -85,6 +87,11 @@ rclcpp::node::Node::SharedPtr ManagedNode::GetRosNode()
 int64_t ManagedNode::GetNodeId()
 {
     return this->NodeId;
+}
+
+bool ManagedNode::NodeSetupSuccessfull()
+{
+    return this->isSetup;
 }
 
 void ManagedNode::AsyncWorker()
@@ -126,6 +133,7 @@ void ManagedNode::Start(bool multithreaded)
 void ManagedNode::Setup()
 {
     Setup(LogLevel::Info);
+
 }
 void ManagedNode::Setup(LogLevel logLevel)
 {
@@ -142,6 +150,7 @@ void ManagedNode::Setup(LogLevel logLevel)
     else
         this->CompManager = std::make_shared<ComponentManager>(this->RosNode);
     //Component manager for a algorithm node: Doesnt need a baseentity
+    this->isSetup = true; //Set setup to true
 }
 
 }
