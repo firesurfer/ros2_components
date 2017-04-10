@@ -45,7 +45,7 @@
 namespace ros2_components
 {
 /**
- * @brief The ComponentManager class - Collects component/entity advertisements in the systems and represents them ordered to the user
+ * @brief The ComponentManager class - Collects component/entity advertisements in the systems and represents them ordered to the user.
  */
 class ComponentManager:public QObject
 {

@@ -26,7 +26,7 @@
 namespace ros2_components
 {
 
-//As supposed in https://stackoverflow.com/questions/19503583/qt-meta-system-call-constructor-with-parameters
+//As proposed in https://stackoverflow.com/questions/19503583/qt-meta-system-call-constructor-with-parameters
 #define METAOBJS_INSERT(c) (EntityFactory::metaObjs.insert(#c, &c::staticMetaObject))
 
 /**
