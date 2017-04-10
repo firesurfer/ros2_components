@@ -19,12 +19,14 @@
 
 
 #include "ros2_components_msg/msg/list_components_response.hpp"
+
+namespace ros2_components
+{
 /**
+ * @brief ComponentInfo - Information needed to identify component.
  * Represents information about a certain component (e.g a motor)
  * These information allow to  definitely identify any component/entity in the system
  */
-namespace ros2_components
-{
 struct ComponentInfo
 {
 

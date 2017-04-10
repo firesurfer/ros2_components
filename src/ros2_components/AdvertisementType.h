@@ -17,8 +17,10 @@
 
 #pragma once
 
+
 namespace AdvertisementType
 {
+
 typedef enum
 {
     Unknown = 0,
