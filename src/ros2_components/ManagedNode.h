@@ -70,9 +70,9 @@
 namespace ros2_components {
 
 
-class ManagedNode: public QObject
+class ManagedNode
 {
-    Q_OBJECT
+
 public:
     typedef std::shared_ptr<ManagedNode> SharedPtr;
     ManagedNode(std::string nodeName,int argc, char* argv[]);
@@ -169,6 +169,11 @@ protected:
      * @brief isSetup - was the setup function called
      */
     bool isSetup = false;
+
+    /**
+     * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
+     */
+    std::string LogfilePath;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;

@@ -25,11 +25,11 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
     //Initialise ros2
     rclcpp::init(argc, argv);
 
-    //Parse commandline arguments for --id
+    //Parse commandline arguments for --id and --logpath
     //TODO make this nicer ;)
 
     int64_t id = 100;
-
+    this->LogfilePath = "";
     for(int i = 0; i < argc;i++)
     {
         std::string arg = std::string(argv[i]);
@@ -39,6 +39,11 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
             std::string id_str = arg.erase(0, arg.find_first_of('=')+1);
 
             id = std::stoi(id_str);
+        }
+        else if(arg.find("--logpath=") != std::string::npos)
+        {
+            std::string logfilePath = arg.erase(0, arg.find_first_of('=')+1);
+            this->LogfilePath = logfilePath;
         }
 
     }
@@ -141,10 +146,15 @@ void ManagedNode::Setup(LogLevel logLevel)
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
 
+    //Init logger
     INIT_LOGGER(RosNode);
+    //Set loglevel to given loglevel
     LOGLEVEL(logLevel);
+    //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
+    if(this->LogfilePath != "")
+        simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
 
-    //Component manager for a hardware node: Has a baseentity where to hardware modell orignates
+    //Component manager for a hardware node: Has a baseentity where to hardware model orignates
     if(this->BaseEntity)
         this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
     else
