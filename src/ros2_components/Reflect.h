@@ -34,6 +34,18 @@
 
 using namespace std;
 
+/**
+ * @brief The Element class - is used for reflection purposes.
+ * In order to support accessing variables by their names the user can mark variables of the following datatypes with the REFLECT macro.
+ * Supported Datatypes:
+ * double, int64_t, bool, string, vector<uint8_t>.
+ * This class needs to be used in cooperation with the Entity class.
+ * By calling REFLECT in an instance of the entity class or a class that inherits it an instance of SpecificElement<T> is added to the @ref internalmap.
+ * The internalmap resides in the @ref EntityBase class.
+ *
+ * By iterating over the internalmap you can access all elements. The name, the type, and also various representations can be access  via the returned Element object.
+ *
+ */
 class Element{
 public:
     string key;
@@ -152,7 +164,6 @@ public:
         bytes.resize(data.length());
         std::memcpy(bytes.data(),data.c_str(),data.length());
         return bytes;
-
     }
 };
 
