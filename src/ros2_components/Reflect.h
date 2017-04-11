@@ -24,6 +24,7 @@
 #include <string>
 #include <type_traits>
 #include "rclcpp/rclcpp.hpp"
+#include <cstring>
 
 #define ASTRINGZ(x) STRINGZ(x)
 #define STRINGZ(x)  #x
@@ -37,11 +38,15 @@ class Element{
 public:
     string key;
     string type;
-    
+
+    virtual std::string getKey(){return key;}
+    virtual std::string getType(){return type;}
+    virtual size_t getSize()=0;
     virtual void print(){}
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key, std::string & _type)=0;
+    virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)=0;
     
 };
 template <class T>
@@ -69,6 +74,11 @@ public:
     {
         data =val;
     }
+    virtual size_t getSize()
+    {
+        return sizeof(T);
+    }
+
     virtual rclcpp::parameter::ParameterVariant getParameterVariant()
     {
         return rclcpp::parameter::ParameterVariant(key, data);
@@ -81,10 +91,19 @@ public:
     {
         _key = key;
         _type = type;
-
         length = sizeof(T);
-
         return &data;
+    }
+    virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)
+    {
+        _key = key;
+        _type = type;
+        size_t length = sizeof(T);
+        std::vector<uint8_t> bytes;
+        bytes.reserve(length);
+        bytes.resize(length);
+        std::memcpy(bytes.data(),&data,length);
+        return bytes;
     }
 };
 
@@ -103,6 +122,10 @@ public:
     {
         data =val;
     }
+    virtual size_t getSize()
+    {
+        return data.length();
+    }
     virtual rclcpp::parameter::ParameterVariant getParameterVariant()
     {
         return rclcpp::parameter::ParameterVariant(key, data);
@@ -116,8 +139,19 @@ public:
         _key = key;
         _type = type;
 
-        length = ((std::string)data).length();
-        return ((std::string)data).c_str();
+        length = data.length();
+        return data.c_str();
+
+    }
+    virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)
+    {
+        _key = key;
+        _type = type;
+        std::vector<uint8_t> bytes;
+        bytes.reserve(data.length());
+        bytes.resize(data.length());
+        std::memcpy(bytes.data(),data.c_str(),data.length());
+        return bytes;
 
     }
 };
@@ -131,12 +165,17 @@ public:
         type = "std::vector<uint8_t>";
     }
     virtual void print(){
-        // cout<<"<"<<key<<"> ="<<data<<endl;
+        cout << "vector<uint8_t> Size: " << data.size() << std::endl;
     }
     virtual void setValue(std::vector<uint8_t> val)
     {
         data =val;
     }
+    virtual size_t getSize()
+    {
+        return data.size();
+    }
+
     virtual rclcpp::parameter::ParameterVariant getParameterVariant()
     {
         return rclcpp::parameter::ParameterVariant(key, data);
@@ -149,10 +188,14 @@ public:
     {
         _key = key;
         _type = type;
-
         length = data.size();
         return data.data();
-
+    }
+    virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)
+    {
+        _key = key;
+        _type = type;
+        return data;
     }
 };
 
