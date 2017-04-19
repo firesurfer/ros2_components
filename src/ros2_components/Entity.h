@@ -79,6 +79,11 @@ public:
     {
         listeners.push_back(listener);
     }
+    void addListener(std::function<void(std::shared_ptr<Entity<MessageType>>)> listener)
+    {
+        ptrListeners.push_back(listener);
+
+    }
 
 
 
@@ -115,6 +120,7 @@ protected:
 
 private:
     std::vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
+    std::vector<std::function<void(std::shared_ptr<Entity<MessageType>>)>> ptrListeners;
     /**
      * @brief calls the rest of the registerd listeners
      */
@@ -127,6 +133,16 @@ private:
             for(auto listener : listeners) {
                 if(listener)
                     listener(msg);
+            }
+            for(auto listener: ptrListeners)
+            {
+                if(listener)
+                {
+                    std::shared_ptr<Entity<MessageType>> ent = dynamic_pointer_cast<Entity<MessageType>>(shared_from_this());
+                    if(ent)
+                    listener(ent);
+
+                }
             }
         }
     }
