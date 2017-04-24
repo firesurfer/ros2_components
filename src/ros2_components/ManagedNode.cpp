@@ -30,6 +30,7 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
 
     int64_t id = 100;
     this->LogfilePath = "";
+    this->ConfigfilePath = "iboss_node.conf";
     for(int i = 0; i < argc;i++)
     {
         std::string arg = std::string(argv[i]);
@@ -44,6 +45,11 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
         {
             std::string logfilePath = arg.erase(0, arg.find_first_of('=')+1);
             this->LogfilePath = logfilePath;
+        }
+        else if(arg.find("--configpath=") != std::string::npos)
+        {
+            //TODO add checks
+            std::string ConfigfilePath = arg.erase(0, arg.find_first_of('=')+1);
         }
 
     }

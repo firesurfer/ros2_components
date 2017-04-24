@@ -174,6 +174,10 @@ protected:
      * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
      */
     std::string LogfilePath;
+    /**
+     * @brief ConfigfilePath - Path to the configfile. Parsed from commandline arguments.
+     */
+    std::string ConfigfilePath;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;
