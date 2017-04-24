@@ -46,6 +46,10 @@ using namespace std;
  * By iterating over the internalmap you can access all elements. The name, the type, and also various representations can be access  via the returned Element object.
  *
  */
+
+//TODO remove parameter variant
+//TODO use configurable map
+//TODO Check assertions
 class Element{
 public:
     string key;
@@ -90,7 +94,6 @@ public:
     {
         return sizeof(T);
     }
-
     virtual rclcpp::parameter::ParameterVariant getParameterVariant()
     {
         return rclcpp::parameter::ParameterVariant(key, data);
@@ -186,7 +189,6 @@ public:
     {
         return data.size();
     }
-
     virtual rclcpp::parameter::ParameterVariant getParameterVariant()
     {
         return rclcpp::parameter::ParameterVariant(key, data);
