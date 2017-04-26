@@ -17,7 +17,7 @@
 
 #pragma once
 #include "EntityBase.h"
-
+#include "EntityContainer.h"
 namespace ros2_components {
 
 template <typename MessageType>
@@ -75,12 +75,13 @@ public:
     /**
      * @brief add a new listener to be called when new data arrives
      */
-    void addListener(std::function<void(typename MessageType::SharedPtr)> listener)
+    /*void addListener(std::function<void(typename MessageType::SharedPtr)> listener)
     {
         listeners.push_back(listener);
-    }
-    void addListener(std::function<void(std::shared_ptr<Entity<MessageType>>)> listener)
+    }*/
+    void addListener(std::function<void(EntityContainer)> listener)
     {
+        //Think about entity wrapper class that allows casts
         ptrListeners.push_back(listener);
 
     }
@@ -91,8 +92,10 @@ protected:
     /**
      * @brief This is the method to handle new data inside your entity
      */
+    //TODO make this method abstract in order to force implementation in subclasses
     virtual void listenerCallback(const typename MessageType::SharedPtr  msg)
     {
+        LOG(Error) << "Please override listenerCallback" << std::endl;
         //To ignore warning
         UNUSED(msg);
 
@@ -120,7 +123,7 @@ protected:
 
 private:
     std::vector<std::function<void(typename MessageType::SharedPtr)>> listeners;
-    std::vector<std::function<void(std::shared_ptr<Entity<MessageType>>)>> ptrListeners;
+    std::vector<std::function<void(EntityContainer)>> ptrListeners;
     /**
      * @brief calls the rest of the registerd listeners
      */
@@ -138,10 +141,9 @@ private:
             {
                 if(listener)
                 {
-                    std::shared_ptr<Entity<MessageType>> ent = dynamic_pointer_cast<Entity<MessageType>>(shared_from_this());
+                    std::shared_ptr<EntityBase> ent = dynamic_pointer_cast<EntityBase>(shared_from_this());
                     if(ent)
-                    listener(ent);
-
+                        listener(EntityContainer(ent));
                 }
             }
         }
