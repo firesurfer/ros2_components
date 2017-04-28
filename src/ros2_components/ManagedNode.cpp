@@ -30,7 +30,7 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
 
     int64_t id = 100;
     this->LogfilePath = "";
-    this->ConfigfilePath = "iboss_node.conf";
+    this->ConfigfilePath = "settings.xml";
     for(int i = 0; i < argc;i++)
     {
         std::string arg = std::string(argv[i]);
