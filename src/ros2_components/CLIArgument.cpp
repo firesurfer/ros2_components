@@ -25,21 +25,17 @@ CLIArgument::CLIArgument(std::__cxx11::string _name, std::string _description, s
 
 bool CLIArgument::check(std::__cxx11::string element)
 {
-
     if(isFlag)
     {
-
         QString qstr = QString::fromStdString(element);
         if(qstr.startsWith("--"))
             qstr = qstr.remove(0,2);
         if(qstr.trimmed().toStdString() == name)
         {
-
             if(found != nullptr)
                 *found = true;
             return true;
         }
-
     }
     else
     {
@@ -51,13 +47,10 @@ bool CLIArgument::check(std::__cxx11::string element)
         if(namestr.trimmed().toStdString() == name)
         {
             qstr = qstr.mid(pos+1, qstr.length()- pos);
-
-
             *this->argument = qstr.toStdString();
             return true;
         }
     }
-
     return false;
 }
 

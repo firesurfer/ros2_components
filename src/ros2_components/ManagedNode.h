@@ -178,6 +178,8 @@ protected:
      * @brief ConfigfilePath - Path to the configfile. Parsed from commandline arguments.
      */
     std::string ConfigfilePath;
+
+    CLIParser parser;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;

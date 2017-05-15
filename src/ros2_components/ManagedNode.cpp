@@ -19,7 +19,7 @@
 namespace ros2_components {
 
 
-ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
+ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[]):parser{argv,argc,nodeName}
 {
 
     //Initialise ros2
@@ -32,7 +32,7 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
     std::string id_str= "";
 
     //TODO put addition help information int parser
-    CLIParser parser(argv,argc, "None");
+
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
 
