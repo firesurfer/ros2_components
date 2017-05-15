@@ -28,7 +28,7 @@
 /* ros2 components */
 #include "ros2_simple_logger/Logger.h"
 #include "ComponentManager.h"
-
+#include "CLIParser.h"
 /**
  * @brief The ManagedNode class
  * This class represents a managed lifecycle node.

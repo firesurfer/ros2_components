@@ -29,13 +29,29 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
     //TODO make this nicer ;)
 
     int64_t id = 100;
+    std::string id_str= "";
+
+    //TODO put addition help information int parser
+    CLIParser parser(argv,argc, "None");
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
+
+    parser.registerArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
+    parser.registerArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
+    parser.registerArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
+    parser.parse();
+    if(parser.getHelpFound())
+        exit(0);
+    if(id_str != "")
+    {
+        std::cout << id_str << std::endl;
+        id = std::stoi(id_str);
+    }
     for(int i = 0; i < argc;i++)
     {
         std::string arg = std::string(argv[i]);
         this->CommandLineArguments.push_back(arg);
-        if(arg.find("--id=") != std::string::npos)
+        /*if(arg.find("--id=") != std::string::npos)
         {
             std::string id_str = arg.erase(0, arg.find_first_of('=')+1);
 
@@ -50,7 +66,7 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[])
         {
             //TODO add checks
             std::string ConfigfilePath = arg.erase(0, arg.find_first_of('=')+1);
-        }
+        }*/
 
     }
 
