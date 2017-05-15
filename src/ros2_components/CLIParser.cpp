@@ -21,8 +21,11 @@ void CLIParser::parse()
         {
             if(cliArg->check(arg))
             {
-                this->cliArguments.remove(cliArg);
-                break;
+                if(cliArg->getName() != "help")
+                {
+                    this->cliArguments.remove(cliArg);
+                    break;
+                }
             }
         }
         if(helpFound)
@@ -42,7 +45,10 @@ void CLIParser::printHelp(std::string additionalInformation)
     std::cout <<  additionalInformation << std::endl;
     for(CLIArgument::SharedPtr & cliArg: cliArguments)
     {
-        std::cout << "  --" << cliArg->getName() << "       " << cliArg->getDescription() << std::endl;
+        std::string output = " --" + cliArg->getName() + "                     ";
+        output.insert(20, cliArg->getDescription());
+
+        std::cout << output << std::endl;
     }
 }
 
