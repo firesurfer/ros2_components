@@ -13,7 +13,10 @@ CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, 
 CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, std::shared_ptr<CLIVerb> _parent, bool *_found):CLIVerb(_verb,_description,_parent)
 {
     this->found = _found;
-    *(this->found) = false;
+    if(found != nullptr)
+    {
+        *(this->found) = false;
+    }
 }
 
 bool CLIVerb::addVerb(CLIVerb::SharedPtr _child)
@@ -38,7 +41,8 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
         if(isVerb(arg))
         {
             if(arg == this->name)
-                *this->found = true;
+                if(found != nullptr)
+                    *this->found = true;
             if(childVerbs[arg] != nullptr)
                 childVerbs[arg]->parse(str);
             it++;
@@ -59,7 +63,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
             if(cliArg->parse(argument))
             {
 
-                 if(cliArg->getName() != "help")
+                if(cliArg->getName() != "help")
                 {
                     this->cliArguments.remove(cliArg);
                     break;
