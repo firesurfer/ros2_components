@@ -23,7 +23,7 @@ CLIArgument::CLIArgument(std::__cxx11::string _name, std::string _description, s
     this->found = nullptr;
 }
 
-bool CLIArgument::check(std::__cxx11::string element)
+bool CLIArgument::parse(std::__cxx11::string element)
 {
     if(isFlag)
     {

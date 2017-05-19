@@ -36,9 +36,9 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[]):parser{ar
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
 
-    parser.registerArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
-    parser.registerArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
-    parser.registerArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
+    parser.addArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
+    parser.addArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
+    parser.addArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
     parser.parse();
     if(parser.getHelpFound())
         exit(0);

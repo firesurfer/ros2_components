@@ -19,7 +19,7 @@ public:
     typedef std::shared_ptr<CLIArgument> SharedPtr;
     CLIArgument(std::string _name, std::string _description, bool * _found);
     CLIArgument(std::string _name, std::string _description, std::string *_argument);
-    bool check(std::string element);
+    bool parse(std::string element);
     std::string getDescription() const;
 
     std::string getName() const;
