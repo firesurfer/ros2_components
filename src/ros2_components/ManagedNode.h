@@ -75,7 +75,7 @@ class ManagedNode
 
 public:
     typedef std::shared_ptr<ManagedNode> SharedPtr;
-    ManagedNode(std::string nodeName,int argc, char* argv[]);
+    ManagedNode(std::string nodeName,int argc, char* argv[], bool parseCli = true);
     virtual ~ManagedNode();
     /**
      * @brief DoWork
