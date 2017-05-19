@@ -42,28 +42,37 @@ void CLIParser::addArgument(CLIArgument::SharedPtr arg)
 void CLIParser::printHelp(std::string additionalInformation)
 {
 
+    int depth = 0;
     std::cout <<  additionalInformation << std::endl;
     std::function<void(CLIVerb::SharedPtr)> func = [&](CLIVerb::SharedPtr verb){
 
 
-        std::cout << verb->getName() << std::endl << std::endl;
-
+        for(int i = 0; i < depth; i++)
+            std::cout << " ";
+        std::cout << printInColor(verb->getName(),ConsoleColor::FG_BLUE) << std::endl;
+        for(int i = 0; i < depth+4; i++)
+            std::cout << " ";
         std::cout << verb->getDescription() << std::endl << std::endl;
 
         for(auto cliArg : verb->getAllCliArguments())
         {
+            for(int i = 0; i < depth+4; i++)
+                std::cout << " ";
             std::string output = " --" + cliArg->getName() + "                     ";
             output.insert(20, cliArg->getDescription());
             std::cout << output << std::endl;
         }
-        std::cout << std::endl;
 
+
+         depth = depth+2;
         for(auto subVerbEntry : verb->getChildVerbs())
         {
             CLIVerb::SharedPtr subVerb = subVerbEntry.second;
 
             func(subVerb);
         }
+        depth = depth-2;
+
 
     };
     func(this->baseVerb);

@@ -8,6 +8,7 @@
 #include "CLIArgument.h"
 #include "CLIVerb.h"
 #include <functional>
+#include "ros2_simple_logger/ConsoleColor.h"
 namespace ros2_components
 {
 /**
