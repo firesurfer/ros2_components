@@ -19,7 +19,7 @@
 namespace ros2_components {
 
 
-ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[]):parser{argv,argc,nodeName}
+ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[]):cliParser{argv,argc,nodeName}
 {
 
     //Initialise ros2
@@ -36,11 +36,11 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[]):parser{ar
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
 
-    parser.addArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
-    parser.addArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
-    parser.addArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
-    parser.parse();
-    if(parser.getHelpFound())
+    cliParser.addArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
+    cliParser.addArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
+    cliParser.addArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
+    cliParser.parse();
+    if(cliParser.getHelpFound())
         exit(0);
     if(id_str != "")
     {

@@ -179,7 +179,7 @@ protected:
      */
     std::string ConfigfilePath;
 
-    CLIParser parser;
+    CLIParser cliParser;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;
