@@ -7,6 +7,12 @@
 #include <QString>
 namespace ros2_components
 {
+/**
+ * @brief The CLIArgument class represents a single argument for the command line.
+ * It distinguishes between flags and parameters. For detecting a passed flag use the constructor with "bool *_found".
+ * For detecting an parameter use the second constructor with "std::string * _argument".
+ * You need to register the argument at a CLIParser instance.
+ */
 class CLIArgument
 {
 public:
