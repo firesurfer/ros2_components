@@ -54,6 +54,14 @@ void CLIParser::printHelp(std::string additionalInformation)
             std::cout << " ";
         std::cout << verb->getDescription() << std::endl << std::endl;
 
+        for(auto cliParam : verb->getAllCliParameter())
+        {
+            for(int i = 0; i < depth+4; i++)
+                std::cout << " ";
+            std::string output =  cliParam->getName() + "                     ";
+            output.insert(20, cliParam->getDescription());
+            std::cout << output << std::endl;
+        }
         for(auto cliArg : verb->getAllCliArguments())
         {
             for(int i = 0; i < depth+4; i++)
@@ -62,6 +70,7 @@ void CLIParser::printHelp(std::string additionalInformation)
             output.insert(20, cliArg->getDescription());
             std::cout << output << std::endl;
         }
+
 
 
          depth = depth+2;

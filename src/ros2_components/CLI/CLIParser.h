@@ -7,6 +7,7 @@
 #include <QString>
 #include "CLIArgument.h"
 #include "CLIVerb.h"
+#include "CLIParameter.h"
 #include <functional>
 #include "ros2_simple_logger/ConsoleColor.h"
 namespace ros2_components
@@ -18,6 +19,7 @@ namespace ros2_components
 class CLIParser
 {
 public:
+    typedef std::shared_ptr<CLIParser> SharedPtr;
     /**
      * @brief CLIParser
      * @param argv - String array with command line arguments

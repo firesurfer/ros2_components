@@ -30,14 +30,26 @@ bool CLIVerb::addArgument(CLIArgument::SharedPtr _arg)
     this->allCliArguments.push_back(_arg);
 }
 
+bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
+{
+    this->cliParameters.push_back(_param);
+    this->allCliParameter.push_back(_param);
+}
+
 bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
 {
     std::vector<std::string> arguments;
-
+    std::vector<std::string> parameters;
+    int count = 0;
     for(auto it = str.begin(); it != str.end();)
     {
         std::string arg = *it;
-
+        if(count < this->allCliParameter.size())
+        {
+            parameters.push_back(arg);
+            str.erase(it);
+        }
+        count++;
         if(isVerb(arg))
         {
             if(arg == this->name)
@@ -71,6 +83,16 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
             }
         }
     }
+    int i = 0;
+    if(allCliParameter.size() != parameters.size())
+        throw std::runtime_error("Wrong amount of parameters. Expecting: "+ std::to_string(allCliParameter.size()));
+
+    for(CLIParameter::SharedPtr param: this->allCliParameter)
+    {
+        param->parse(parameters[i]);
+        i++;
+
+    }
 }
 
 std::string CLIVerb::getName() const
@@ -96,6 +118,11 @@ std::vector<CLIArgument::SharedPtr> CLIVerb::getAllCliArguments() const
 std::map<std::string, CLIVerb::SharedPtr> CLIVerb::getChildVerbs() const
 {
     return childVerbs;
+}
+
+std::vector<CLIParameter::SharedPtr> CLIVerb::getAllCliParameter() const
+{
+    return allCliParameter;
 }
 
 bool CLIVerb::isVerb(std::__cxx11::string arg)

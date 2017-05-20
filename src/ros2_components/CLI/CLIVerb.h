@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 #include "CLIArgument.h"
+#include "CLIParameter.h"
 #include <QString>
 #include <list>
 namespace  ros2_components {
@@ -19,6 +20,7 @@ public:
     CLIVerb(std::string _verb, std::string _description, std::shared_ptr<CLIVerb> _parent, bool * _found);
     bool addVerb(CLIVerb::SharedPtr _child);
     bool addArgument(CLIArgument::SharedPtr _arg);
+    bool addParameter(CLIParameter::SharedPtr _param);
     /**
      * @brief parse - Parse the corresponding arguments for this verb -> Pass subverbs and arguments to childen
      * @param arguments
@@ -37,6 +39,8 @@ public:
 
     std::map<std::string, CLIVerb::SharedPtr> getChildVerbs() const;
 
+    std::vector<CLIParameter::SharedPtr> getAllCliParameter() const;
+
 private:
 
     std::string name;
@@ -44,7 +48,9 @@ private:
     std::shared_ptr<CLIVerb> parent;
     std::map<std::string, CLIVerb::SharedPtr> childVerbs;
     std::list <CLIArgument::SharedPtr> cliArguments;
-     std::vector<CLIArgument::SharedPtr> allCliArguments;
+    std::list <CLIParameter::SharedPtr> cliParameters;
+    std::vector<CLIArgument::SharedPtr> allCliArguments;
+    std::vector<CLIParameter::SharedPtr> allCliParameter;
     bool* found;
 
     bool isVerb(std::string arg);
