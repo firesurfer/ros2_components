@@ -53,7 +53,12 @@ void CLIParser::printHelp(std::string additionalInformation)
         for(int i = 0; i < depth+4; i++)
             std::cout << " ";
         std::cout << verb->getDescription() << std::endl << std::endl;
-
+        if(verb->getAllCliParameter().size() > 0)
+        {
+            for(int i = 0; i < depth+2; i++)
+                std::cout << " ";
+            std::cout << "Needed parameters: " << std::endl;
+        }
         for(auto cliParam : verb->getAllCliParameter())
         {
             for(int i = 0; i < depth+4; i++)
