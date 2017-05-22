@@ -64,8 +64,6 @@ private:
      */
     CLIVerb::SharedPtr baseVerb;
     std::vector<std::string> arguments;
-
-
     bool helpFound = false;
     std::string helpString;
 

@@ -14,20 +14,23 @@ CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, 
 {
     this->found = _found;
     if(found != nullptr)
-    {
         *(this->found) = false;
-    }
 }
 
 bool CLIVerb::addVerb(CLIVerb::SharedPtr _child)
 {
+    if(this->childVerbs.find(_child->getName()) != this->childVerbs.end())
+        return false;
     this->childVerbs[_child->getName()] = _child;
+    return true;
 }
 
 bool CLIVerb::addArgument(CLIArgument::SharedPtr _arg)
 {
+    //TODO return false if argument already in list
     this->cliArguments.push_back(_arg);
     this->allCliArguments.push_back(_arg);
+    return true;
 }
 
 bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
@@ -94,6 +97,12 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
 
     }
 }
+
+bool CLIVerb::wasFound()
+{
+    return found;
+}
+
 
 std::string CLIVerb::getName() const
 {
