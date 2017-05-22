@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <iostream>
 namespace ros2_components
 {
 /**

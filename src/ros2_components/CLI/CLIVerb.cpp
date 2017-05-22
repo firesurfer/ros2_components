@@ -7,6 +7,7 @@ CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, 
     this->name = _verb;
     this->description = _description;
     this->parent = _parent;
+    this->found = nullptr;
 }
 
 CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, std::shared_ptr<CLIVerb> _parent, bool *_found):CLIVerb(_verb,_description,_parent)
@@ -41,26 +42,41 @@ bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
 
 bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
 {
+    if(str.size() <= 0)
+        return false;
     std::vector<std::string> arguments;
     std::vector<std::string> parameters;
     int count = 0;
     for(auto it = str.begin(); it != str.end();)
     {
+
         std::string arg = *it;
+        if(arg == "")
+        {
+            str.erase(it);
+            continue;
+        }
+        //Second check if this arg was found
+        if(arg == this->name)
+        {
+            if(found != nullptr)
+                *this->found = true;
+            str.erase(it);
+            continue;
+        }
+        //First check for parameters
         if(count < this->allCliParameter.size())
         {
             parameters.push_back(arg);
             str.erase(it);
         }
         count++;
+
         if(isVerb(arg))
         {
-            if(arg == this->name)
-                if(found != nullptr)
-                    *this->found = true;
-            if(childVerbs[arg] != nullptr)
-                childVerbs[arg]->parse(str);
-            it++;
+            if(arg != "")
+                if(childVerbs[arg] != nullptr)
+                    childVerbs[arg]->parse(str);
         }
         else
         {
