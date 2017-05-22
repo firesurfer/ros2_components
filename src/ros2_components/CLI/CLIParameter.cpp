@@ -9,13 +9,15 @@ CLIParameter::CLIParameter(std::string _name, std::string _description, std::str
     this->name = _name;
     this->description = _description;
     this->param = _param;
-
 }
 
 bool CLIParameter::parse(std::__cxx11::string parameter)
 {
     if(param != nullptr)
         *param = parameter;
+    else
+        throw std::invalid_argument("param was NULL");
+    return true;
 }
 
 std::string CLIParameter::getName() const
