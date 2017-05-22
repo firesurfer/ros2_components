@@ -17,6 +17,8 @@ CLIParser::CLIParser(char *argv[], int argc, std::string _programDescription)
 
 void CLIParser::parse()
 {
+    if(arguments.size() <= 0)
+        return;
     arguments.erase(arguments.begin());
     this->baseVerb->parse(arguments);
 
