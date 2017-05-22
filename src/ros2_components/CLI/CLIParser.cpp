@@ -19,7 +19,8 @@ void CLIParser::parse()
 {
     if(arguments.size() <= 0)
         return;
-    arguments.erase(arguments.begin());
+    std::vector<std::string> arg_copy = arguments;
+    arg_copy.erase(arg_copy.begin());
     this->baseVerb->parse(arguments);
 
     if(helpFound)
