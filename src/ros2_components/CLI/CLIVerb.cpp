@@ -7,7 +7,6 @@ CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, 
     this->name = _verb;
     this->description = _description;
     this->parent = _parent;
-
 }
 
 CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, std::shared_ptr<CLIVerb> _parent, bool *_found):CLIVerb(_verb,_description,_parent)
@@ -35,6 +34,7 @@ bool CLIVerb::addArgument(CLIArgument::SharedPtr _arg)
 
 bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
 {
+    //TODO return fals if parameter is already in list
     this->cliParameters.push_back(_param);
     this->allCliParameter.push_back(_param);
 }
@@ -72,12 +72,10 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
     }
     for(std::string & argument: arguments)
     {
-
         for(CLIArgument::SharedPtr & cliArg: cliArguments)
         {
             if(cliArg->parse(argument))
             {
-
                 if(cliArg->getName() != "help")
                 {
                     this->cliArguments.remove(cliArg);
@@ -94,7 +92,6 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
     {
         param->parse(parameters[i]);
         i++;
-
     }
 }
 
@@ -102,7 +99,6 @@ bool CLIVerb::wasFound()
 {
     return found;
 }
-
 
 std::string CLIVerb::getName() const
 {
@@ -137,10 +133,7 @@ std::vector<CLIParameter::SharedPtr> CLIVerb::getAllCliParameter() const
 bool CLIVerb::isVerb(std::__cxx11::string arg)
 {
     QString qarg = QString::fromStdString(arg);
-
     return !(qarg.startsWith("-") || qarg.startsWith("--"));
-
-
 }
 
 }
