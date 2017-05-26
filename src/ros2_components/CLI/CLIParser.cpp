@@ -21,10 +21,15 @@ void CLIParser::parse()
         return;
     std::vector<std::string> arg_copy = arguments;
     arg_copy.erase(arg_copy.begin());
-    this->baseVerb->parse(arguments);
+    bool error = false;
+    this->baseVerb->parse(arguments, &error);
 
-    if(helpFound)
+    if(helpFound || error)
     {
+        if(error)
+        {
+            std::cout << printInColor("Bad argument!", ConsoleColor::FG_RED) << std::endl;
+        }
         printHelp(this->helpString);
     }
 }

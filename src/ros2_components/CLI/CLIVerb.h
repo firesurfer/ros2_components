@@ -45,7 +45,7 @@ public:
      * @param arguments
      * @return
      */
-    bool parse(std::vector<std::string>& str);
+    bool parse(std::vector<std::string>& str, bool *error);
 
     /**
      * @brief wasFound
@@ -73,6 +73,7 @@ public:
     std::map<std::string, CLIVerb::SharedPtr> getChildVerbs() const;
 
     std::vector<CLIParameter::SharedPtr> getAllCliParameter() const;
+
 
 private:
 

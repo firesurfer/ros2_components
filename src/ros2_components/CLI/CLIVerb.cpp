@@ -40,7 +40,7 @@ bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
     this->allCliParameter.push_back(_param);
 }
 
-bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
+bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
 {
     if(str.size() <= 0)
         return false;
@@ -77,9 +77,12 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
         {
             if(arg != "")
                 if(childVerbs[arg] != nullptr)
-                    childVerbs[arg]->parse(str);
+                    childVerbs[arg]->parse(str,error);
                 else
+                {
                     str.erase(it);
+                    *error = true;
+                }
         }
         else
         {
@@ -154,5 +157,6 @@ bool CLIVerb::isVerb(std::__cxx11::string arg)
     QString qarg = QString::fromStdString(arg);
     return !(qarg.startsWith("-") || qarg.startsWith("--"));
 }
+
 
 }
