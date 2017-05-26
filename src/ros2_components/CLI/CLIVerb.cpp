@@ -51,6 +51,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
     {
 
         std::string arg = *it;
+
         if(arg == "")
         {
             str.erase(it);
@@ -77,6 +78,8 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str)
             if(arg != "")
                 if(childVerbs[arg] != nullptr)
                     childVerbs[arg]->parse(str);
+                else
+                    str.erase(it);
         }
         else
         {
