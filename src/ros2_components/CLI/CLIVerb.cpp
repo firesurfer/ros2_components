@@ -57,7 +57,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
             str.erase(it);
             continue;
         }
-        //Second check if this arg was found
+        //First check if this arg was found
         if(arg == this->name)
         {
             if(found != nullptr)
@@ -65,26 +65,28 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
             str.erase(it);
             continue;
         }
-        //First check for parameters
+        //Second check for parameters
         if(count < this->allCliParameter.size())
         {
             parameters.push_back(arg);
             str.erase(it);
+            count++;
+            continue;
         }
-        count++;
+
 
         if(isVerb(arg))
         {
             if(arg != "")
+            {
                 if(childVerbs[arg] != nullptr)
                     childVerbs[arg]->parse(str,error);
                 else
                 {
-
-                    //str.erase(it);
-                   // if(error != nullptr)
-                     //   *error = true;
+                    str.erase(it);
+                    *error = true;
                 }
+            }
         }
         else
         {
