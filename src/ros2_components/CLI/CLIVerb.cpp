@@ -80,8 +80,10 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
                     childVerbs[arg]->parse(str,error);
                 else
                 {
-                    str.erase(it);
-                    *error = true;
+
+                    //str.erase(it);
+                   // if(error != nullptr)
+                     //   *error = true;
                 }
         }
         else
