@@ -21,17 +21,14 @@ namespace ros2_components {
 
 ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,nodeName}
 {
-
     //Initialise ros2
     rclcpp::init(argc, argv);
 
-    //Parse commandline arguments for --id and --logpath
-    //TODO make this nicer ;)
-
+    //Set default values for node id.
     int64_t id = 100;
     std::string id_str= "";
 
-    //TODO put addition help information int parser
+    //TODO put additional help information into parser
 
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
@@ -39,6 +36,8 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool pars
     cliParser.addArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
     cliParser.addArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
     cliParser.addArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
+
+    //This defaults to true. You could pass parseCli = false to the constructor in case you want to add your own arguments in an inherited node.
     if(parseCli)
     {
         cliParser.parse();
@@ -49,29 +48,15 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool pars
         std::cout << id_str << std::endl;
         id = std::stoi(id_str);
     }
+
+
+    //This is deprecated and will be removed soon
     for(int i = 0; i < argc;i++)
     {
         std::string arg = std::string(argv[i]);
         this->CommandLineArguments.push_back(arg);
-        /*if(arg.find("--id=") != std::string::npos)
-        {
-            std::string id_str = arg.erase(0, arg.find_first_of('=')+1);
-
-            id = std::stoi(id_str);
-        }
-        else if(arg.find("--logpath=") != std::string::npos)
-        {
-            std::string logfilePath = arg.erase(0, arg.find_first_of('=')+1);
-            this->LogfilePath = logfilePath;
-        }
-        else if(arg.find("--configpath=") != std::string::npos)
-        {
-            //TODO add checks
-            std::string ConfigfilePath = arg.erase(0, arg.find_first_of('=')+1);
-        }*/
-
     }
-
+    //Create the ros node base on the given node name and the specified id
     RosNode = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
     NodeId = id;
     std::cout << "Started node: " << RosNode->get_name() << std::endl;
@@ -86,20 +71,26 @@ void ManagedNode::Spin()
 {
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
-    rclcpp::executors::SingleThreadedExecutor executor;
-    executor.add_node(RosNode);
-    rclcpp::WallRate loop_rate(80);
+
+    rclcpp::WallRate loop_rate(this->loopRate);
     while(rclcpp::ok() && !Abort)
     {
         executor.spin_some();
         loop_rate.sleep();
-
     }
-    // std::cout << "Ending spin" << std::endl;
 }
 
-bool ManagedNode::Ok()
+void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
 {
+    if(!isSetup)
+        throw std::runtime_error("Node wasn't setup yet");
+    if(rclcpp::ok() && !Abort)
+         executor.spin_once(timeout);
+}
+
+bool ManagedNode::Ok() const
+{
+    //TODO add &&abort ?
     return rclcpp::ok();
 }
 
@@ -121,6 +112,21 @@ int64_t ManagedNode::GetNodeId()
 bool ManagedNode::NodeSetupSuccessfull()
 {
     return this->isSetup;
+}
+
+int ManagedNode::GetLoopRate() const
+{
+    return loopRate;
+}
+
+void ManagedNode::SetLoopRate(int value)
+{
+    loopRate = value;
+}
+
+CLIParser ManagedNode::GetCliParser() const
+{
+    return cliParser;
 }
 
 void ManagedNode::AsyncWorker()
@@ -158,6 +164,7 @@ void ManagedNode::Start(bool multithreaded)
     SpinThread = std::make_shared<std::thread>(std::bind(&ManagedNode::Spin,this));
     if(multithreaded)
         WorkThread = std::make_shared<std::thread>(std::bind(&ManagedNode::AsyncWorker,this));
+    this->isSpinningAsync = true;
 }
 void ManagedNode::Setup()
 {
@@ -169,7 +176,8 @@ void ManagedNode::Setup(LogLevel logLevel)
     //If you want to implement a hardware node create base entity in derived class
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
-
+    //Add the node to our singlethread executor
+    executor.add_node(RosNode);
     //Init logger
     INIT_LOGGER(RosNode);
     //Set loglevel to given loglevel

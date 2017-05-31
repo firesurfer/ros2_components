@@ -91,10 +91,10 @@ public:
     /**
      * @brief Start
      * @param multithreaded
-     * Start the spin function and in case mutlithreaded==true DoWork will be called in a seperate thread.
+     * Start the spin function in an extra thread and in case mutlithreaded==true DoWork will be called in a seperate thread.
      * For synchronous spinning call Spin yourself and dont call start
      */
-    virtual void Start(bool multithreaded = true);
+    virtual void Start(bool multithreaded = false);
     /**
      * @brief Setup
      * Do basic setup tasks after creating a node
@@ -111,10 +111,14 @@ public:
      */
     virtual void Spin();
     /**
+     * @brief SpinOnce
+     */
+    virtual void SpinOnce(chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
+    /**
      * @brief Ok
      * @return If the node is still ok -> Otherwise you should stop spinning!
      */
-    virtual bool Ok();
+    virtual bool Ok() const;
     /**
      * @brief GetComponentManager
      * @return The component manager
@@ -135,11 +139,18 @@ public:
      * @return true if setup was called
      */
     bool NodeSetupSuccessfull();
+
+    int GetLoopRate() const;
+    void SetLoopRate(int value);
+
+    CLIParser GetCliParser() const;
+
 protected:
     /**
      * @brief CommandLineArguments
      * Contains the given command line arguments
      */
+    [[deprecated]]
     std::vector<std::string> CommandLineArguments;
 
     /**
@@ -171,6 +182,11 @@ protected:
     bool isSetup = false;
 
     /**
+     * @brief isSpinningAsync - true in case we called start
+     */
+    bool isSpinningAsync = false;
+
+    /**
      * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
      */
     std::string LogfilePath;
@@ -178,12 +194,20 @@ protected:
      * @brief ConfigfilePath - Path to the configfile. Parsed from commandline arguments.
      */
     std::string ConfigfilePath;
-
+    /**
+     * @brief cliParser - Parse for commandline arguments
+     */
     CLIParser cliParser;
+
+    /**
+     * @brief loopRate - contains the rate the spin function of the node is called in case it was started via spin. Can be set during runtime
+     */
+    int loopRate = 80;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;
     void AsyncWorker();
+    rclcpp::executors::SingleThreadedExecutor executor;
 
 };
 
