@@ -147,18 +147,8 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         {
             if(myInfo.id == (int64_t)msg->id)
             {
-                foundInList = true;
-                //TODO check if it is okay to replace the info object
+                foundInList = true;        
                 myInfo = currentInfo;
-                /*myInfo.type = msg->type;
-                myInfo.name = msg->componentname;
-                myInfo.parentId = msg->parent;
-                myInfo.parentType = msg->parenttype;
-                myInfo.childIds = msg->childids;
-                myInfo.childTypes = msg->childtypes;
-                myInfo.machineip = msg->machineip;
-                myInfo.nodename = msg->nodename;*/
-
             }
         }
         if(!foundInList)

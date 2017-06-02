@@ -71,7 +71,7 @@ public:
      * @param id
      * @return true if id is already in use
      *
-     * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return true even if the id is in use.
+     * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return false even if the id is in use.
      */
     bool IDAlreadyInUse(uint64_t id);
     /**
@@ -82,7 +82,7 @@ public:
     std::vector<ComponentInfo> ListComponents();
     /**
      * @brief CountComponents
-     * @return
+     * @return Amount of found components in the system
      */
     int64_t CountComponents();
     /**
