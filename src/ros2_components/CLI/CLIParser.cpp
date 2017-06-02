@@ -2,7 +2,7 @@
 
 namespace ros2_components
 {
-CLIParser::CLIParser(char *argv[], int argc, std::string _programDescription)
+CLIParser::CLIParser(char *argv[], int argc, std::string _programDescription):baseVerb{std::string(argv[0]), _programDescription}, helpArgument{"help", "Print this help", &helpFound}
 {
 
     for(int i=0; i < argc;i++)
@@ -11,8 +11,8 @@ CLIParser::CLIParser(char *argv[], int argc, std::string _programDescription)
 
     }
     //0 arg is the program name
-    this->baseVerb = std::make_shared<CLIVerb>(arguments[0], _programDescription,nullptr);
-    this->baseVerb->addArgument(std::make_shared<CLIArgument>("help", "Print this help", &helpFound ));
+
+    baseVerb.addArgument(helpArgument);
 }
 
 void CLIParser::parse()
@@ -22,7 +22,7 @@ void CLIParser::parse()
     std::vector<std::string> arg_copy = arguments;
     arg_copy.erase(arg_copy.begin());
     bool error = false;
-    this->baseVerb->parse(arguments, &error);
+    this->baseVerb.parse(arguments, &error);
 
     if(helpFound || error)
     {
@@ -34,62 +34,62 @@ void CLIParser::parse()
     }
 }
 
-void CLIParser::addVerb(CLIVerb::SharedPtr verb)
+void CLIParser::addVerb(CLIVerb& verb)
 {
-    this->baseVerb->addVerb(verb);
+    this->baseVerb.addVerb(verb);
 }
 
-void CLIParser::addArgument(CLIArgument::SharedPtr arg)
+void CLIParser::addArgument(CLIArgument &arg)
 {
-    this->baseVerb->addArgument(arg);
+    this->baseVerb.addArgument(arg);
 }
 
 void CLIParser::printHelp(std::string additionalInformation)
 {
     int depth = 0;
     std::cout <<  additionalInformation << std::endl;
-    std::function<void(CLIVerb::SharedPtr)> func = [&](CLIVerb::SharedPtr verb)
+    std::function<void(CLIVerb&)> func = [&](CLIVerb& verb)
     {
-        if(!verb)
-            return;
+        //if(!verb)
+            //return;
         for(int i = 0; i < depth; i++)
             std::cout << " ";
 
-        std::cout << printInColor(verb->getName(),ConsoleColor::FG_BLUE) << std::endl;
+        std::cout << printInColor(verb.getName(),ConsoleColor::FG_BLUE) << std::endl;
 
         for(int i = 0; i < depth+4; i++)
             std::cout << " ";
 
-        std::cout << verb->getDescription() << std::endl << std::endl;
-        if(verb->getAllCliParameter().size() > 0)
+        std::cout << verb.getDescription() << std::endl << std::endl;
+        if(verb.getAllCliParameter().size() > 0)
         {
             for(int i = 0; i < depth+2; i++)
                 std::cout << " ";
             std::cout << "Needed parameters: " << std::endl;
         }
 
-        for(auto cliParam : verb->getAllCliParameter())
+        for(auto cliParam : verb.getAllCliParameter())
         {
             for(int i = 0; i < depth+4; i++)
                 std::cout << " ";
-            std::string output =  cliParam->getName() + "                     ";
-            output.insert(20, cliParam->getDescription());
+            std::string output =  cliParam.getName() + "                     ";
+            output.insert(20, cliParam.getDescription());
             std::cout << output << std::endl;
         }
 
-        for(auto cliArg : verb->getAllCliArguments())
+        for(auto cliArg : verb.getAllCliArguments())
         {
             for(int i = 0; i < depth+4; i++)
                 std::cout << " ";
-            std::string output = " --" + cliArg->getName() + "                     ";
-            output.insert(20, cliArg->getDescription());
+            std::string output = " --" + cliArg.getName() + "                     ";
+            output.insert(20, cliArg.getDescription());
             std::cout << output << std::endl;
         }
 
         depth = depth+2;
-        for(auto subVerbEntry : verb->getChildVerbs())
+        for(auto subVerbEntry : verb.getChildVerbs())
         {
-            CLIVerb::SharedPtr subVerb = subVerbEntry.second;
+            CLIVerb& subVerb = subVerbEntry.second;
 
             func(subVerb);
         }
@@ -104,7 +104,7 @@ bool CLIParser::getHelpFound() const
     return helpFound;
 }
 
-CLIVerb::SharedPtr CLIParser::getBaseVerb() const
+CLIVerb& CLIParser::getBaseVerb()
 {
     return baseVerb;
 }

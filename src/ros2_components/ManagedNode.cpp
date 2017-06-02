@@ -21,8 +21,10 @@ namespace ros2_components {
 
 ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,nodeName}
 {
+    std::cout << "Calling init " << std::endl;
     //Initialise ros2
     rclcpp::init(argc, argv);
+    executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
     //Set default values for node id.
     int64_t id = 100;
@@ -33,9 +35,12 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool pars
     this->LogfilePath = "";
     this->ConfigfilePath = "settings.xml";
 
-    cliParser.addArgument(std::make_shared<CLIArgument>("id","Specify id used for the node", &id_str));
-    cliParser.addArgument(std::make_shared<CLIArgument>("logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath));
-    cliParser.addArgument(std::make_shared<CLIArgument>("configpath","Path to a configfile", &this->ConfigfilePath));
+    CLIArgument idArg = {"id","Specify id used for the node", &id_str};
+    CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath};
+    CLIArgument configArg = {"configpath","Path to a configfile", &this->ConfigfilePath};
+    cliParser.addArgument(idArg);
+    cliParser.addArgument(logArg);
+    cliParser.addArgument(configArg);
 
     //This defaults to true. You could pass parseCli = false to the constructor in case you want to add your own arguments in an inherited node.
     if(parseCli)
@@ -75,7 +80,7 @@ void ManagedNode::Spin()
     rclcpp::WallRate loop_rate(this->loopRate);
     while(rclcpp::ok() && !Abort)
     {
-        executor.spin_some();
+        executor->spin_some();
         loop_rate.sleep();
     }
 }
@@ -85,7 +90,7 @@ void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
     if(rclcpp::ok() && !Abort)
-         executor.spin_once(timeout);
+         executor->spin_once(timeout);
 }
 
 bool ManagedNode::Ok() const
@@ -177,7 +182,7 @@ void ManagedNode::Setup(LogLevel logLevel)
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
     //Add the node to our singlethread executor
-    executor.add_node(RosNode);
+    executor->add_node(RosNode);
     //Init logger
     INIT_LOGGER(RosNode);
     //Set loglevel to given loglevel

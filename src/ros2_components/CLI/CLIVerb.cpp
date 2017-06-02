@@ -2,42 +2,55 @@
 
 namespace  ros2_components {
 
-CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, std::shared_ptr<CLIVerb> _parent)
+
+
+
+
+
+CLIVerb::CLIVerb()
+{
+
+}
+
+CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description)
 {
     this->name = _verb;
     this->description = _description;
-    this->parent = _parent;
     this->found = nullptr;
+
 }
 
-CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, std::shared_ptr<CLIVerb> _parent, bool *_found):CLIVerb(_verb,_description,_parent)
+CLIVerb::CLIVerb(std::__cxx11::string _verb, std::__cxx11::string _description, bool *_found):CLIVerb(_verb,_description)
 {
     this->found = _found;
     if(found != nullptr)
-        *(this->found) = false;
+        *found = false;
 }
 
-bool CLIVerb::addVerb(CLIVerb::SharedPtr _child)
+bool CLIVerb::addVerb(CLIVerb &_child)
 {
-    if(this->childVerbs.find(_child->getName()) != this->childVerbs.end())
+    if(this->childVerbs.find(_child.getName()) != this->childVerbs.end())
         return false;
-    this->childVerbs[_child->getName()] = _child;
+    this->childVerbs[_child.getName()] = _child;
     return true;
 }
 
-bool CLIVerb::addArgument(CLIArgument::SharedPtr _arg)
+
+
+bool CLIVerb::addArgument(CLIArgument &_arg)
 {
-    //TODO return false if argument already in list
-    this->cliArguments.push_back(_arg);
-    this->allCliArguments.push_back(_arg);
+    cliArguments.push_back(_arg);
+    allCliArguments.push_back(_arg);
     return true;
 }
 
-bool CLIVerb::addParameter(CLIParameter::SharedPtr _param)
+
+
+bool CLIVerb::addParameter(CLIParameter &_param)
 {
-    //TODO return fals if parameter is already in list
     this->cliParameters.push_back(_param);
-    this->allCliParameter.push_back(_param);
+    allCliParameters.push_back(_param);
+    return true;
 }
 
 bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
@@ -46,7 +59,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
         return false;
     std::vector<std::string> arguments;
     std::vector<std::string> parameters;
-    int count = 0;
+    unsigned int count = 0;
     for(auto it = str.begin(); it != str.end();)
     {
 
@@ -66,7 +79,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
             continue;
         }
         //Second check for parameters
-        if(count < this->allCliParameter.size())
+        if(count < this->cliParameters.size())
         {
             parameters.push_back(arg);
             str.erase(it);
@@ -79,8 +92,8 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
         {
             if(arg != "")
             {
-                if(childVerbs[arg] != nullptr)
-                    childVerbs[arg]->parse(str,error);
+                if(childVerbs.find(arg) != childVerbs.end())
+                    childVerbs[arg].parse(str,error);
                 else
                 {
                     str.erase(it);
@@ -98,27 +111,29 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
     }
     for(std::string & argument: arguments)
     {
-        for(CLIArgument::SharedPtr & cliArg: cliArguments)
+        for(auto it=cliArguments.begin();it !=cliArguments.end();it++)
         {
-            if(cliArg->parse(argument))
+            if(it->parse(argument))
             {
-                if(cliArg->getName() != "help")
+                if(it->getName() != "help")
                 {
-                    this->cliArguments.remove(cliArg);
+                    this->cliArguments.erase(it);
                     break;
                 }
             }
         }
+
     }
     int i = 0;
-    if(allCliParameter.size() != parameters.size())
-        throw std::runtime_error("Wrong amount of parameters. Expecting: "+ std::to_string(allCliParameter.size()));
+    if(cliParameters.size() != parameters.size())
+        throw std::runtime_error("Wrong amount of parameters. Expecting: "+ std::to_string(cliParameters.size()));
 
-    for(CLIParameter::SharedPtr param: this->allCliParameter)
+    for(CLIParameter& param: this->cliParameters)
     {
-        param->parse(parameters[i]);
+        param.parse(parameters[i]);
         i++;
     }
+    return true;
 }
 
 bool CLIVerb::wasFound()
@@ -131,29 +146,25 @@ std::string CLIVerb::getName() const
     return name;
 }
 
-std::shared_ptr<CLIVerb> CLIVerb::getParent() const
-{
-    return parent;
-}
 
 std::string CLIVerb::getDescription() const
 {
     return description;
 }
 
-std::vector<CLIArgument::SharedPtr> CLIVerb::getAllCliArguments() const
+std::vector<CLIArgument> CLIVerb::getAllCliArguments() const
 {
     return allCliArguments;
 }
 
-std::map<std::string, CLIVerb::SharedPtr> CLIVerb::getChildVerbs() const
+std::map<std::string, CLIVerb> CLIVerb::getChildVerbs() const
 {
     return childVerbs;
 }
 
-std::vector<CLIParameter::SharedPtr> CLIVerb::getAllCliParameter() const
+std::vector<CLIParameter> CLIVerb::getAllCliParameter() const
 {
-    return allCliParameter;
+    return allCliParameters;
 }
 
 bool CLIVerb::isVerb(std::__cxx11::string arg)

@@ -20,26 +20,32 @@ class CLIVerb
 {
 public:
     typedef std::shared_ptr<CLIVerb> SharedPtr;
-    CLIVerb(std::string _verb, std::string _description, std::shared_ptr<CLIVerb> _parent);
-    CLIVerb(std::string _verb, std::string _description, std::shared_ptr<CLIVerb> _parent, bool * _found);
+
+    CLIVerb();
+    CLIVerb(std::string _verb, std::string _description);
+    CLIVerb(std::string _verb, std::string _description, bool *_found);
     /**
      * @brief addVerb - add a sub verb to this verb
      * @param _child
      * @return
      */
-    bool addVerb(CLIVerb::SharedPtr _child);
+
+    bool addVerb(CLIVerb& _child);
     /**
      * @brief addArgument - add an argument to this verb
      * @param _arg
      * @return
      */
-    bool addArgument(CLIArgument::SharedPtr _arg);
+
+    bool addArgument(CLIArgument& _arg);
+
     /**
      * @brief addParameter - add a parameter to this verb
      * @param _param
      * @return
      */
-    bool addParameter(CLIParameter::SharedPtr _param);
+
+    bool addParameter(CLIParameter& _param);
     /**
      * @brief parse - Parse the corresponding arguments for this verb -> Pass subverbs and arguments to childen
      * @param arguments
@@ -57,37 +63,37 @@ public:
      * @return The name of this verb
      */
     std::string getName() const;
-    /**
-     * @brief getParent
-     * @return The parent of this verb
-     */
-    std::shared_ptr<CLIVerb> getParent() const;
+
     /**
      * @brief getDescription
      * @return The description string of this verb
      */
     std::string getDescription() const;
 
-    std::vector<CLIArgument::SharedPtr> getAllCliArguments() const;
+    std::vector<CLIArgument> getAllCliArguments() const;
 
-    std::map<std::string, CLIVerb::SharedPtr> getChildVerbs() const;
+    std::map<std::string, CLIVerb> getChildVerbs() const;
 
-    std::vector<CLIParameter::SharedPtr> getAllCliParameter() const;
+    std::vector<CLIParameter> getAllCliParameter() const;
 
 
 private:
 
     std::string name;
     std::string description;
-    std::shared_ptr<CLIVerb> parent;
-    std::map<std::string, CLIVerb::SharedPtr> childVerbs;
-    std::list <CLIArgument::SharedPtr> cliArguments;
-    std::list <CLIParameter::SharedPtr> cliParameters;
-    std::vector<CLIArgument::SharedPtr> allCliArguments;
-    std::vector<CLIParameter::SharedPtr> allCliParameter;
+
     bool* found;
 
     bool isVerb(std::string arg);
+
+
+
+    std::list<CLIArgument> cliArguments;
+    std::list<CLIParameter> cliParameters;
+    std::map<std::string, CLIVerb> childVerbs;
+
+    std::vector<CLIArgument> allCliArguments;
+    std::vector<CLIParameter> allCliParameters;
 
 };
 }

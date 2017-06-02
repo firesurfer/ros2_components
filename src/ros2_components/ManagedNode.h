@@ -207,7 +207,7 @@ private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;
     void AsyncWorker();
-    rclcpp::executors::SingleThreadedExecutor executor;
+    rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
 
 };
 

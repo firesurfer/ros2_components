@@ -35,12 +35,12 @@ public:
      * @brief addArgument - Add argument to the baseVerb
      * @param arg
      */
-    void addArgument(CLIArgument::SharedPtr arg);
+    void addArgument(CLIArgument& arg);
     /**
      * @brief addVerb - Add verb to the baseVerb. In case you want to nest verbs add the nested verbs to the subverb you pass to this function.
      * @param verb
      */
-    void addVerb(CLIVerb::SharedPtr verb);
+    void addVerb(CLIVerb &verb);
     /**
      * @brief printHelp - Print the help output
      * @param additionalInformation
@@ -56,13 +56,14 @@ public:
      * @brief getBaseVerb
      * @return
      */
-    CLIVerb::SharedPtr getBaseVerb() const;
+    CLIVerb &getBaseVerb();
 
 private:
     /**
      * @brief baseVerb - Base Verb with the same name as the application
      */
-    CLIVerb::SharedPtr baseVerb;
+    CLIVerb baseVerb;
+    CLIArgument helpArgument;
     std::vector<std::string> arguments;
     bool helpFound = false;
     std::string helpString;
