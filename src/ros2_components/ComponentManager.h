@@ -73,7 +73,7 @@ public:
      *
      * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return false even if the id is in use.
      */
-    bool IDAlreadyInUse(uint64_t id);
+    bool IDAlreadyInUse(int64_t id);
     /**
      * @brief ListComponents
      * @return vector of all currently listed components
@@ -102,7 +102,7 @@ public:
      * @param success
      * @return ComponentInfo to the given id
      */
-    ComponentInfo GetInfoToId(uint64_t id, bool* success = 0);
+    ComponentInfo GetInfoToId(int64_t id, bool* success = 0);
 
     /**
      * @brief UpdateComponentsList

@@ -5,7 +5,7 @@ project(ros2_components)
 
 
 if(NOT WIN32)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wextra -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -fPIC")
 endif()
 
 
@@ -18,6 +18,8 @@ find_package(rmw REQUIRED)
 find_package(rmw_implementation_cmake REQUIRED)
 find_package(ros2_components_msg REQUIRED)
 find_package(ros2_simple_logger REQUIRED)
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package (Threads REQUIRED)
 
 
 set(CMAKE_AUTOMOC ON)
@@ -28,8 +30,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components)
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/tests)
 
 file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
-	"${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.h*"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/ComponentFilter/*.h*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/*.h*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/ComponentFilter/*.h*"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/CLI/*.h*"
 )
 

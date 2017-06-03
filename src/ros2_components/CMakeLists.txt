@@ -13,14 +13,14 @@ include_directories(
 
 
 file(GLOB COMPONENTS_SRC_FILES 
-	"${CMAKE_CURRENT_SOURCE_DIR}/*.c*"
-	"${CMAKE_CURRENT_SOURCE_DIR}/*.h*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.c*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/*.h*"
 	
-	"${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.c*"
-	"${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.h*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.c*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.h*"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/CLI/*.c*"
-	"${CMAKE_CURRENT_SOURCE_DIR}/CLI/*.h*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/CLI/*.h*"
 	
 )
 add_library(ros2_components
@@ -34,7 +34,7 @@ target_link_libraries(ros2_components
     ${builtin_interfaces_LIBRARIES}
     ${ros2_components_msg_LIBRARIES}
     ${ros2_simple_logger_LIBRARIES}
-    -pthread
+    Threads::Threads
     Qt5::Core
     Qt5::Network
 

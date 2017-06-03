@@ -57,7 +57,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
 }
 
-bool ComponentManager::IDAlreadyInUse(uint64_t id)
+bool ComponentManager::IDAlreadyInUse(int64_t id)
 {
     for(auto & myInfo: Components)
     {
@@ -87,7 +87,7 @@ std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilte
     return filter.Filter(this->Components);
 }
 
-ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
+ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success)
 {
     if(success != NULL)
         *success = false;
