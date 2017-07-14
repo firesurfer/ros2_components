@@ -179,6 +179,7 @@ void ManagedNode::Setup()
 void ManagedNode::Setup(LogLevel logLevel)
 {
     //If you want to implement a hardware node create base entity in derived class
+    //Check if rosnode is valid -> should be always the case
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
     //Add the node to our singlethread executor

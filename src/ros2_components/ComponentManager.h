@@ -136,6 +136,14 @@ public:
     template<typename T>
     std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
     {
+        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy));
+        if(!entity)
+            throw std::runtime_error("Could not cast entity to given type");
+        return entity;
+    }
+
+    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
+    {
         if(!EntityFactory::Contains(info.type))
             throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory");
 
@@ -150,14 +158,13 @@ public:
         QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
 
         std::shared_ptr<EntityBase> ent = EntityFactory::CreateInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
-        std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
+        //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
 
         //The following line recusivly rebuild the tree structure that was published before
         if(rebuildHierarchy)
         {
             std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo parentInfo)
             {
-
                 for(auto & child_id: parentInfo.childIds)
                 {
                     bool success = false;
@@ -172,28 +179,15 @@ public:
                     else
                         subscribeArg = Q_ARG(bool, false);
                     std::shared_ptr<EntityBase> child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
-
-
                     parentEntity->addChild(child_obj);
                     rec_build(child_obj,childInfo);
                 }
             };
-            std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(secEnt);
+            std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(ent);
             rec_build(parentEnt,info);
-
-            //TODO work on better paramter mechanism
-           /* auto func = []( std::shared_ptr<EntityBase> ent){
-                ent->updateParameters();
-            };
-            parentEnt->updateParameters();
-            parentEnt->IterateThroughAllChilds(func);*/
-
         }
-
-        return secEnt;
-
+        return ent;
     }
-
 
 
 
