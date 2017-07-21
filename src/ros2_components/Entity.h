@@ -107,7 +107,8 @@ protected:
                 entityPublisher->publish(msg);
             else
                 return false;
-        else return false;
+        else
+            return false;
         return true;
     }
 

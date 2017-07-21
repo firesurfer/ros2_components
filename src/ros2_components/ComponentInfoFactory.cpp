@@ -13,26 +13,8 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
     info.id = ent->getId();
 
     //TODO move this into a more general place
-    int64_t ipAddr =0;
-    foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if(!interface.name().contains("vmnet"))
-        {
-            foreach (const QHostAddress &address, interface.allAddresses())
-            {
-                if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-                {
-                    //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
-                    if(!address.isLoopback())
-                    {
-                        ipAddr = address.toIPv4Address();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    info.machineip = ipAddr;
+
+    info.machineip = GetLocalIpV4();
     if(ent->getParent() != NULL)
     {
         info.parentId = ent->getParent()->getId();
@@ -89,5 +71,29 @@ ComponentInfo ComponentInfoFactory::FromComponentChangedMessage(ros2_components_
     info.subscriber = msg->subscriber;
     //TODO check if all fields are used
     return info;
+}
+
+int64_t ComponentInfoFactory::GetLocalIpV4()
+{
+    int64_t ipAddr =0;
+    foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if(!interface.name().contains("vmnet"))
+        {
+            foreach (const QHostAddress &address, interface.allAddresses())
+            {
+                if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+                {
+                    //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
+                    if(!address.isLoopback())
+                    {
+                        ipAddr = address.toIPv4Address();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return ipAddr;
 }
 }

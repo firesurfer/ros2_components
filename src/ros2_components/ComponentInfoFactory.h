@@ -41,6 +41,12 @@ public:
      * Creates a ComponentInfo object from a given ComponentChanged
      */
     static ComponentInfo FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
+
+    /**
+     * @brief GetLocalIpV4
+     * @return The local ipv4 address
+     */
+    static int64_t GetLocalIpV4();
 };
 }
 
