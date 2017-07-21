@@ -96,4 +96,32 @@ int64_t ComponentInfoFactory::GetLocalIpV4()
     }
     return ipAddr;
 }
+
+std::vector<uint8_t> ComponentInfoFactory::GetLocalIpV6()
+{
+    std::vector<uint8_t> returnAddr;
+    foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
+    {
+        if(!interface.name().contains("vmnet"))
+        {
+            foreach (const QHostAddress &address, interface.allAddresses())
+            {
+                if (address.protocol() == QAbstractSocket::IPv6Protocol && address != QHostAddress(QHostAddress::LocalHost))
+                {
+                    //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
+                    if(!address.isLoopback())
+                    {
+                        Q_IPV6ADDR ipAddr = address.toIPv6Address();
+                        for(int i = 0; i < 16;i++)
+                        {
+                            returnAddr.push_back(ipAddr[i]);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return returnAddr;
+}
 }

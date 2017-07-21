@@ -47,6 +47,8 @@ public:
      * @return The local ipv4 address
      */
     static int64_t GetLocalIpV4();
+
+    static std::vector<uint8_t> GetLocalIpV6();
 };
 }
 
