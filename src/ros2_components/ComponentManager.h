@@ -170,7 +170,10 @@ public:
                     bool success = false;
                     ComponentInfo childInfo = GetInfoToId(child_id,&success);
                     if(!success)
+                    {
+                        LOG(Warning) << "Could not find info for: " << child_id << std::endl;
                         continue;
+                    }
                     idArg = Q_ARG(int64_t, childInfo.id);
 
                     //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;
