@@ -22,9 +22,12 @@ namespace ros2_components
 {
 ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
 {
+    using namespace std::placeholders;
     //Variable Assignments
     this->RosNode = _localNode;
 
+    //Start responder thread
+    this->responder_thread = std::make_unique<std::thread>(std::bind(&ComponentManager::RespondingTask,this));
     //Qos Profile
     //rmw_qos_profile_services_default
     component_manager_profile = rmw_qos_profile_parameters;
@@ -32,7 +35,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
-    using namespace std::placeholders;
+
     this->ComponentChangedSubscription = RosNode->create_subscription<ros2_components_msg::msg::ComponentChanged>("ComponentChanged", std::bind(&ComponentManager::ComponentChangedCallback, this,_1), component_manager_profile);
     this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
 
@@ -133,24 +136,7 @@ void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::L
 {
     if(RosNode->get_name() != msg->nodename)
     {
-
-        auto responseFunc = [&]()
-        {
-            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
-            msg->nodename = RosNode->get_name();
-            this->ListComponentsResponsePublisher->publish(msg);
-            std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
-            {
-                auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
-                respMsg->nodename = RosNode->get_name();
-                this->ListComponentsResponsePublisher->publish(respMsg);
-                ent->IterateThroughAllChilds(iteratingFunc);
-            };
-            this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
-        };
-        std::thread * asyncResponder = new std::thread(responseFunc);
-
-        //TODO have one central thread that responds to all requests
+        triggerResponseQueue.push(true);
     }
 }
 
@@ -254,6 +240,34 @@ void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg:
     }
     Components.erase(Components.begin()+i);
     emit ComponentDeleted(info);
+}
+
+void ComponentManager::RespondingTask()
+{
+    while(true)
+    {
+        auto responseFunc = [&]()
+        {
+            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
+            msg->nodename = RosNode->get_name();
+            this->ListComponentsResponsePublisher->publish(msg);
+            std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
+            {
+                auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
+                respMsg->nodename = RosNode->get_name();
+                this->ListComponentsResponsePublisher->publish(respMsg);
+                ent->IterateThroughAllChilds(iteratingFunc);
+            };
+            this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
+        };
+        while(triggerResponseQueue.empty())
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        while(!triggerResponseQueue.empty())
+        {
+            triggerResponseQueue.pop();
+            responseFunc();
+        }
+    }
 }
 
 void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg)

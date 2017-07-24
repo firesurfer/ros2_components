@@ -24,6 +24,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+#include <queue>
 
 /*ROS2*/
 #include "rclcpp/rclcpp.hpp"
@@ -259,7 +260,7 @@ private:
     void ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info);
     void ProcessChangeAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
     void ProcessDeleteAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
-
+    void RespondingTask();
     /**
      * @brief Components
      * Stored components
@@ -267,6 +268,9 @@ private:
     std::vector<ComponentInfo> Components;
     EntityBase::SharedPtr BaseEntity;
     rmw_qos_profile_t component_manager_profile;
+    std::unique_ptr<std::thread> responder_thread;
+    std::queue<bool> triggerResponseQueue;
+
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
     void NewComponentFound(ComponentInfo &info);
