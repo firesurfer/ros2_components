@@ -68,6 +68,10 @@ public:
      */
     ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
     /**
+     * @brief ~ComponentManager - destructor. Waits for responder thread
+     */
+    virtual ~ComponentManager();
+    /**
      * @brief IDAlreadyInUse
      * @param id
      * @return true if id is already in use
@@ -270,6 +274,7 @@ private:
     rmw_qos_profile_t component_manager_profile;
     std::unique_ptr<std::thread> responder_thread;
     std::queue<bool> triggerResponseQueue;
+    bool abort = false;
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system

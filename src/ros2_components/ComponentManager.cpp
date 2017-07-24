@@ -60,6 +60,12 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
 }
 
+ComponentManager::~ComponentManager()
+{
+    this->abort =true;
+    responder_thread->join();
+}
+
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
 {
     for(auto & myInfo: Components)
@@ -151,7 +157,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         {
             if(myInfo.id == (int64_t)msg->id)
             {
-                foundInList = true;        
+                foundInList = true;
                 myInfo = currentInfo;
             }
         }
@@ -244,24 +250,37 @@ void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg:
 
 void ComponentManager::RespondingTask()
 {
-    while(true)
+    int count = 0;
+    while(!abort)
     {
         auto responseFunc = [&]()
         {
-            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
-            msg->nodename = RosNode->get_name();
-            this->ListComponentsResponsePublisher->publish(msg);
-            std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
+            if(BaseEntity)
             {
-                auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
-                respMsg->nodename = RosNode->get_name();
-                this->ListComponentsResponsePublisher->publish(respMsg);
-                ent->IterateThroughAllChilds(iteratingFunc);
-            };
-            this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
+                ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
+                msg->nodename = RosNode->get_name();
+                this->ListComponentsResponsePublisher->publish(msg);
+                std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
+                {
+                    auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
+                    respMsg->nodename = RosNode->get_name();
+                    this->ListComponentsResponsePublisher->publish(respMsg);
+                    ent->IterateThroughAllChilds(iteratingFunc);
+                };
+
+                this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
+            }
         };
-        while(triggerResponseQueue.empty())
+        while(triggerResponseQueue.empty() && !abort)
+        {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            count ++;
+            if(count > 100)
+            {
+                count = 0;
+                responseFunc();
+            }
+        }
         while(!triggerResponseQueue.empty())
         {
             triggerResponseQueue.pop();
