@@ -162,7 +162,7 @@ public:
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
 
         //TODO - Check if this works
-       if(!info.subscriber)
+        if(!info.subscriber)
             subscribeArg = Q_ARG(bool, true);
         else
             subscribeArg = Q_ARG(bool, false);
@@ -281,6 +281,8 @@ signals:
     void NewComponentFound(ComponentInfo &info);
     void ComponentDeleted(ComponentInfo &info);
     void ComponentChanged(ComponentInfo &info);
+private slots:
+    void OnComponentChanged();
 
 };
 }

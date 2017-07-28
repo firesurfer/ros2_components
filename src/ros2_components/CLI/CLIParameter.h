@@ -21,8 +21,9 @@ public:
      * @param _name
      * @param _description
      * @param _param
+     * @param optional - Optional is not implemented yet!
      */
-    CLIParameter(std::string _name, std::string _description, std::string* _param);
+    CLIParameter(std::string _name, std::string _description, std::string* _param, bool _optional = false);
     /**
      * @brief parse
      * @param parameter
@@ -41,11 +42,17 @@ public:
      * @return The description of the parameter
      */
     std::string getDescription() const;
+    /**
+     * @brief getOptional
+     * @return True in case this parameter is optional
+     */
+    bool getOptional() const;
 
 private:
     std::string name;
     std::string description;
     std::string* param;
+    bool optional;
 
 };
 }

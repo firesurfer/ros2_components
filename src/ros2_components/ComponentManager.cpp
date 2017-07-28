@@ -35,7 +35,6 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
-
     this->ComponentChangedSubscription = RosNode->create_subscription<ros2_components_msg::msg::ComponentChanged>("ComponentChanged", std::bind(&ComponentManager::ComponentChangedCallback, this,_1), component_manager_profile);
     this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
 
@@ -287,6 +286,11 @@ void ComponentManager::RespondingTask()
             responseFunc();
         }
     }
+}
+
+void ComponentManager::OnComponentChanged()
+{
+
 }
 
 void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
