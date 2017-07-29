@@ -283,11 +283,10 @@ protected:
      */
     std::string description;
 protected slots:
-    virtual void on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
-    virtual void on_child_removed(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
+
 signals:
-    void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
-    void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, int depth, bool remote);
+    void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, bool remote);
+    void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, bool remote);
 
     void newData(); //TODO SharedPtr ?
 

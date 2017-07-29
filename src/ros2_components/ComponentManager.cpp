@@ -35,7 +35,6 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
-    this->ComponentChangedSubscription = RosNode->create_subscription<ros2_components_msg::msg::ComponentChanged>("ComponentChanged", std::bind(&ComponentManager::ComponentChangedCallback, this,_1), component_manager_profile);
     this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
 
     //Publishers
@@ -49,7 +48,11 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
     //Variable Assignments
     this->BaseEntity = _baseEntity; //TODO register to components and add change callbacks
-
+    for(EntityBase::SharedPtr & child:BaseEntity->getAllChilds())
+    {
+        connect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
+        connect(child.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
+    }
     //Subscriptions
     using namespace std::placeholders;
     this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
@@ -169,83 +172,9 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 
 }
 
-void ComponentManager::ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
-{
-    //TODO rework Process<X>Advertisement functions
-    LOG(Debug) << "Got type " <<"New"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
-    for(auto & myInfo: Components)
-    {
-        if(myInfo.id == info.id)
-        {
-            if(myInfo.nodename == info.nodename)
-            {
-                LOG(Warning) << "Id already used in system but was advertised from the same node - I assume that the node was restarted - I'm going to interpret this advertisement as change ad" << std::endl;
-                LOG(Debug) << "Got type " <<"Change"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
-                int i = 0;
-                for(auto & compinfo : Components)
-                {
-                    if(compinfo.id == msg->id)
-                    {
-                        Components[i] = info;
-                        emit ComponentChanged(info);
-                        break;
-                    }
-                    i++;
-                }
-                return;
-            }
-            else
-            {
-                LOG(Fatal) << "Id already used in system -> this might result in unpredictable behaviour - I'm not going to interpret this ad: "<< info.name << " ID is used by: " <<myInfo.name<< std::endl;
-                return;
-
-            }
-        }
-    }
-    Components.push_back(info);
 
 
-}
 
-void ComponentManager::ProcessChangeAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
-{
-    LOG(Debug) << "Got type " <<"Change"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
-    int i = 0;
-    bool found = false;
-    for(auto & compinfo : Components)
-    {
-        if(compinfo.id == msg->id)
-        {
-            Components[i] = info;
-            found = true;
-            emit ComponentChanged(info);
-            break;
-        }
-        i++;
-    }
-    if(!found)
-    {
-        LOG(Warning) << "Got change advertisement without new advertisement before: " << msg->id << " " << info.name << " " << "Interpreting as new advertisement"<< std::endl;
-        ProcessNewAdvertisment(msg,info);
-    }
-}
-
-void ComponentManager::ProcessDeleteAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info)
-{
-    LOG(Debug) << "Got type " <<"Delete"<<" advertisement:" << msg->id << " " << info.name << " " << msg->type << std::endl;
-    int i = 0;
-    for(auto & compinfo : Components)
-    {
-        if(compinfo.id == msg->id)
-        {
-            Components[i] = info;
-            break;
-        }
-        i++;
-    }
-    Components.erase(Components.begin()+i);
-    emit ComponentDeleted(info);
-}
 
 void ComponentManager::RespondingTask()
 {
@@ -288,39 +217,33 @@ void ComponentManager::RespondingTask()
     }
 }
 
-void ComponentManager::OnComponentChanged()
+void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
+    LOG(Info) << "Child added: " << child->getName() << std::endl;
+    //Connect to add events
+    connect(child.get(),&EntityBase::childAdded,this, &ComponentManager::OnChildAdded);
+    connect(child.get(),&EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved);
+
+    //Publish component information
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
+    msg->nodename = RosNode->get_name();
+    this->ListComponentsResponsePublisher->publish(msg);
 
 }
 
-void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
+void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
-    //Any Advertisement message that gets caught will be processed in this function
-    if(msg->nodename == this->RosNode->get_name())
-        return;
-    ComponentInfo info;
-    info.nodename = msg->nodename;
-    info.childIds = msg->childids;
-    info.childTypes = msg->childtypes;
-    info.id = msg->id;
-    info.type = msg->type;
-    info.name = msg->componentname;
-    info.parentId = msg->parent;
-    info.machineip = msg->machineip;
+    disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded);
+    disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
 
-    LOG(Debug) << "Got new advertisement: " << info.id << std::endl;
-
-    if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Change)
-    {
-        ProcessChangeAdvertisment(msg,info);
-    }
-    else if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Delete)
-    {
-        std::cout << "Deleting component" << std::endl;
-        ProcessDeleteAdvertisment(msg,info);
-    }
-
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
+    msg->nodename = RosNode->get_name();
+    msg->deleted = true;
+    this->ListComponentsResponsePublisher->publish(msg);
 }
+
+
+
 
 
 }

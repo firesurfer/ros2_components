@@ -88,9 +88,7 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
     LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << " from: " << getName()<< std::endl;
     childs.push_back(child);
     child->setParent(shared_from_this());
-    connect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added,Qt::DirectConnection);
-    connect(child.get(), &EntityBase::childRemoved,this, &EntityBase::on_child_removed,Qt::DirectConnection);
-    emit childAdded(child,child->getParent(),0,remote);
+    emit childAdded(child,child->getParent(),remote);
 }
 
 void EntityBase::removeChild(std::shared_ptr<EntityBase> child, bool remote)
@@ -102,8 +100,7 @@ void EntityBase::removeChild(std::shared_ptr<EntityBase> child, bool remote)
     }
     else
         throw std::runtime_error("Can't remove given child - child not found!");
-    disconnect(child.get(), &EntityBase::childAdded,this, &EntityBase::on_child_added);
-    emit childRemoved(child,child->getParent(),0, remote);
+    emit childRemoved(child,shared_from_this(), remote);
 }
 
 std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
@@ -112,9 +109,6 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
     {
         if(child->getId() == id)
         {
-            //Do to bug in ROS 2 this might throw an exception
-            //if(!child->WasMetaInformationUpdated())
-            //child->updateParameters();
             return child;
         }
     }
@@ -123,7 +117,6 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
 
 uint64_t EntityBase::countChilds()
 {
-
     return childs.size();
 }
 
@@ -140,27 +133,11 @@ void EntityBase::setParent(std::shared_ptr<EntityBase> par)
 string EntityBase::getTopicName()
 {
     if(!isSubscriber())
-    {
         return pubBase->get_topic_name();
-    }
     else
         return subBase->get_topic_name();
 }
 
-
-
-void EntityBase::on_child_added(std::shared_ptr<EntityBase> child,std::shared_ptr<EntityBase> parent,int depth, bool remote)
-{
-    if(parent != NULL && child != NULL)
-        LOG(LogLevel::Info) << "child"<<child->getName()<< " added to: " <<parent->getName() << " depth: " << depth << std::endl;
-    emit childAdded(child,parent, depth+1,remote);
-}
-
-void EntityBase::on_child_removed(std::shared_ptr<EntityBase> child, std::shared_ptr<EntityBase> parent, int depth, bool remote)
-{
-    LOG(LogLevel::Info) << "child"<<child->getName()<< " removed from: " <<parent->getName() << " depth: " << depth << std::endl;
-    emit childRemoved(child,parent, depth+1,remote);
-}
 
 void EntityBase::IterateThroughAllProperties(std::function<void(QMetaProperty)> func)
 {

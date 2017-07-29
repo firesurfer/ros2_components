@@ -227,11 +227,7 @@ private:
      * On this topic the answer to the ListComponentsRequest is published
      */
     rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponseSubscription;
-    /**
-     * @brief ComponentChangedPublisher
-     * @see ComponentChangedSubscription
-     */
-    rclcpp::publisher::Publisher<ros2_components_msg::msg::ComponentChanged>::SharedPtr ComponentChangedPublisher;
+
     /**
      * @brief ListComponentsRequestPublisher
      * @see ListComponentsRequestSubscription
@@ -242,12 +238,7 @@ private:
      * @see ListComponentsResponseSubscription
      */
     rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponsePublisher;
-    /**
-     * @brief ComponentChangedCallback
-     * @param msg
-     * Gets called if a new message on the ComponentChanged topic is available
-     */
-    void ComponentChangedCallback(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
+
     /**
      * @brief ListComponentsRequestCallback
      * @param msg
@@ -261,9 +252,7 @@ private:
      */
     void ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
 
-    void ProcessNewAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg, ComponentInfo info);
-    void ProcessChangeAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
-    void ProcessDeleteAdvertisment(const ros2_components_msg::msg::ComponentChanged::SharedPtr msg,ComponentInfo info);
+
     void RespondingTask();
     /**
      * @brief Components
@@ -282,7 +271,8 @@ signals:
     void ComponentDeleted(ComponentInfo &info);
     void ComponentChanged(ComponentInfo &info);
 private slots:
-    void OnComponentChanged();
+    void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
+    void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
 
 };
 }
