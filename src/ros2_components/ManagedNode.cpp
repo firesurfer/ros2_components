@@ -19,21 +19,18 @@
 namespace ros2_components {
 
 
-ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,nodeName}
+ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,nodeName}
 {
-    std::cout << "Calling init " << std::endl;
+
     //Initialise ros2
     rclcpp::init(argc, argv);
     executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
 
-    //Set default values for node id.
-    int64_t id = 100;
-    std::string id_str= "";
+    nodeName = _nodeName;
 
     //TODO put additional help information into parser
 
-    this->LogfilePath = "";
-    this->ConfigfilePath = "settings.xml";
+
 
     CLIArgument idArg = {"id","Specify id used for the node", &id_str};
     CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath};
@@ -48,23 +45,9 @@ ManagedNode::ManagedNode(std::string nodeName, int argc, char *argv[], bool pars
         cliParser.parse();
     }
 
-    if(id_str != "")
-    {
-        std::cout << id_str << std::endl;
-        id = std::stoi(id_str);
-    }
 
 
-    //This is deprecated and will be removed soon
-    for(int i = 0; i < argc;i++)
-    {
-        std::string arg = std::string(argv[i]);
-        this->CommandLineArguments.push_back(arg);
-    }
-    //Create the ros node base on the given node name and the specified id
-    RosNode = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
-    NodeId = id;
-    std::cout << "Started node: " << RosNode->get_name() << std::endl;
+
 
 }
 ManagedNode::~ManagedNode()
@@ -90,7 +73,7 @@ void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
     if(rclcpp::ok() && !Abort)
-         executor->spin_once(timeout);
+        executor->spin_once(timeout);
 }
 
 bool ManagedNode::Ok() const
@@ -178,6 +161,19 @@ void ManagedNode::Setup()
 }
 void ManagedNode::Setup(LogLevel logLevel)
 {
+    uint64_t id = 100;
+    if(id_str != "")
+    {
+        std::cout << id_str << std::endl;
+        id = std::stoi(id_str);
+    }
+
+    //Create the ros node base on the given node name and the specified id
+    RosNode = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
+    NodeId = id;
+    std::cout << "Started node: " << RosNode->get_name() << std::endl;
+
+    this->nodeEntity = std::make_shared<NodeEntity>(NodeId, this->nodeName, RosNode);
     //If you want to implement a hardware node create base entity in derived class
     //Check if rosnode is valid -> should be always the case
     if( !this->RosNode)
@@ -192,11 +188,11 @@ void ManagedNode::Setup(LogLevel logLevel)
     if(this->LogfilePath != "")
         simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
 
-    //Component manager for a hardware node: Has a baseentity where to hardware model orignates
-    if(this->BaseEntity)
-        this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->BaseEntity);
-    else
-        this->CompManager = std::make_shared<ComponentManager>(this->RosNode);
+
+
+    //Create Componentmanager with nodeEntity as base
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity);
+
     //Component manager for a algorithm node: Doesnt need a baseentity
     this->isSetup = true; //Set setup to true
 }

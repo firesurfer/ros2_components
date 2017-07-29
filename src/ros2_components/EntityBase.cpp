@@ -25,6 +25,8 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     this->parentNode = _parentNode;
     this->className = _className;
     this->active = true;
+    this->name = getClassName()  + std::to_string(id);
+
     //TODO rework meta mechanism
 
     REFLECT(virtualEntity);
@@ -33,6 +35,12 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
 
+
+}
+
+EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, string _className, string _componentName):EntityBase(_id,_subscribe, _parentNode,_className)
+{
+    this->name = _componentName + std::to_string(_id);
 }
 
 EntityBase::~EntityBase()
@@ -47,8 +55,9 @@ int64_t EntityBase::getId()
 
 string EntityBase::getName()
 {
-    return getClassName()  + std::to_string(id);
+    return name;
 }
+
 
 string EntityBase::getClassName()
 {

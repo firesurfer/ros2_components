@@ -25,10 +25,12 @@
 #include <thread>
 /* ros 2 */
 #include "rclcpp/rclcpp.hpp"
+
 /* ros2 components */
 #include "ros2_simple_logger/Logger.h"
 #include "ComponentManager.h"
 #include "CLIParser.h"
+#include "NodeEntity.h"
 /**
  * @brief The ManagedNode class
  * This class represents a managed lifecycle node.
@@ -203,11 +205,21 @@ protected:
      * @brief loopRate - contains the rate the spin function of the node is called in case it was started via spin. Can be set during runtime
      */
     int loopRate = 80;
+    /**
+      * @brief nodeEntity Entity that represents this node.
+      */
+    NodeEntity::SharedPtr nodeEntity;
+
+    std::string nodeName;
 private:
     std::shared_ptr<std::thread> SpinThread;
     std::shared_ptr<std::thread> WorkThread;
     void AsyncWorker();
     rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
+
+    std::string id_str= "";
+
+
 
 };
 

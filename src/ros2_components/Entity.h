@@ -30,7 +30,32 @@ public:
      * @brief Constructor of Entity
      * @param className is used together with the id to itentify topics, etc. of this entity
      */
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> parentNode, std::string className) : EntityBase(_id, _subscribe, parentNode, className)
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
+    {
+        //Some ROS2 QOS Configuration -> Taken from an example
+        custom_qos_profile = rmw_qos_profile_sensor_data;
+        //custom_qos_profile.depth = 2;
+        //custom_qos_profile.history = hist_pol;
+        if(!isSubscriber())
+        {
+            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+
+            //rmw_qos_profile_services_default
+            //rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
+            //component_manager_profile.depth = 1000;
+            //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
+            pubBase = entityPublisher;
+
+        }
+        else
+        {
+            using namespace std::placeholders;
+            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            subBase = entitySubscription;
+        }
+        LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
+    }
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;

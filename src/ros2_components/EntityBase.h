@@ -61,6 +61,7 @@ public:
 
     typedef std::shared_ptr<EntityBase> SharedPtr;
     EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
+    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className, std::string _componentName);
     virtual ~EntityBase();
 
     /**
@@ -309,6 +310,10 @@ private:
      * @brief Name of the implementing class
      */
     std::string className;
+    /**
+     * @brief name of the component
+     */
+    std::string name;
 
 
 

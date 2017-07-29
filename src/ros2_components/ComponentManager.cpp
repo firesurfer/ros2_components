@@ -149,15 +149,15 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 {
     if(RosNode->get_name() != msg->nodename)
     {
-        //LOG(Info) << RosNode->get_name() << "  " << msg->nodename << std::endl;
         bool foundInList = false;
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
         {
-            if(myInfo.id == (int64_t)msg->id)
+            if(myInfo.name == msg->componentname)
             {
                 foundInList = true;
                 myInfo = currentInfo;
+                //TODO emit changed event and implement equal method
             }
         }
         if(!foundInList)
@@ -316,6 +316,7 @@ void ComponentManager::ComponentChangedCallback(const ros2_components_msg::msg::
     }
     else if((AdvertisementType::Enum)msg->advertisementtype == AdvertisementType::Enum::Delete)
     {
+        std::cout << "Deleting component" << std::endl;
         ProcessDeleteAdvertisment(msg,info);
     }
 
