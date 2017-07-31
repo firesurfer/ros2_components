@@ -168,7 +168,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
                 else
                 {
                     toDelete = true;
-                    //TODO delete from list
+                    //TODO delete from list more efficient
                     emit ComponentDeleted(myInfo);
                 }
             }
@@ -181,7 +181,16 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         }
         if(toDelete)
         {
-            //TODO
+            size_t pos = 0;
+            for(auto & info: Components)
+            {
+               if( info.id == msg->id)
+               {
+                    break;
+               }
+               pos++;
+            }
+            Components.erase(Components.begin()+pos);
         }
     }
 
