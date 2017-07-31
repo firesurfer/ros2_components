@@ -153,20 +153,35 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
     if(RosNode->get_name() != msg->nodename)
     {
         bool foundInList = false;
+        bool toDelete = false;
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(auto & myInfo: Components)
         {
             if(myInfo.name == msg->componentname)
             {
-                foundInList = true;
-                myInfo = currentInfo;
-                //TODO emit changed event and implement equal method
+                if(!msg->deleted)
+                {
+                    foundInList = true;
+                    myInfo = currentInfo;
+                    emit ComponentChanged(myInfo);
+                }
+                else
+                {
+                    toDelete = true;
+                    //TODO delete from list
+                    emit ComponentDeleted(myInfo);
+                }
             }
         }
+
         if(!foundInList)
         {
             Components.push_back(currentInfo);
             emit NewComponentFound(currentInfo);
+        }
+        if(toDelete)
+        {
+            //TODO
         }
     }
 
