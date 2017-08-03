@@ -155,9 +155,9 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         bool foundInList = false;
         bool toDelete = false;
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
-        for(auto & myInfo: Components)
+        for(ComponentInfo & myInfo: Components)
         {
-            if(myInfo.name == msg->componentname)
+            if(myInfo.id == msg->id)
             {
                 if(!msg->deleted)
                 {
