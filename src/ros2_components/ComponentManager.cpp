@@ -157,20 +157,27 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
         for(ComponentInfo & myInfo: Components)
         {
-            if(myInfo.id == msg->id)
+
+            if(myInfo.name == currentInfo.name)
             {
+                //LOG(Debug) << "My: " << myInfo.id << " " << myInfo.name << " Remote: " << currentInfo.id << " " << currentInfo.name << std::endl;
+                foundInList = true;
                 if(!msg->deleted)
                 {
-                    foundInList = true;
+                    //TODO implement comparison for component info
                     myInfo = currentInfo;
                     emit ComponentChanged(myInfo);
+
                 }
                 else
                 {
+
                     toDelete = true;
                     //TODO delete from list more efficient
                     emit ComponentDeleted(myInfo);
+
                 }
+                break;
             }
         }
 
@@ -184,11 +191,11 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
             size_t pos = 0;
             for(auto & info: Components)
             {
-               if( info.id == msg->id)
-               {
+                if( info.id == msg->id)
+                {
                     break;
-               }
-               pos++;
+                }
+                pos++;
             }
             Components.erase(Components.begin()+pos);
         }
@@ -211,11 +218,13 @@ void ComponentManager::RespondingTask()
             {
                 ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
                 msg->nodename = RosNode->get_name();
+                msg->deleted = false;
                 this->ListComponentsResponsePublisher->publish(msg);
                 std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
                 {
                     auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
                     respMsg->nodename = RosNode->get_name();
+                    respMsg->deleted = false;
                     this->ListComponentsResponsePublisher->publish(respMsg);
                     ent->IterateThroughAllChilds(iteratingFunc);
                 };
@@ -251,12 +260,14 @@ void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::Sha
     //Publish component information
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
+    msg->deleted = false;
     this->ListComponentsResponsePublisher->publish(msg);
 
 }
 
 void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
+    LOG(Info) << "Child removed: " << child->getName() << std::endl;
     disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded);
     disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
 
