@@ -21,8 +21,10 @@ public:
     ~EntityWidget();
 
 private:
-    EntityModel* model;
+
     Ui::EntityWidget *ui;
+protected:
+    EntityModel* model;
     EntityBase::SharedPtr entity;
 };
 
