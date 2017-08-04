@@ -55,7 +55,7 @@ public:
         msg->parent = parentId;
         msg->parenttype = parentType;
         msg->childids = childIds;
-        msg->childids = childIds;
+        msg->childtypes = childTypes;
         msg->machineip = machineip;
         msg->nodename = nodename;
         msg->subscriber = subscriber;

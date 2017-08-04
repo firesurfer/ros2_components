@@ -267,9 +267,9 @@ private:
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
-    void NewComponentFound(ComponentInfo &info);
-    void ComponentDeleted(ComponentInfo &info);
-    void ComponentChanged(ComponentInfo &info);
+    void NewComponentFound(ComponentInfo info);
+    void ComponentDeleted(ComponentInfo info);
+    void ComponentChanged(ComponentInfo info);
 private slots:
     void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
