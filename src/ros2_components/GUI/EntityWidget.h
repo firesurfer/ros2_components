@@ -17,15 +17,17 @@ class EntityWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit EntityWidget(EntityBase::SharedPtr _entity, QWidget *parent = 0);
+    Q_INVOKABLE EntityWidget(EntityBase::SharedPtr _entity, QWidget *parent = 0);
+
     ~EntityWidget();
 
 private:
 
-    Ui::EntityWidget *ui;
+
 protected:
     EntityModel* model;
     EntityBase::SharedPtr entity;
+     Ui::EntityWidget *ui;
 };
 
 }

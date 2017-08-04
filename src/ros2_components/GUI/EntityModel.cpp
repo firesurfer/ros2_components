@@ -6,7 +6,7 @@ namespace ros2_components {
 EntityModel::EntityModel(EntityBase::SharedPtr entity)
 {
     //TODO which size?
-    model = new QStandardItemModel(9,9);
+    model = new QStandardItemModel(0,0);
     QStandardItem* idItem = new QStandardItem(QString::number(entity->getId()));
     QStandardItem* idLabelItem = new QStandardItem("Id");
     model->insertRow(model->rowCount(), idItem);

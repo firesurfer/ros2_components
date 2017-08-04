@@ -16,6 +16,7 @@ EntityWidget::EntityWidget(EntityBase::SharedPtr _entity, QWidget *parent) :
     ui->tableView->setModel(model->getModel());
 }
 
+
 EntityWidget::~EntityWidget()
 {
     delete model;
