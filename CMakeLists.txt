@@ -13,6 +13,7 @@ find_package (Threads REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rmw REQUIRED)
@@ -40,6 +41,7 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components)
 ament_export_include_directories(include
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
+    ${Qt5Widgets_INCLUDE_DIRS}
     ${rclcpp_INCLUDE_DIRS}
     ${rmw_INCLUDE_DIRS}
     ${rmw_implementation_INCLUDE_DIRS}
@@ -48,6 +50,6 @@ ament_export_include_directories(include
     ${ros2_components_msg_INCLUDE_DIRS}
     )
 ament_export_libraries(ros2_components)
-ament_export_dependencies(Qt5Core Qt5Network ros2_components_msg ros2_simple_logger ament_cmake builtin_interfaces rmw rmw_implementation_cmake std_msgs Threads)
+ament_export_dependencies(Qt5Core Qt5Network Qt5Widgets ros2_components_msg ros2_simple_logger ament_cmake builtin_interfaces rmw rmw_implementation_cmake std_msgs Threads)
 
 ament_package()
