@@ -153,7 +153,7 @@ public:
         return entity;
     }
 
-    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
+    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, bool forcePubOrSubChange = false)
     {
         if(!EntityFactory::Contains(info.type))
             throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory");
@@ -162,7 +162,7 @@ public:
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
 
         //TODO - Check if this works
-        if(!info.subscriber)
+        if((!info.subscriber) != forcePubOrSubChange)
             subscribeArg = Q_ARG(bool, true);
         else
             subscribeArg = Q_ARG(bool, false);
