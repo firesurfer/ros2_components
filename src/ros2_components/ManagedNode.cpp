@@ -187,7 +187,7 @@ void ManagedNode::Setup(LogLevel logLevel)
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
     if(this->LogfilePath != "")
         simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
-
+    LOG(Info) <<"Build at: "<< BuildInfo::get_build_date() << std::endl;
 
 
     //Create Componentmanager with nodeEntity as base

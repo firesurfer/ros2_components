@@ -27,6 +27,7 @@
 #include "rclcpp/rclcpp.hpp"
 
 /* ros2 components */
+#include "BuildInfo.h"
 #include "ros2_simple_logger/Logger.h"
 #include "ComponentManager.h"
 #include "CLIParser.h"
