@@ -82,6 +82,7 @@ ComponentManager::~ComponentManager()
         }
     };
     iterateFunc(BaseEntity);
+
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
