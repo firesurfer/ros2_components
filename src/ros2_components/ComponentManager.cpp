@@ -251,7 +251,7 @@ void ComponentManager::RespondingTask()
         };
         while(triggerResponseQueue.empty() && !abort)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
             count ++;
             if(count > 100)
             {
@@ -262,8 +262,8 @@ void ComponentManager::RespondingTask()
         while(!triggerResponseQueue.empty())
         {
             triggerResponseQueue.pop();
-            responseFunc();
         }
+        responseFunc();
     }
 }
 
