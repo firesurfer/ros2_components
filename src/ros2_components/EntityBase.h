@@ -38,6 +38,7 @@
 
 /*ros2_components*/
 #include "Reflect.h"
+#include "ComponentInfo.h"
 
 /*Qt5*/
 #include <QObject>
@@ -287,7 +288,7 @@ protected slots:
 signals:
     void childAdded(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, bool remote);
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, bool remote);
-
+    void entityDeleted(ComponentInfo info);
     void newData(); //TODO SharedPtr ?
 
 private:

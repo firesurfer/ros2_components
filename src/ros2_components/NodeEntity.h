@@ -14,6 +14,8 @@ class NodeEntity: public Entity<std_msgs::msg::Empty>
 public:
     typedef std::shared_ptr<NodeEntity> SharedPtr;
     NodeEntity(uint64_t _id, std::string _name, rclcpp::node::Node::SharedPtr _rosNode);
+
+    virtual ~NodeEntity();
 };
 }
 

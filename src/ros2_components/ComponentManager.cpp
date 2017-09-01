@@ -52,6 +52,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     {
         connect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
         connect(child.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
+        connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
     }
     //Subscriptions
     using namespace std::placeholders;
@@ -66,6 +67,21 @@ ComponentManager::~ComponentManager()
 {
     this->abort =true;
     responder_thread->join();
+
+    LOG(Warning) << "Deletion of component manager. We interpret this that the whole cube got disposed. Advertising deletion!" << std::endl;
+    std::function<void(EntityBase::SharedPtr)> iterateFunc = [&](EntityBase::SharedPtr ent)
+    {
+        ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
+        msg->nodename = RosNode->get_name();
+        msg->deleted = true;
+        this->ListComponentsResponsePublisher->publish(msg);
+        for(EntityBase::SharedPtr & child:ent->getAllChilds())
+        {
+
+            iterateFunc(child);
+        }
+    };
+    iterateFunc(BaseEntity);
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
@@ -256,7 +272,7 @@ void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::Sha
     //Connect to add events
     connect(child.get(),&EntityBase::childAdded,this, &ComponentManager::OnChildAdded);
     connect(child.get(),&EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved);
-
+    connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted);
     //Publish component information
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
@@ -272,6 +288,15 @@ void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::S
     disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
 
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
+    msg->nodename = RosNode->get_name();
+    msg->deleted = true;
+    this->ListComponentsResponsePublisher->publish(msg);
+}
+
+void ComponentManager::OnEntityDeleted(ComponentInfo info)
+{
+    LOG(Warning) << info.name << " got deleted" << std::endl;
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = info.toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = true;
     this->ListComponentsResponsePublisher->publish(msg);

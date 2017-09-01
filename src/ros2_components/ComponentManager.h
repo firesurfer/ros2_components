@@ -273,6 +273,7 @@ signals:
 private slots:
     void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
+    void OnEntityDeleted(ComponentInfo info);
 
 };
 }

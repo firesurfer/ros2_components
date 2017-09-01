@@ -47,6 +47,15 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
 EntityBase::~EntityBase()
 {
     std::cout << "Destroying: " << getName() << std::endl;
+    ComponentInfo info;
+    info.id = getId();
+    info.parentId = parent->getId();
+    info.name = getName();
+    info.nodename = parentNode->get_name();
+    info.parentType = parent->getClassName();
+    info.type = getClassName();
+
+    emit entityDeleted(info);
 }
 
 int64_t EntityBase::getId()

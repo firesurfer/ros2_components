@@ -9,4 +9,9 @@ NodeEntity::NodeEntity(uint64_t _id, std::string _name, rclcpp::node::Node::Shar
 
 }
 
+NodeEntity::~NodeEntity()
+{
+
+}
+
 }
