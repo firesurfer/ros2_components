@@ -63,7 +63,7 @@ void ManagedNode::Spin()
     rclcpp::WallRate loop_rate(this->loopRate);
     while(rclcpp::ok() && !Abort)
     {
-        executor->spin_some();
+        SpinOnce();
         loop_rate.sleep();
     }
 }
