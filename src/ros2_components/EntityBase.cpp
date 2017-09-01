@@ -55,7 +55,7 @@ EntityBase::~EntityBase()
     info.parentType = parent->getClassName();
     info.type = getClassName();
 
-    emit entityDeleted(info);
+    //emit entityDeleted(info);
 }
 
 int64_t EntityBase::getId()
