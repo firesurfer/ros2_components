@@ -108,7 +108,7 @@ public:
      * @param logLevel
      * Initiate the logger with a specific log level instead of LogLevel::Info @see Setup
      */
-    virtual void Setup(LogLevel logLevel);
+    virtual void Setup(LogLevel logLevel, bool no_executor= false);
     /**
      * @brief Spin - Spin this node (manually)
      */

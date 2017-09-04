@@ -159,7 +159,7 @@ void ManagedNode::Setup()
     Setup(LogLevel::Info);
 
 }
-void ManagedNode::Setup(LogLevel logLevel)
+void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
 {
     uint64_t id = 100;
     if(id_str != "")
@@ -179,7 +179,8 @@ void ManagedNode::Setup(LogLevel logLevel)
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
     //Add the node to our singlethread executor
-    executor->add_node(RosNode);
+    if(!no_executor)
+        executor->add_node(RosNode);
     //Init logger
     INIT_LOGGER(RosNode);
     //Set loglevel to given loglevel
