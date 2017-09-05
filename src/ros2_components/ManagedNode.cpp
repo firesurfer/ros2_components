@@ -16,6 +16,7 @@
  */
 
 #include "ManagedNode.h"
+//using namespace std::chrono_literals;
 namespace ros2_components {
 
 
@@ -63,7 +64,7 @@ void ManagedNode::Spin()
     rclcpp::WallRate loop_rate(this->loopRate);
     while(rclcpp::ok() && !Abort)
     {
-        SpinOnce();
+        SpinOnce(std::chrono::nanoseconds(100));
         loop_rate.sleep();
     }
 }
