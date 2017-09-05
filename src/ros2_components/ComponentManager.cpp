@@ -31,7 +31,9 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     //Qos Profile
     //rmw_qos_profile_services_default
     component_manager_profile = rmw_qos_profile_default;
+    component_manager_profile.depth = 100;
     component_manager_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+
 
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
