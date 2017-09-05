@@ -121,6 +121,10 @@ public:
      */
     bool CheckIfChildsAreAvailable(uint64_t id);
     /**
+     * @brief DisableThreadedResponse - Stops the async responder thread - Uses synchronous responses afterwards
+     */
+    void DisableThreadedResponse();
+    /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      */
     template<typename T>
@@ -264,6 +268,9 @@ private:
     std::unique_ptr<std::thread> responder_thread;
     std::queue<bool> triggerResponseQueue;
     bool abort = false;
+    bool syncResponses = false;
+
+    void GenerateResponse();
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
