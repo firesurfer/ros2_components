@@ -30,15 +30,16 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     this->responder_thread = std::make_unique<std::thread>(std::bind(&ComponentManager::RespondingTask,this));
     //Qos Profile
     //rmw_qos_profile_services_default
-    component_manager_profile = rmw_qos_profile_parameters;
-    component_manager_profile.depth = 1000;
+    component_manager_profile = rmw_qos_profile_default;
+    component_manager_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
+
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
-    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), rmw_qos_profile_default);
+    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
 
     //Publishers
-    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",rmw_qos_profile_default);
+    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
@@ -56,10 +57,10 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     }
     //Subscriptions
     using namespace std::placeholders;
-    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), rmw_qos_profile_default);
+    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
 
     //Publishers
-    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",rmw_qos_profile_default);
+    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
 
 }
 
