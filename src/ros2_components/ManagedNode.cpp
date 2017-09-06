@@ -193,7 +193,7 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
 
 
     //Create Componentmanager with nodeEntity as base
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity);
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity,true);
 
     //Component manager for a algorithm node: Doesnt need a baseentity
     this->isSetup = true; //Set setup to true

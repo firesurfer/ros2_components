@@ -20,14 +20,16 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, bool _runSychronous)
 {
     using namespace std::placeholders;
     //Variable Assignments
     this->RosNode = _localNode;
 
+    this->syncResponses = _runSychronous;
     //Start responder thread
-    this->responder_thread = std::make_unique<std::thread>(std::bind(&ComponentManager::RespondingTask,this));
+    if(!_runSychronous)
+        this->responder_thread = std::make_unique<std::thread>(std::bind(&ComponentManager::RespondingTask,this));
     //Qos Profile
     //rmw_qos_profile_services_default
     component_manager_profile = rmw_qos_profile_default;
@@ -46,7 +48,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
 
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity): ComponentManager(_localNode)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity, bool _runSychronous): ComponentManager(_localNode, _runSychronous)
 {
 
     //Variable Assignments

@@ -59,14 +59,14 @@ public:
      * @param _localNode
      * Use this constructor if your having a node that doesnt need a base entity (for example an algorithm node)
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, bool _runSychronous = false);
     /**
      * @brief ComponentManager
      * @param _localNode
      * @param _baseEntity
      * Use this constructor if your having a node that needs a base entity (for example a hardware sensor/actor node)
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity, bool _runSychronous = false);
     /**
      * @brief ~ComponentManager - destructor. Waits for responder thread
      */
