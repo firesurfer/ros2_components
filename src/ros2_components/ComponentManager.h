@@ -271,6 +271,7 @@ private:
     bool syncResponses = false;
 
     void GenerateResponse();
+    rclcpp::timer::TimerBase::SharedPtr updateTimer;
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system

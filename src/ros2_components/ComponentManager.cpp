@@ -66,13 +66,15 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     //Publishers
     this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
 
+    this->updateTimer = RosNode->create_wall_timer(1s, std::bind(&ComponentManager::GenerateResponse,this));
 
 }
 
 ComponentManager::~ComponentManager()
 {
     this->abort =true;
-    responder_thread->join();
+    if(responder_thread)
+        responder_thread->join();
 
     LOG(Warning) << "Deletion of component manager. We interpret this that the whole cube got disposed. Advertising deletion!" << std::endl;
     std::function<void(EntityBase::SharedPtr)> iterateFunc = [&](EntityBase::SharedPtr ent)
