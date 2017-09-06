@@ -258,7 +258,6 @@ void ComponentManager::GenerateResponse()
                 respMsg->nodename = RosNode->get_name();
                 respMsg->deleted = false;
                 this->ListComponentsResponsePublisher->publish(respMsg);
-                ent->IterateThroughAllChilds(iteratingFunc);
             };
 
             this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
