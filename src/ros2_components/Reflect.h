@@ -55,6 +55,8 @@ public:
     string key;
     string type;
 
+    virtual ~Element() {}
+
     virtual std::string getKey(){return key;}
     virtual std::string getType(){return type;}
     virtual size_t getSize()=0;

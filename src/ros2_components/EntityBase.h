@@ -262,7 +262,7 @@ protected:
     /**
      * Parent of this entity
      */
-    std::shared_ptr<EntityBase> parent;
+    std::weak_ptr<EntityBase> parent;
     /**
      * @brief pubBase
      */

@@ -47,15 +47,23 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
 EntityBase::~EntityBase()
 {
     std::cout << "Destroying: " << getName() << std::endl;
-   /*ComponentInfo info;
+    for (auto e : internalmap)
+    {
+      delete e;
+    }
+    ComponentInfo info;
     info.id = getId();
-    info.parentId = parent->getId();
+    std::shared_ptr<EntityBase> parent_ptr = parent.lock();
+    if (parent_ptr)
+    {
+      info.parentId = parent_ptr->getId();
+      info.parentType = parent_ptr->getClassName();
+    }
     info.name = getName();
     info.nodename = parentNode->get_name();
-    info.parentType = parent->getClassName();
-    info.type = getClassName();*/
+    info.type = getClassName();
 
-    //emit entityDeleted(info);
+    emit entityDeleted(info);
 }
 
 int64_t EntityBase::getId()
@@ -132,7 +140,7 @@ uint64_t EntityBase::countChilds()
 
 std::shared_ptr<EntityBase> EntityBase::getParent()
 {
-    return this->parent;
+    return this->parent.lock();
 }
 
 void EntityBase::setParent(std::shared_ptr<EntityBase> par)

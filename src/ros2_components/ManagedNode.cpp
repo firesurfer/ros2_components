@@ -20,7 +20,7 @@
 namespace ros2_components {
 
 
-ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,nodeName}
+ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool parseCli):cliParser{argv,argc,_nodeName}
 {
 
     //Initialise ros2
