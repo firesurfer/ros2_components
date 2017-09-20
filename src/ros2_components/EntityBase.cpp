@@ -104,6 +104,29 @@ rclcpp::node::Node::SharedPtr EntityBase::getParentNode()
 void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
 {
     LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << " from: " << getName()<< std::endl;
+
+    std::function<bool (std::shared_ptr<EntityBase>, EntityBase*)> has_child =
+      [&] (std::shared_ptr<EntityBase> entity, EntityBase* child)
+    {
+      if (entity.get() == child)
+      {
+        return true;
+      }
+      for (auto e : entity->childs)
+      {
+        if (has_child(e, child))
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+    if (has_child(child, this))
+    {
+      throw std::runtime_error("Adding Child " + child->getName() + " to " + getName()
+                               + " creates cycle");
+    }
+
     childs.push_back(child);
     child->setParent(shared_from_this());
     emit childAdded(child,child->getParent(),remote);
