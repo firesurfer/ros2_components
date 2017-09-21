@@ -52,13 +52,21 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 {
 
     //Variable Assignments
-    this->BaseEntity = _baseEntity; //TODO register to components and add change callbacks
-    for(EntityBase::SharedPtr & child:BaseEntity->getAllChilds())
+    this->BaseEntity = _baseEntity;
+
+    //Connect to entity structure change callbacks
+    auto func = [&](EntityBase::SharedPtr child)
     {
         connect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
         connect(child.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
         connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
-    }
+    };
+    connect(BaseEntity.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
+    connect(BaseEntity.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
+    connect(BaseEntity.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
+    //Call lambda
+    BaseEntity->IterateThroughAllChilds(func);
+
     //Subscriptions
     using namespace std::placeholders;
     this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
@@ -80,7 +88,7 @@ ComponentManager::~ComponentManager()
     if(responder_thread)
         responder_thread->join();
 
-    LOG(Warning) << "Deletion of component manager. We interpret this that the whole cube got disposed. Advertising deletion!" << std::endl;
+    LOG(Warning) << "Deletion of component manager" << std::endl;
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
@@ -201,6 +209,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 
                     toDelete = true;
                     //TODO delete from list more efficient
+                      LOG(Info) << "Deleting: " << myInfo.name << std::endl;
                     emit ComponentDeleted(myInfo);
 
                 }
@@ -215,6 +224,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         }
         if(toDelete)
         {
+
             size_t pos = 0;
             for(auto & info: Components)
             {
