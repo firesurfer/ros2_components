@@ -159,7 +159,7 @@ public:
 
     std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, bool forcePubOrSubChange = false)
     {
-        if(!EntityFactory::Contains(info.type))
+        if(!EntityFactory::contains(info.type))
             throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory");
 
         QGenericArgument subscribeArg;
@@ -172,7 +172,7 @@ public:
             subscribeArg = Q_ARG(bool, false);
         QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
 
-        std::shared_ptr<EntityBase> ent = EntityFactory::CreateInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
+        std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
         //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
 
         //The following line recusivly rebuild the tree structure that was published before
@@ -196,7 +196,7 @@ public:
                         subscribeArg = Q_ARG(bool, true);
                     else
                         subscribeArg = Q_ARG(bool, false);
-                    std::shared_ptr<EntityBase> child_obj = EntityFactory::CreateInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
+                    std::shared_ptr<EntityBase> child_obj = EntityFactory::createInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
                     parentEntity->addChild(child_obj);
                     rec_build(child_obj,childInfo);
                 }

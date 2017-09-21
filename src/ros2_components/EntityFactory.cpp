@@ -26,12 +26,12 @@ EntityFactory::EntityFactory(QObject *parent) : QObject(parent)
 
 
 
-void EntityFactory::AddQObject(QObject *obj)
+void EntityFactory::addQObject(QObject *obj)
 {
     EntityFactory::metaObjs.insert(obj->metaObject()->className(), obj->metaObject());
 }
 
-std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string className,QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3)
+std::shared_ptr<EntityBase> EntityFactory::createInstanceFromName(string className,QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3)
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
         throw std::runtime_error("Class with name: " +className+" not registered");
@@ -48,7 +48,7 @@ std::shared_ptr<EntityBase> EntityFactory::CreateInstanceFromName(string classNa
     return sptr;
 }
 
-std::shared_ptr<QMetaObject> EntityFactory::GetQMetaObject(string className)
+std::shared_ptr<QMetaObject> EntityFactory::getQMetaObject(string className)
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
         throw std::runtime_error("Class with name: " +className+" not registered");
@@ -58,7 +58,7 @@ std::shared_ptr<QMetaObject> EntityFactory::GetQMetaObject(string className)
     return std::shared_ptr<QMetaObject>(const_cast<QMetaObject*>(meta));
 }
 
-bool EntityFactory::Contains(string className)
+bool EntityFactory::contains(string className)
 {
     QString name = QString::fromStdString(className);
     if(metaObjs.contains(name))
@@ -68,19 +68,19 @@ bool EntityFactory::Contains(string className)
 }
 
 template<typename T>
-std::shared_ptr<T> EntityFactory::CreateInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
+std::shared_ptr<T> EntityFactory::createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
 {
     return std::make_shared<T>(_id,_subscribe,_parentNode);
 }
 
 template<typename T>
-std::shared_ptr<T> EntityFactory::CreateInstanceFromName(string className, int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
+std::shared_ptr<T> EntityFactory::createInstanceFromName(string className, int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
 {
     QGenericArgument subscribeArg = Q_ARG(bool, _subscribe);
     QGenericArgument idArg = Q_ARG(int64_t, _id);
     QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, _parentNode);
 
-    return dynamic_pointer_cast<T>(CreateInstanceFromName(className, idArg, subscribeArg,nodeArg));
+    return dynamic_pointer_cast<T>(createInstanceFromName(className, idArg, subscribeArg,nodeArg));
 }
 
 }

@@ -160,23 +160,7 @@ public:
      * @param func
      * //TODO iterator ?
      */
-    void iterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func)
-    {
-        std::function<void(EntityBase::SharedPtr)> rec_func = [&](EntityBase::SharedPtr base){
-            for(auto &  child : base->getAllChilds())
-            {
-                func(child);
-                rec_func(child);
-
-            }
-
-        };
-        for(auto & seg: getAllChilds())
-        {
-            func(seg);
-            rec_func(seg);
-        }
-    }
+    void iterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func);
 
     /**
      * @brief IterateThroughAllChildsOfType

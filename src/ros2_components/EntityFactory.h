@@ -48,7 +48,7 @@ public:
      * @brief AddQObject
      * @param obj
      */
-    static void AddQObject(QObject * obj);
+    static void addQObject(QObject * obj);
     /**
      * @brief CreateInstanceFromName
      * @param className
@@ -57,27 +57,27 @@ public:
      * @param arg3
      * @return
      */
-    static std::shared_ptr<EntityBase> CreateInstanceFromName(std::string className, QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3);
+    static std::shared_ptr<EntityBase> createInstanceFromName(std::string className, QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3);
 
     template<typename T>
-    static std::shared_ptr<T> CreateInstanceFromName(std::string className, int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
+    static std::shared_ptr<T> createInstanceFromName(std::string className, int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
     /**
      *  @brief CreateInstanceGiven by the type.
      */
     template<typename T>
-    static std::shared_ptr<T> CreateInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
+    static std::shared_ptr<T> createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
     /**
      * @brief GetQMetaObject
      * @param className
      * @return
      */
-    static std::shared_ptr<QMetaObject> GetQMetaObject(std::string className);
+    static std::shared_ptr<QMetaObject> getQMetaObject(std::string className);
     /**
      * @brief Contains
      * @param className
      * @return True if the given className is available
      */
-    static bool Contains(std::string className);
+    static bool contains(std::string className);
 
 signals:
 
