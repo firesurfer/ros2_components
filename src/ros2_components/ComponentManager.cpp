@@ -118,7 +118,7 @@ std::vector<string> ComponentManager::ListNodes()
 
 std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilter filter)
 {
-    return filter.Filter(this->Components);
+    return filter.filter(this->Components);
 }
 
 ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
@@ -189,7 +189,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
     {
         bool foundInList = false;
         bool toDelete = false;
-        ComponentInfo currentInfo = ComponentInfoFactory::FromListComponentsResponseMessage(msg);
+        ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
         for(ComponentInfo & myInfo: Components)
         {
 
@@ -250,13 +250,13 @@ void ComponentManager::GenerateResponse()
     {
         if(BaseEntity)
         {
-            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(this->BaseEntity).toRosMessage();
+            ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(this->BaseEntity).toRosMessage();
             msg->nodename = RosNode->get_name();
             msg->deleted = false;
             this->ListComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
             {
-                auto respMsg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
+                auto respMsg = ComponentInfoFactory::fromEntity(ent).toRosMessage();
                 respMsg->nodename = RosNode->get_name();
                 respMsg->deleted = false;
                 this->ListComponentsResponsePublisher->publish(respMsg);
@@ -305,7 +305,7 @@ void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::Sha
     connect(child.get(),&EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved);
     connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted);
     //Publish component information
-    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = false;
     this->ListComponentsResponsePublisher->publish(msg);
@@ -318,7 +318,7 @@ void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::S
     disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded);
     disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
 
-    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(child).toRosMessage();
+    ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = true;
     this->ListComponentsResponsePublisher->publish(msg);

@@ -27,7 +27,7 @@ public:
      * @return ComponentInfo object
      * Creates a ComponentInfo object from a given entity
      */
-    static ComponentInfo FromEntity(EntityBase::SharedPtr ent);
+    static ComponentInfo fromEntity(EntityBase::SharedPtr ent);
 
     /**
      * @brief FromListComponentsResponseMessage
@@ -35,22 +35,25 @@ public:
      * @return
      * Creates a ComponentInfo object from a given ListComponentsResponse msg
      */
-    static ComponentInfo FromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
+    static ComponentInfo fromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
     /**
      * @brief FromComponentChangedMessage
      * @param msg
      * @return
      * Creates a ComponentInfo object from a given ComponentChanged
      */
-    static ComponentInfo FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
+    static ComponentInfo fromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
 
     /**
      * @brief GetLocalIpV4
      * @return The local ipv4 address
      */
-    static int64_t GetLocalIpV4();
-
-    static std::vector<uint8_t> GetLocalIpV6();
+    static int64_t getLocalIpV4();
+    /**
+     * @brief getLocalIpV6
+     * @return  The local ipv6 address
+     */
+    static std::vector<uint8_t> getLocalIpV6();
 };
 }
 

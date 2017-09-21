@@ -29,7 +29,7 @@ class ComponentListFilter
 {
 public:
     ComponentListFilter();
-    virtual std::vector<ComponentInfo> Filter(std::vector<ComponentInfo> infos);
+    virtual std::vector<ComponentInfo> filter(std::vector<ComponentInfo> infos);
 };
 }
 

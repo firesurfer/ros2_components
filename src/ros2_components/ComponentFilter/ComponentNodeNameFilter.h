@@ -28,7 +28,7 @@ public:
     std::string getNodeName() const;
     void setNodeName(const std::string &value);
 
-     virtual std::vector<ComponentInfo> Filter(std::vector<ComponentInfo> infos);
+     virtual std::vector<ComponentInfo> filter(std::vector<ComponentInfo> infos);
 
 private:
     std::string NodeName;

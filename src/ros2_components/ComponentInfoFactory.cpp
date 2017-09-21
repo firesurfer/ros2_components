@@ -6,7 +6,7 @@ ComponentInfoFactory::ComponentInfoFactory()
 
 }
 
-ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
+ComponentInfo ComponentInfoFactory::fromEntity(EntityBase::SharedPtr ent)
 {
     ComponentInfo info;
     info.name = ent->getName();
@@ -14,7 +14,7 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
 
     //TODO move this into a more general place
 
-    info.machineip = GetLocalIpV4();
+    info.machineip = getLocalIpV4();
     if(ent->getParent() != NULL)
     {
         info.parentId = ent->getParent()->getId();
@@ -39,7 +39,7 @@ ComponentInfo ComponentInfoFactory::FromEntity(EntityBase::SharedPtr ent)
 
 }
 
-ComponentInfo ComponentInfoFactory::FromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
+ComponentInfo ComponentInfoFactory::fromListComponentsResponseMessage(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
 {
     ComponentInfo info;
     info.id = msg->id;
@@ -56,7 +56,7 @@ ComponentInfo ComponentInfoFactory::FromListComponentsResponseMessage(ros2_compo
     return info;
 }
 
-ComponentInfo ComponentInfoFactory::FromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
+ComponentInfo ComponentInfoFactory::fromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg)
 {
     ComponentInfo info;
     info.id = msg->id;
@@ -73,7 +73,7 @@ ComponentInfo ComponentInfoFactory::FromComponentChangedMessage(ros2_components_
     return info;
 }
 
-int64_t ComponentInfoFactory::GetLocalIpV4()
+int64_t ComponentInfoFactory::getLocalIpV4()
 {
     int64_t ipAddr =0;
     foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -97,7 +97,7 @@ int64_t ComponentInfoFactory::GetLocalIpV4()
     return ipAddr;
 }
 
-std::vector<uint8_t> ComponentInfoFactory::GetLocalIpV6()
+std::vector<uint8_t> ComponentInfoFactory::getLocalIpV6()
 {
     std::vector<uint8_t> returnAddr;
     foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())

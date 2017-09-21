@@ -33,7 +33,7 @@ void ComponentNameFilter::setName(const std::string &value)
     Name = value;
 }
 
-std::vector<ComponentInfo> ComponentNameFilter::Filter(std::vector<ComponentInfo> infos)
+std::vector<ComponentInfo> ComponentNameFilter::filter(std::vector<ComponentInfo> infos)
 {
     std::vector<ComponentInfo> components;
     for(ComponentInfo & info: infos)
