@@ -160,7 +160,7 @@ public:
      * @param func
      * //TODO iterator ?
      */
-    void IterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func)
+    void iterateThroughAllChilds(std::function<void(EntityBase::SharedPtr)> func)
     {
         std::function<void(EntityBase::SharedPtr)> rec_func = [&](EntityBase::SharedPtr base){
             for(auto &  child : base->getAllChilds())
@@ -183,7 +183,7 @@ public:
      * //TODO real iterator?
      */
     template<typename T>
-    void IterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
+    void iterateThroughAllChildsOfType(std::function<void(std::shared_ptr<T>)> func)
     {
         auto callbackFunc = [&](EntityBase::SharedPtr item)
         {
@@ -192,7 +192,7 @@ public:
                 func(ch);
 
         };
-        IterateThroughAllChilds(callbackFunc);
+        iterateThroughAllChilds(callbackFunc);
     }
 
     /**
@@ -200,7 +200,7 @@ public:
      * @return Number of childs of the given type
      */
     template<typename T>
-    int CountChildsOfType()
+    int countChildsOfType()
     {
         int count = 0;
         for(EntityBase::SharedPtr & ent: this->childs)
@@ -218,7 +218,7 @@ public:
      * @remark Consider using the Iteration functions
      */
     template<typename T>
-    std::vector<T> GetChildsOfType()
+    std::vector<T> getChildsOfType()
     {
         std::vector<T> childsOfT;
         for(EntityBase::SharedPtr & ent: this->childs)

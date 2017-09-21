@@ -34,18 +34,10 @@ public:
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
-        //custom_qos_profile.depth = 2;
-        //custom_qos_profile.history = hist_pol;
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-
-            //rmw_qos_profile_services_default
-            //rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
-            //component_manager_profile.depth = 1000;
-            //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
             pubBase = entityPublisher;
-
         }
         else
         {
@@ -59,18 +51,10 @@ public:
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
-        //custom_qos_profile.depth = 2;
-        //custom_qos_profile.history = hist_pol;
         if(!isSubscriber())
         {
             entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
-
-            //rmw_qos_profile_services_default
-            //rmw_qos_profile_t component_manager_profile = rmw_qos_profile_parameters;
-            //component_manager_profile.depth = 1000;
-            //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
             pubBase = entityPublisher;
-
         }
         else
         {

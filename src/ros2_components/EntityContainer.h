@@ -10,31 +10,31 @@ class EntityContainer
 public:
     EntityContainer(EntityBase::SharedPtr _entity)
     {
-        this->Instance =_entity;
-        this->ClassName = _entity->getClassName();
+        this->instance =_entity;
+        this->className = _entity->getClassName();
 
     }
 
     template<class U>
     bool IsType()
     {
-        return dynamic_pointer_cast<U>(Instance) != nullptr;
+        return dynamic_pointer_cast<U>(instance) != nullptr;
     }
 
     template<class U>
     std::shared_ptr<U> Cast()
     {
-        return dynamic_pointer_cast<U>(Instance);
+        return dynamic_pointer_cast<U>(instance);
     }
 
     std::string getClassName() const
     {
-         return ClassName;
+         return className;
     }
 
 private:
-    EntityBase::SharedPtr Instance;
-    std::string ClassName;
+    EntityBase::SharedPtr instance;
+    std::string className;
 };
 }
 

@@ -65,7 +65,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     connect(BaseEntity.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
     connect(BaseEntity.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
     //Call lambda
-    BaseEntity->IterateThroughAllChilds(func);
+    BaseEntity->iterateThroughAllChilds(func);
 
     //Subscriptions
     using namespace std::placeholders;
@@ -262,7 +262,7 @@ void ComponentManager::GenerateResponse()
                 this->ListComponentsResponsePublisher->publish(respMsg);
             };
 
-            this->BaseEntity->IterateThroughAllChilds(iteratingFunc);
+            this->BaseEntity->iterateThroughAllChilds(iteratingFunc);
         }
     };
 

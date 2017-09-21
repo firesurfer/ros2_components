@@ -149,12 +149,7 @@ public:
     CLIParser GetCliParser() const;
 
 protected:
-    /**
-     * @brief CommandLineArguments
-     * Contains the given command line arguments
-     */
-    [[deprecated]]
-    std::vector<std::string> CommandLineArguments;
+
 
     /**
      * @brief Abort
