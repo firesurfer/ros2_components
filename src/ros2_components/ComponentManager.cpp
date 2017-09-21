@@ -73,19 +73,6 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
 ComponentManager::~ComponentManager()
 {
-    std::function<void(EntityBase::SharedPtr)> iterateFunc = [&](EntityBase::SharedPtr ent)
-    {
-        ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
-        msg->nodename = RosNode->get_name();
-        msg->deleted = true;
-        this->ListComponentsResponsePublisher->publish(msg);
-        for(EntityBase::SharedPtr & child:ent->getAllChilds())
-        {
-
-            iterateFunc(child);
-        }
-    };
-    iterateFunc(BaseEntity);
     this->BaseEntity.reset();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
