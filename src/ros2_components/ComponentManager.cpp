@@ -73,11 +73,6 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
 ComponentManager::~ComponentManager()
 {
-    this->abort =true;
-    if(responder_thread)
-        responder_thread->join();
-
-    LOG(Warning) << "Deletion of component manager. We interpret this that the whole cube got disposed. Advertising deletion!" << std::endl;
     std::function<void(EntityBase::SharedPtr)> iterateFunc = [&](EntityBase::SharedPtr ent)
     {
         ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::FromEntity(ent).toRosMessage();
@@ -91,7 +86,14 @@ ComponentManager::~ComponentManager()
         }
     };
     iterateFunc(BaseEntity);
+    this->BaseEntity.reset();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+    this->abort =true;
+    if(responder_thread)
+        responder_thread->join();
+
+    LOG(Warning) << "Deletion of component manager. We interpret this that the whole cube got disposed. Advertising deletion!" << std::endl;
 }
 
 bool ComponentManager::IDAlreadyInUse(uint64_t id)
