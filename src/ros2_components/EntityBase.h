@@ -49,6 +49,7 @@
 Q_DECLARE_SMART_POINTER_METATYPE(std::shared_ptr)
 Q_DECLARE_METATYPE(std::string)
 
+
 using namespace std;
 using namespace std::placeholders;
 
@@ -212,6 +213,15 @@ public:
                 childsOfT.push_back(ch);
         }
         return childsOfT;
+    }
+
+    /**
+     * @brief makeVirtual sets this entity as virtual
+     * @remark call this if it is a rebuild of an entity
+     */
+    void makeVirtual()
+    {
+        virtualEntity = true;
     }
 
 protected:

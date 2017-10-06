@@ -25,11 +25,11 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
     this->parentNode = _parentNode;
     this->className = _className;
     this->active = true;
+    this->virtualEntity = false;
     this->name = getClassName()  + std::to_string(id);
 
     //TODO rework meta mechanism
 
-    REFLECT(virtualEntity);
     REFLECT(className);
     REFLECT(active);
     REFLECT(description)
@@ -46,24 +46,26 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
 
 EntityBase::~EntityBase()
 {
-    std::cout << "Destroying: " << getName() << std::endl;
     for (auto e : internalmap)
     {
       delete e;
     }
-    ComponentInfo info;
-    info.id = getId();
-    std::shared_ptr<EntityBase> parent_ptr = parent.lock();
-    if (parent_ptr)
-    {
-      info.parentId = parent_ptr->getId();
-      info.parentType = parent_ptr->getClassName();
-    }
-    info.name = getName();
-    info.nodename = parentNode->get_name();
-    info.type = getClassName();
 
-    emit entityDeleted(info);
+    if (!isVirtual())
+    {
+        ComponentInfo info;
+        info.id = getId();
+        std::shared_ptr<EntityBase> parent_ptr = parent.lock();
+        if (parent_ptr)
+        {
+          info.parentId = parent_ptr->getId();
+          info.parentType = parent_ptr->getClassName();
+        }
+        info.name = getName();
+        info.nodename = parentNode->get_name();
+        info.type = getClassName();
+        emit entityDeleted(info);
+    }
 }
 
 int64_t EntityBase::getId()

@@ -204,6 +204,7 @@ public:
             std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(ent);
             rec_build(parentEnt,info);
         }
+        ent->makeVirtual();
         return ent;
     }
 

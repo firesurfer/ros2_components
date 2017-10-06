@@ -47,6 +47,7 @@
  * node->Setup(..);
  *
  * //The following lines are either or
+ *
  * //For asynchronous spinning:
  * node->Start();
  * while(rclcpp::ok())
@@ -165,11 +166,6 @@ protected:
      */
     int64_t NodeId = 0;
     /**
-     * @brief CompManager
-     * One component manager per node
-     */
-    ComponentManager::SharedPtr CompManager;
-    /**
      * @brief BaseEntity
      * The basic entity where the abstraction structure of this node starts from
      */
@@ -212,6 +208,12 @@ private:
     std::shared_ptr<std::thread> WorkThread;
     void AsyncWorker();
     rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
+
+    /**
+     * @brief CompManager
+     * One component manager per node
+     */
+    ComponentManager::SharedPtr CompManager;
 
     std::string id_str= "";
 

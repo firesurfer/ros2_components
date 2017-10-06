@@ -120,8 +120,7 @@ CLIParser ManagedNode::GetCliParser() const
 
 void ManagedNode::AsyncWorker()
 {
-    //TODO make loop_rate configurable
-    rclcpp::WallRate loop_rate(80);
+    rclcpp::WallRate loop_rate(GetLoopRate());
     while(!Abort)
     {
         DoWork();
@@ -195,7 +194,6 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
     //Create Componentmanager with nodeEntity as base
     this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity,true);
 
-    //Component manager for a algorithm node: Doesnt need a baseentity
     this->isSetup = true; //Set setup to true
 }
 
