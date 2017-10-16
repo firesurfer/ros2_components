@@ -114,6 +114,19 @@ public:
      * @return the child with the given id
      */
     virtual std::shared_ptr<EntityBase> getChildById(int64_t id);
+
+    /**
+     *  @brief getChildById<T> calls getChildById and casts to the given type T
+     */
+    template<typename T>
+    std::shared_ptr<T> getChildById(int64_t id)
+    {
+        EntityBase::SharedPtr child = getChildById(id);
+        std::shared_ptr<T> casted_child = dynamic_pointer_cast<T>(child);
+        if(!casted_child)
+            throw std::runtime_error("Could not cast child: " + std::to_string(id) + " to given type T");
+        return casted_child;
+    }
     /**
      * @brief getAllChilds
      * @return all childs of this entity
