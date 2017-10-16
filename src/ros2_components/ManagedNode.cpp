@@ -54,7 +54,15 @@ void ManagedNode::Spin()
 {
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
-    rclcpp::spin(RosNode);
+
+    rclcpp::WallRate loopRate(50);
+    while(!Abort && Ok())
+    {
+        rclcpp::spin_some(RosNode);
+        loopRate.sleep();
+
+    }
+    //rclcpp::spin(RosNode);
 }
 
 void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
