@@ -132,15 +132,13 @@ void ManagedNode::DoWork()
 
 void ManagedNode::Exit()
 {
-    //std::cout << "Calling exit" << std::endl;
+    LOG(Info) << "Called exit on: " << RosNode->get_name() << std::endl;
     Abort = true;
     if(WorkThread)
         WorkThread->join();
     if(SpinThread)
         SpinThread->join();
-    //std::cout << "Thread successfully ended" << std::endl;
     rclcpp::shutdown();
-    //std::cout << "Exit successfull" << std::endl;
 }
 
 void ManagedNode::Start(bool multithreaded)
@@ -153,7 +151,6 @@ void ManagedNode::Start(bool multithreaded)
 void ManagedNode::Setup()
 {
     Setup(LogLevel::Info);
-
 }
 void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
 {
@@ -187,7 +184,6 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
 
     //Create Componentmanager with nodeEntity as base
     this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity,true);
-
     this->isSetup = true; //Set setup to true
 }
 
