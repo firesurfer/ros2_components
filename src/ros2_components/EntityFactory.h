@@ -35,11 +35,11 @@ namespace ros2_components
  * simply call: METAOBJS_INSERT(MyType) for all Types you want to register to the system.
  * Your classes may only have 3 constructor arguments
  */
-class EntityFactory : public QObject
+class EntityFactory
 {
-    Q_OBJECT
+
 public:
-    explicit EntityFactory(QObject *parent = 0);
+    explicit EntityFactory();
     /**
      * @brief metaObjs
      */
@@ -79,10 +79,6 @@ public:
      */
     static bool contains(std::string className);
 
-signals:
-
-public slots:
-private:
 
 
 };

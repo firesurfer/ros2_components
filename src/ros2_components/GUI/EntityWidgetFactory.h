@@ -13,11 +13,10 @@ namespace  ros2_components {
 #define METAWIDGETOBJS_INSERT(c) (EntityWidgetFactory::metaWidgetObjs.insert(#c, &c::staticMetaObject))
 
 
-class EntityWidgetFactory:public QObject
+class EntityWidgetFactory
 {
-    Q_OBJECT
 public:
-    EntityWidgetFactory(QObject * parent=0);
+    EntityWidgetFactory();
 
     static QHash<QString, const QMetaObject*> metaWidgetObjs;
 

@@ -19,7 +19,7 @@
 namespace ros2_components
 {
 QHash<QString, const QMetaObject*> EntityFactory::metaObjs;
-EntityFactory::EntityFactory(QObject *parent) : QObject(parent)
+EntityFactory::EntityFactory()
 {
 
 }

@@ -4,7 +4,7 @@ namespace  ros2_components {
 
 QHash<QString, const QMetaObject*> EntityWidgetFactory::metaWidgetObjs;
 
-EntityWidgetFactory::EntityWidgetFactory(QObject *parent)
+EntityWidgetFactory::EntityWidgetFactory()
 {
 
 }
