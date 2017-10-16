@@ -54,14 +54,7 @@ void ManagedNode::Spin()
 {
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
-
-    rclcpp::WallRate loop_rate(this->loopRate);
-    while(rclcpp::ok() && !Abort)
-    {
-       // SpinOnce(std::chrono::nanoseconds(100));
-        executor->spin_some();
-        //loop_rate.sleep();
-    }
+    rclcpp::spin(RosNode);
 }
 
 void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
@@ -69,7 +62,7 @@ void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
     if(rclcpp::ok() && !Abort)
-        executor->spin_once(timeout);
+        executor->spin_node_once(RosNode,timeout);
 }
 
 bool ManagedNode::Ok() const
@@ -173,9 +166,7 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
     //Check if rosnode is valid -> should be always the case
     if( !this->RosNode)
         throw std::runtime_error("RosNode may not be null - cant proceed with setup");
-    //Add the node to our singlethread executor
-    if(!no_executor)
-        executor->add_node(RosNode);
+
     //Init logger
     INIT_LOGGER(RosNode);
     //Set loglevel to given loglevel
