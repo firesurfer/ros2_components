@@ -31,8 +31,6 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
 
     //TODO put additional help information into parser
 
-
-
     CLIArgument idArg = {"id","Specify id used for the node", &id_str};
     CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath};
     CLIArgument configArg = {"configpath","Path to a configfile", &this->ConfigfilePath};
@@ -45,10 +43,6 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
     {
         cliParser.parse();
     }
-
-
-
-
 
 }
 ManagedNode::~ManagedNode()
@@ -64,8 +58,9 @@ void ManagedNode::Spin()
     rclcpp::WallRate loop_rate(this->loopRate);
     while(rclcpp::ok() && !Abort)
     {
-        SpinOnce(std::chrono::nanoseconds(100));
-        loop_rate.sleep();
+       // SpinOnce(std::chrono::nanoseconds(100));
+        executor->spin_some();
+        //loop_rate.sleep();
     }
 }
 
