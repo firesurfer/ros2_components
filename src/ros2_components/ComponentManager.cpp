@@ -141,32 +141,31 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success)
 
 void ComponentManager::UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback)
 {
-    bool found;
-    ComponentInfo info = this->GetInfoToId(id, &found);
-    if (found)
+    auto func = [callback, id](ComponentInfo info)
     {
-        callback(info);
-    }
-    else
-    {
-        auto func = [callback, id](ComponentInfo info)
+        if (info.id == id)
         {
-            if (info.id == id)
-            {
-                callback(info);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        };
-        RegisterComponentCallback(func);
-    }
+            callback(info);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    };
+    RegisterComponentCallback(func);
 }
 
 void ComponentManager::RegisterComponentCallback(std::function<bool (ComponentInfo)> callback)
 {
+    for (ComponentInfo info : Components)
+    {
+        if (callback(info))
+        {
+            return;
+        }
+    }
+
     new_component_callbacks.push_back(callback);
 }
 
