@@ -74,6 +74,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
     //Publishers
     this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
 
+    connect(this, &ComponentManager::NewComponentFound, this, &ComponentManager::NewComponentCallbacks, Qt::DirectConnection);
    // this->updateTimer = RosNode->create_wall_timer(1s, std::bind(&ComponentManager::GenerateResponse,this));
 
 
@@ -91,7 +92,7 @@ ComponentManager::~ComponentManager()
     LOG(Warning) << "Deletion of component manager" << std::endl;
 }
 
-bool ComponentManager::IDAlreadyInUse(uint64_t id)
+bool ComponentManager::IDAlreadyInUse(int64_t id)
 {
     for(auto & myInfo: Components)
     {
@@ -121,7 +122,7 @@ std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilte
     return filter.filter(this->Components);
 }
 
-ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
+ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success)
 {
     if(success != NULL)
         *success = false;
@@ -136,6 +137,37 @@ ComponentInfo ComponentManager::GetInfoToId(uint64_t id, bool *success)
     }
     ComponentInfo dummy;
     return dummy;
+}
+
+void ComponentManager::UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback)
+{
+    bool found;
+    ComponentInfo info = this->GetInfoToId(id, &found);
+    if (found)
+    {
+        callback(info);
+    }
+    else
+    {
+        auto func = [callback, id](ComponentInfo info)
+        {
+            if (info.id == id)
+            {
+                callback(info);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        };
+        RegisterComponentCallback(func);
+    }
+}
+
+void ComponentManager::RegisterComponentCallback(std::function<bool (ComponentInfo)> callback)
+{
+    new_component_callbacks.push_back(callback);
 }
 
 void ComponentManager::UpdateComponentsList()
@@ -333,9 +365,20 @@ void ComponentManager::OnEntityDeleted(ComponentInfo info)
     this->ListComponentsResponsePublisher->publish(msg);
 }
 
-
-
-
-
+void ComponentManager::NewComponentCallbacks(ComponentInfo info)
+{
+    auto it = new_component_callbacks.begin();
+    while (it != new_component_callbacks.end())
+    {
+        if ((*it)(info))
+        {
+            it = new_component_callbacks.erase(it);
+        }
+        else
+        {
+            it++;
+        }
+    }
 }
 
+}

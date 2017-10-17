@@ -78,7 +78,7 @@ public:
      *
      * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return false even if the id is in use.
      */
-    bool IDAlreadyInUse(uint64_t id);
+    bool IDAlreadyInUse(int64_t id);
     /**
      * @brief ListComponents
      * @return vector of all currently listed components
@@ -107,8 +107,18 @@ public:
      * @param success
      * @return ComponentInfo to the given id
      */
-    ComponentInfo GetInfoToId(uint64_t id, bool* success = 0);
-
+    ComponentInfo GetInfoToId(int64_t id, bool* success = 0);
+    /**
+     * @brief GetInfoToId will call the callback as soon as the component has been found
+     * @param id
+     * @param callback
+     */
+    void UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback);
+    /**
+     * @brief RegisterComponentCallback - registers a callback for all existing and in the future coming components
+     * @callback the callback. Deregisters itself as soon as it returns true
+     */
+    void RegisterComponentCallback(std::function<bool (ComponentInfo)> callback);
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -271,6 +281,8 @@ private:
     bool abort = false;
     bool syncResponses = false;
 
+    std::list<std::function<bool (ComponentInfo)> > new_component_callbacks;
+
     void GenerateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;
 
@@ -283,6 +295,7 @@ private slots:
     void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnEntityDeleted(ComponentInfo info);
+    void NewComponentCallbacks(ComponentInfo info);
 
 };
 }
