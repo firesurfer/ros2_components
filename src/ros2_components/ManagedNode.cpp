@@ -50,6 +50,11 @@ ManagedNode::~ManagedNode()
     Exit();
 }
 
+void ManagedNode::SpinAsync()
+{
+    SpinThread = std::make_shared<std::thread>(std::bind(&ManagedNode::Spin,this));
+    this->isSpinningAsync = true;
+}
 void ManagedNode::Spin()
 {
     if(!isSetup)
@@ -65,13 +70,6 @@ void ManagedNode::Spin()
     //rclcpp::spin(RosNode);
 }
 
-void ManagedNode::SpinOnce(std::chrono::nanoseconds timeout )
-{
-    if(!isSetup)
-        throw std::runtime_error("Node wasn't setup yet");
-    if(rclcpp::ok() && !Abort)
-        executor->spin_node_once(RosNode,timeout);
-}
 
 bool ManagedNode::Ok() const
 {
@@ -114,15 +112,7 @@ CLIParser ManagedNode::GetCliParser() const
     return cliParser;
 }
 
-void ManagedNode::AsyncWorker()
-{
-    rclcpp::WallRate loop_rate(GetLoopRate());
-    while(!Abort)
-    {
-        DoWork();
-        loop_rate.sleep();
-    }
-}
+
 
 
 void ManagedNode::DoWork()
@@ -134,20 +124,12 @@ void ManagedNode::Exit()
 {
     LOG(Info) << "Called exit on: " << RosNode->get_name() << std::endl;
     Abort = true;
-    if(WorkThread)
-        WorkThread->join();
     if(SpinThread)
         SpinThread->join();
     rclcpp::shutdown();
 }
 
-void ManagedNode::Start(bool multithreaded)
-{
-    SpinThread = std::make_shared<std::thread>(std::bind(&ManagedNode::Spin,this));
-    if(multithreaded)
-        WorkThread = std::make_shared<std::thread>(std::bind(&ManagedNode::AsyncWorker,this));
-    this->isSpinningAsync = true;
-}
+
 void ManagedNode::Setup()
 {
     Setup(LogLevel::Info);

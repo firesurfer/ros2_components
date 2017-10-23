@@ -92,13 +92,6 @@ public:
      */
     virtual void Exit();
     /**
-     * @brief Start
-     * @param multithreaded
-     * Start the spin function in an extra thread and in case mutlithreaded==true DoWork will be called in a seperate thread.
-     * For synchronous spinning call Spin yourself and dont call start
-     */
-    virtual void Start(bool multithreaded = false);
-    /**
      * @brief Setup
      * Do basic setup tasks after creating a node
      */
@@ -114,9 +107,10 @@ public:
      */
     virtual void Spin();
     /**
-     * @brief SpinOnce
+     * @brief SpinAsync
+     * Start the spin function in an extra thread
      */
-    virtual void SpinOnce(chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
+    virtual void SpinAsync();
     /**
      * @brief Ok
      * @return If the node is still ok -> Otherwise you should stop spinning!
@@ -204,8 +198,8 @@ protected:
     std::string nodeName;
 private:
     std::shared_ptr<std::thread> SpinThread;
-    std::shared_ptr<std::thread> WorkThread;
-    void AsyncWorker();
+
+
     rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
 
     /**
