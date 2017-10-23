@@ -82,7 +82,7 @@ public:
     /**
      * @brief Spin - Spin this node (manually)
      */
-    virtual void Spin();
+    virtual void Spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
     /**
      * @brief SpinAsync
      * Start the spin function in an extra thread

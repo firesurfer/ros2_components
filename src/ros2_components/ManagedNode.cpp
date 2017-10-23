@@ -70,12 +70,20 @@ void ManagedNode::SpinAsync()
     SpinThread = std::make_shared<std::thread>(async_spin);
     this->isSpinningAsync = true;
 }
-void ManagedNode::Spin()
+void ManagedNode::Spin(std::chrono::nanoseconds timeout)
 {
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
     isSpinning = true;
-    rclcpp::spin_some(RosNode);
+    if(timeout == std::chrono::nanoseconds(-1))
+        rclcpp::spin_some(RosNode);
+    else
+    {
+        executor->add_node(RosNode);
+        executor->spin_once(timeout);
+        executor->remove_node(RosNode);
+
+    }
     isSpinning = false;
 }
 
