@@ -36,43 +36,20 @@
  * @brief The ManagedNode class
  * This class represents a managed lifecycle node.
  *
- * Example Usage:
- *
- * Inherit from ManagedNode (MyManagedNode and override DoWork and Setup
- * In the Setup function you should create your the correct BaseEntity (In most cases your robot frame)
- *
- * Afterwards in your main function:
- *
- * std::shared_ptr<MyManagedNode> node = std::make_shared<MyManagedNode>(<nodename>, argc, argv);
- * node->Setup(..);
- *
- * //The following lines are either or
- *
- * //For asynchronous spinning:
- * node->Start();
- * while(rclcpp::ok())
- * {
- *     node->DoWork();
- * }
- *
- * //For asnychronous spinning and working:
- * node->Start(true);
- * while(rclcpp::ok())
- * {
- *     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
- * }
- *
- * //For synchronous spinning:
- * while(rclcpp::ok())
- * {
- *      node->Spin();
- *      node->DoWork();
- *      std::this_thread::sleep_for(std::chrono::milliseconds(50));
- *      //Or use rclcpp::loop_rate
- * }
  */
 namespace ros2_components {
 
+
+typedef enum
+{
+    NotInitialized = 0,
+    Initialized = 1,
+    SpinningAsync = 2,
+    SpinningSync = 3,
+    ExitCalled = 4,
+    Unknown = 5
+
+}ManagedNodeState;
 
 class ManagedNode
 {
@@ -135,12 +112,20 @@ public:
      * @brief NodeSetupSuccessfull
      * @return true if setup was called
      */
-    bool NodeSetupSuccessfull();
+
 
     int GetLoopRate() const;
     void SetLoopRate(int value);
-
+    /**
+     * @brief GetCliParser
+     * @return
+     */
     CLIParser GetCliParser() const;
+    /**
+     * @brief GetNodeState
+     * @return The current state of the node
+     */
+    ManagedNodeState GetNodeState() const;
 
 protected:
 
@@ -149,7 +134,7 @@ protected:
      * @brief Abort
      * Will be set to true in case Exit was called
      */
-    bool Abort = false;
+    bool abort = false;
     /**
      * @brief RosNode
      */
@@ -169,9 +154,14 @@ protected:
     bool isSetup = false;
 
     /**
-     * @brief isSpinningAsync - true in case we called start
+     * @brief isSpinningAsync - true in case we SpinAsync
      */
     bool isSpinningAsync = false;
+    /**
+     * @brief isSpinning - true in case we are spinning at the moment
+     */
+    bool isSpinning = false;
+
 
     /**
      * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
@@ -189,13 +179,15 @@ protected:
     /**
      * @brief loopRate - contains the rate the spin function of the node is called in case it was started via spin. Can be set during runtime
      */
-    int loopRate = 80;
+    int loopRate = 40;
     /**
       * @brief nodeEntity Entity that represents this node.
       */
     NodeEntity::SharedPtr nodeEntity;
 
     std::string nodeName;
+
+
 private:
     std::shared_ptr<std::thread> SpinThread;
 

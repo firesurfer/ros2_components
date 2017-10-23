@@ -52,22 +52,31 @@ ManagedNode::~ManagedNode()
 
 void ManagedNode::SpinAsync()
 {
-    SpinThread = std::make_shared<std::thread>(std::bind(&ManagedNode::Spin,this));
+    if(!isSetup)
+        throw std::runtime_error("Node wasn't setup yet");
+    auto async_spin = [&]()
+    {
+        isSpinning = true;
+        rclcpp::WallRate loopRate(this->loopRate);
+        while(!abort && Ok())
+        {
+            rclcpp::spin_some(RosNode);
+            loopRate.sleep();
+
+        }
+        isSpinning = false;
+    };
+
+    SpinThread = std::make_shared<std::thread>(async_spin);
     this->isSpinningAsync = true;
 }
 void ManagedNode::Spin()
 {
     if(!isSetup)
         throw std::runtime_error("Node wasn't setup yet");
-
-    rclcpp::WallRate loopRate(50);
-    while(!Abort && Ok())
-    {
-        rclcpp::spin_some(RosNode);
-        loopRate.sleep();
-
-    }
-    //rclcpp::spin(RosNode);
+    isSpinning = true;
+    rclcpp::spin_some(RosNode);
+    isSpinning = false;
 }
 
 
@@ -92,10 +101,6 @@ int64_t ManagedNode::GetNodeId()
     return this->NodeId;
 }
 
-bool ManagedNode::NodeSetupSuccessfull()
-{
-    return this->isSetup;
-}
 
 int ManagedNode::GetLoopRate() const
 {
@@ -112,6 +117,23 @@ CLIParser ManagedNode::GetCliParser() const
     return cliParser;
 }
 
+ManagedNodeState ManagedNode::GetNodeState() const
+{
+    if(!isSetup)
+        return ManagedNodeState::NotInitialized;
+    if(isSetup && !isSpinning && !isSpinningAsync && !abort)
+        return ManagedNodeState::Initialized;
+    if(isSetup && isSpinningAsync && !abort)
+        return ManagedNodeState::SpinningAsync;
+    if(isSetup && !isSpinningAsync && !abort)
+        return ManagedNodeState::SpinningSync;
+    if(abort)
+        return ManagedNodeState::ExitCalled;
+
+    return ManagedNodeState::Unknown;
+
+}
+
 
 
 
@@ -123,7 +145,7 @@ void ManagedNode::DoWork()
 void ManagedNode::Exit()
 {
     LOG(Info) << "Called exit on: " << RosNode->get_name() << std::endl;
-    Abort = true;
+    abort = true;
     if(SpinThread)
         SpinThread->join();
     rclcpp::shutdown();
