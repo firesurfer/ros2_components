@@ -1,5 +1,8 @@
 #include "NodeContainer.h"
 
+namespace ros2_components {
+
+
 NodeContainer::NodeContainer(rclcpp::node::Node::SharedPtr _ros_node, int64_t _node_id, std::string _name):
     ros_node(_ros_node), node_id(_node_id), node_name(_name)
 {
@@ -85,4 +88,5 @@ std::string NodeContainer::GetNodeName() const
 int64_t NodeContainer::GetNodeId() const
 {
     return node_id;
+}
 }
