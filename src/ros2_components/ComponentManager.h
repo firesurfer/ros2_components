@@ -108,10 +108,6 @@ public:
      * @return true in case all childs are available, else returns false
      */
     bool CheckIfChildsAreAvailable(uint64_t id);
-    /**
-     * @brief DisableThreadedResponse - Stops the async responder thread - Uses synchronous responses afterwards
-     */
-    void DisableThreadedResponse();
 
     /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
