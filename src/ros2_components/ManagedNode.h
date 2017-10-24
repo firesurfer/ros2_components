@@ -21,12 +21,10 @@
 #include <QObject>
 /* std lib */
 #include <iostream>
-#include <memory>
-#include <thread>
-/* ros 2 */
-#include "rclcpp/rclcpp.hpp"
+
 
 /* ros2 components */
+#include "NodeContainer.h"
 #include "BuildInfo.h"
 #include "ros2_simple_logger/Logger.h"
 #include "ComponentManager.h"
@@ -109,12 +107,14 @@ public:
      */
     int64_t GetNodeId();
     /**
-     * @brief NodeSetupSuccessfull
-     * @return true if setup was called
+     * @brief GetLoopRate
+     * @return Looprate for async spin
      */
-
-
     int GetLoopRate() const;
+    /**
+     * @brief SetLoopRate
+     * @param value - loop rate for async spin
+     */
     void SetLoopRate(int value);
     /**
      * @brief GetCliParser
@@ -130,19 +130,13 @@ public:
 protected:
 
 
-    /**
-     * @brief Abort
-     * Will be set to true in case Exit was called
-     */
-    bool abort = false;
+
     /**
      * @brief RosNode
      */
-    rclcpp::node::Node::SharedPtr RosNode;
-    /**
-     * @brief NodeId
-     */
-    int64_t NodeId = 0;
+    NodeContainer::SharedPtr RosNode;
+
+
     /**
      * @brief BaseEntity
      * The basic entity where the abstraction structure of this node starts from
@@ -152,17 +146,6 @@ protected:
      * @brief isSetup - was the setup function called
      */
     bool isSetup = false;
-
-    /**
-     * @brief isSpinningAsync - true in case we SpinAsync
-     */
-    bool isSpinningAsync = false;
-    /**
-     * @brief isSpinning - true in case we are spinning at the moment
-     */
-    bool isSpinning = false;
-
-
     /**
      * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
      */
@@ -177,10 +160,6 @@ protected:
     CLIParser cliParser;
 
     /**
-     * @brief loopRate - contains the rate the spin function of the node is called in case it was started via spin. Can be set during runtime
-     */
-    int loopRate = 40;
-    /**
       * @brief nodeEntity Entity that represents this node.
       */
     NodeEntity::SharedPtr nodeEntity;
@@ -189,16 +168,14 @@ protected:
 
 
 private:
-    std::shared_ptr<std::thread> SpinThread;
 
-
-    rclcpp::executors::SingleThreadedExecutor::SharedPtr executor;
 
     /**
      * @brief CompManager
      * One component manager per node
      */
     ComponentManager::SharedPtr CompManager;
+
 
     std::string id_str= "";
 
