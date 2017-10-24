@@ -6,7 +6,9 @@
 
 namespace ros2_components {
 
-
+/**
+ * @brief The NodeEntity class represents a node in the component system.
+ */
 
 class NodeEntity: public Entity<std_msgs::msg::Empty>
 {

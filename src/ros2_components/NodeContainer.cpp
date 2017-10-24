@@ -1,5 +1,8 @@
 #include "NodeContainer.h"
 
+namespace ros2_components {
+
+
 NodeContainer::NodeContainer(rclcpp::node::Node::SharedPtr _ros_node, int64_t _node_id, std::string _name):
     ros_node(_ros_node), node_id(_node_id), node_name(_name)
 {
@@ -16,7 +19,7 @@ NodeContainer::~NodeContainer()
 void NodeContainer::Spin(std::chrono::nanoseconds timeout)
 {
     if(isSpinning)
-        throw std::runtime_error("Node already spinning");
+        throw AlreadySpinningException();
     isSpinning = true;
     if(timeout == std::chrono::nanoseconds(-1))
         rclcpp::spin_some(ros_node);
@@ -33,7 +36,7 @@ void NodeContainer::Spin(std::chrono::nanoseconds timeout)
 void NodeContainer::SpinAsync()
 {
     if(isSpinning)
-        throw std::runtime_error("Node already spinning");
+        throw AlreadySpinningException();
     auto async_spin = [&]()
     {
         isSpinning = true;
@@ -85,4 +88,10 @@ std::string NodeContainer::GetNodeName() const
 int64_t NodeContainer::GetNodeId() const
 {
     return node_id;
+}
+
+bool NodeContainer::Ok()
+{
+    return rclcpp::ok();
+}
 }

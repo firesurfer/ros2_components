@@ -3,6 +3,10 @@
 
 
 #include "rclcpp/rclcpp.hpp"
+#include "ros2_components_exceptions.h"
+namespace  ros2_components {
+
+
 /**
  * @brief The NodeContainer class encapsules a ros node. It provides status information and sync/async methods for spinning the node.
  */
@@ -51,6 +55,12 @@ public:
 
     int64_t GetNodeId() const;
 
+    /**
+     * @brief Ok
+     * @return False in case node was destroyed or rclcpp::ok returns false
+     */
+    bool Ok();
+
 private:
     rclcpp::node::Node::SharedPtr ros_node;
     rclcpp::executors::SingleThreadedExecutor executor;
@@ -66,4 +76,5 @@ private:
     std::shared_ptr<std::thread> spinThread;
 };
 
+}
 #endif // NODECONTAINER_H

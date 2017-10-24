@@ -9,8 +9,9 @@ include_directories(
     ${Qt5Widgets_INCLUDE_DIRS}
     ${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter
     ${CMAKE_CURRENT_SOURCE_DIR}/CLI
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Exceptions
     ${CMAKE_CURRENT_SOURCE_DIR}/GUI
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 
@@ -28,6 +29,8 @@ file(GLOB COMPONENTS_SRC_FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/GUI/*.h*"
     "${CMAKE_CURRENT_SOURCE_DIR}/GUI/*.ui*"
 	
+    "${CMAKE_CURRENT_SOURCE_DIR}/Exceptions/*.c*"
+    "${CMAKE_CURRENT_SOURCE_DIR}/Exceptions/*.h*"
 )
 add_library(ros2_components
     ${COMPONENTS_SRC_FILES}

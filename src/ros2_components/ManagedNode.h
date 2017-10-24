@@ -76,14 +76,16 @@ public:
      * @param logLevel
      * Initiate the logger with a specific log level instead of LogLevel::Info @see Setup
      */
-    virtual void Setup(LogLevel logLevel, bool no_executor= false);
+    virtual void Setup(LogLevel logLevel);
     /**
      * @brief Spin - Spin this node (manually)
+     * @throws NodeNotInitializedException
      */
     virtual void Spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
     /**
      * @brief SpinAsync
      * Start the spin function in an extra thread
+     * @throws NodeNotInitializedException
      */
     virtual void SpinAsync();
     /**
@@ -99,6 +101,7 @@ public:
     /**
      * @brief GetRosNode
      * @return The encapsulated ros node
+     * @throws NodeNotInitializedException
      */
     rclcpp::node::Node::SharedPtr GetRosNode();
     /**
@@ -109,6 +112,7 @@ public:
     /**
      * @brief GetLoopRate
      * @return Looprate for async spin
+     * @throws NodeNotInitializedException
      */
     int GetLoopRate() const;
     /**
@@ -126,6 +130,8 @@ public:
      * @return The current state of the node
      */
     ManagedNodeState GetNodeState() const;
+
+    NodeContainer::SharedPtr GetRosNodeContainer() const;
 
 protected:
 

@@ -30,16 +30,6 @@ public:
 
     }
 
-    /*template<typename T>
-    std::shared_ptr<T> getConcreteChild(int index)
-    {
-        auto ch = this->getChild(index);
-        std::shared_ptr<T> con_ch = std::dynamic_pointer_cast<T>(ch);
-        if(con_ch == NULL)
-            throw std::runtime_error("Wrong type - can't cast");
-        return con_ch;
-    }*/
-
     template<typename T>
     std::shared_ptr<T> getConcreteChildById(int id)
     {
