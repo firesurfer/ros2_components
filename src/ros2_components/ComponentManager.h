@@ -73,24 +73,11 @@ public:
      */
     virtual ~ComponentManager();
     /**
-     * @brief IDAlreadyInUse
-     * @param id
-     * @return true if id is already in use
-     *
-     * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return false even if the id is in use.
-     */
-    bool IDAlreadyInUse(int64_t id); //TODO remove
-    /**
      * @brief ListComponents
      * @return vector of all currently listed components
      * TODO think of a better way to access all components
      */
     std::vector<ComponentInfo> ListComponents();
-    /**
-     * @brief CountComponents
-     * @return Amount of found components in the system
-     */
-    int64_t CountComponents(); //TODO remove
     /**
      * @brief ListNodes
      * @return List of all found nodes
@@ -109,17 +96,6 @@ public:
      * @return ComponentInfo to the given id
      */
     ComponentInfo GetInfoToId(int64_t id, bool* success = 0, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
-    /**
-     * @brief GetInfoToId will call the callback as soon as the component has been found
-     * @param id
-     * @param callback
-     */
-    void UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback); //TODO replace with async rebuild
-    /**
-     * @brief RegisterComponentCallback - registers a callback for all existing and in the future coming components
-     * @callback the callback. Deregisters itself as soon as it returns true
-     */
-    void RegisterComponentCallback(std::function<bool (ComponentInfo)> callback); //TODO replace
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -318,9 +294,6 @@ private:
     std::queue<bool> triggerResponseQueue;
     bool abort = false;
     bool syncResponses = false;
-
-    std::list<std::function<bool (ComponentInfo)> > new_component_callbacks;
-
     void GenerateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;
 
@@ -333,8 +306,6 @@ private slots:
     void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
     void OnEntityDeleted(ComponentInfo info);
-    void NewComponentCallbacks(ComponentInfo info);
-
 };
 }
 
