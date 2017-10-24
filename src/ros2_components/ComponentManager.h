@@ -60,14 +60,14 @@ public:
      * @param _localNode
      * Use this constructor if your having a node that doesnt need a base entity (for example an algorithm node)
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, bool _runSychronous = false);
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
     /**
      * @brief ComponentManager
      * @param _localNode
      * @param _baseEntity
      * Use this constructor if your having a node that needs a base entity (for example a hardware sensor/actor node)
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity, bool _runSychronous = false);
+    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
     /**
      * @brief ~ComponentManager - destructor. Waits for responder thread
      */
@@ -94,6 +94,7 @@ public:
      * @param id
      * @param success
      * @return ComponentInfo to the given id
+     * @param timeout in milliseconds. Waits indefinitely if negative; defaults to 0ms
      */
     ComponentInfo GetInfoToId(int64_t id, bool* success = 0, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
@@ -281,8 +282,6 @@ private:
      */
     void ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
 
-
-    void RespondingTask();
     /**
      * @brief Components
      * Stored components
@@ -290,10 +289,6 @@ private:
     std::vector<ComponentInfo> Components;
     EntityBase::SharedPtr BaseEntity;
     rmw_qos_profile_t component_manager_profile;
-    std::unique_ptr<std::thread> responder_thread;
-    std::queue<bool> triggerResponseQueue;
-    bool abort = false;
-    bool syncResponses = false;
     void GenerateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;
 

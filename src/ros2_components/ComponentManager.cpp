@@ -20,16 +20,13 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, bool _runSychronous)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
 {
     using namespace std::placeholders;
     //Variable Assignments
     this->RosNode = _localNode;
 
-    this->syncResponses = _runSychronous;
     //Start responder thread
-    if(!_runSychronous)
-        this->responder_thread = std::make_unique<std::thread>(std::bind(&ComponentManager::RespondingTask,this));
     //Qos Profile
     //rmw_qos_profile_services_default
     component_manager_profile = rmw_qos_profile_default;
@@ -48,7 +45,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, boo
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
 
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity, bool _runSychronous): ComponentManager(_localNode, _runSychronous)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity): ComponentManager(_localNode)
 {
 
     //Variable Assignments
@@ -82,10 +79,6 @@ ComponentManager::~ComponentManager()
 {
     this->BaseEntity.reset();
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    this->abort =true;
-    if(responder_thread)
-        responder_thread->join();
 
     LOG(Warning) << "Deletion of component manager" << std::endl;
 }
@@ -143,7 +136,7 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
                 {
                     break;
                 }
-                hertz = std::max(hertz, std::chrono::milliseconds(1000) / diffTime);
+                hertz = std::max(hertz, std::chrono::milliseconds(1000).count() / diffTime.count());
             }
 
             rclcpp::WallRate loop_rate(hertz);
@@ -184,23 +177,11 @@ bool ComponentManager::CheckIfChildsAreAvailable(uint64_t id)
     return checkChilds(id);
 }
 
-void ComponentManager::DisableThreadedResponse()
-{
-    abort = true;
-    syncResponses = true;
-
-}
-
 void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
     if(RosNode->get_name() != msg->nodename)
     {
-        if(!syncResponses)
-            triggerResponseQueue.push(true);
-        else
-        {
-            GenerateResponse();
-        }
+        GenerateResponse();
     }
 }
 
@@ -283,34 +264,6 @@ void ComponentManager::GenerateResponse()
     };
 
     responseFunc();
-}
-
-void ComponentManager::RespondingTask()
-{
-    int count = 0;
-    while(!abort)
-    {
-
-        while(triggerResponseQueue.empty() && !abort)
-        {
-            if(abort)
-                return;
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
-            count ++;
-            if(count > 100)
-            {
-                count = 0;
-                GenerateResponse();
-            }
-        }
-        if(abort)
-            return;
-        while(!triggerResponseQueue.empty())
-        {
-            triggerResponseQueue.pop();
-        }
-        GenerateResponse();
-    }
 }
 
 void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)

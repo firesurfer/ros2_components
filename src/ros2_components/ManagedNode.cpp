@@ -132,7 +132,7 @@ NodeContainer::SharedPtr ManagedNode::GetRosNodeContainer() const
 
 void ManagedNode::DoWork()
 {
-    
+
 }
 
 void ManagedNode::Exit()
@@ -173,9 +173,8 @@ void ManagedNode::Setup(LogLevel logLevel)
         simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
     LOG(Info) <<"Build at: "<< BuildInfo::get_build_date() << std::endl;
 
-
     //Create Componentmanager with nodeEntity as base
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode(),this->nodeEntity,true);
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode(),this->nodeEntity);
     this->isSetup = true; //Set setup to true
 }
 
