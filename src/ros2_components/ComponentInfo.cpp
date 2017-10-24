@@ -18,7 +18,7 @@
 #include "ComponentInfo.h"
 namespace ros2_components
 {
-ComponentInfo::ComponentInfo()
+ComponentInfo::ComponentInfo() : id(0), parentId(0), machineip(0), subscriber(false)
 {
 
 }

@@ -25,6 +25,7 @@
 #include <iostream>
 #include <ctime>
 #include <queue>
+#include <chrono>
 
 /*ROS2*/
 #include "rclcpp/rclcpp.hpp"
@@ -78,7 +79,7 @@ public:
      *
      * WARNING: This function can't guarantee 100% that an id isn't used in the system. If an component is created but not published to the system this function will return false even if the id is in use.
      */
-    bool IDAlreadyInUse(int64_t id);
+    bool IDAlreadyInUse(int64_t id); //TODO remove
     /**
      * @brief ListComponents
      * @return vector of all currently listed components
@@ -89,12 +90,12 @@ public:
      * @brief CountComponents
      * @return Amount of found components in the system
      */
-    int64_t CountComponents();
+    int64_t CountComponents(); //TODO remove
     /**
      * @brief ListNodes
      * @return List of all found nodes
      */
-    std::vector<std::string> ListNodes();
+    std::vector<std::string> ListNodes(); //TODO move?
     /**
      * @brief ListComponentsBy
      * @param filter
@@ -107,18 +108,18 @@ public:
      * @param success
      * @return ComponentInfo to the given id
      */
-    ComponentInfo GetInfoToId(int64_t id, bool* success = 0);
+    ComponentInfo GetInfoToId(int64_t id, bool* success = 0, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
      * @brief GetInfoToId will call the callback as soon as the component has been found
      * @param id
      * @param callback
      */
-    void UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback);
+    void UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback); //TODO replace with async rebuild
     /**
      * @brief RegisterComponentCallback - registers a callback for all existing and in the future coming components
      * @callback the callback. Deregisters itself as soon as it returns true
      */
-    void RegisterComponentCallback(std::function<bool (ComponentInfo)> callback);
+    void RegisterComponentCallback(std::function<bool (ComponentInfo)> callback); //TODO replace
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -134,43 +135,61 @@ public:
      * @brief DisableThreadedResponse - Stops the async responder thread - Uses synchronous responses afterwards
      */
     void DisableThreadedResponse();
+
     /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
+     *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
+     *  @param timeout in milliseconds, throws exception if no component is found before timeout. Waits indefinitely if negative; defaults to 0ms
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(int64_t id,bool rebuildHierarchy = false)
+    std::shared_ptr<T> RebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
-        ComponentInfo relavantInfo;
-        bool found = false;
-        for(auto & info : Components)
+        auto startTime = std::chrono::system_clock::now();
+        bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
+        bool found;
+        ComponentInfo relevantInfo = GetInfoToId(id, &found, timeout);
+
+        if (found)
         {
-            if(info.id == id)
+            std::shared_ptr<T> ent;
+            if (waitIndefinitely)
             {
-                relavantInfo = info;
-                found = true;
+                ent = RebuildComponent<T>(relevantInfo, rebuildHierarchy, timeout);
             }
+            else
+            {
+                auto remaining_timeout = startTime + timeout - std::chrono::system_clock::now();
+                if (remaining_timeout < std::chrono::milliseconds::zero())
+                {
+                    remaining_timeout = std::chrono::milliseconds::zero();
+                }
+                ent = RebuildComponent<T>(relevantInfo, rebuildHierarchy, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
+            }
+            return ent;
         }
-        if(!found)
-            throw std::runtime_error("Could not find a component with the given id");
-        std::shared_ptr<T> ent = RebuildComponent<T>(relavantInfo,rebuildHierarchy);
-        return ent;
+        else
+        {
+            throw  std::runtime_error("Could not find Component in time"); //FIXME more descriptive exception
+        }
     }
     /**
      * Rebuild a component from a ComponentInfo object using the EntityFactory
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false)
+    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
-        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy));
+        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy, false, timeout));
         if(!entity)
             throw std::runtime_error("Could not cast entity to given type");
         return entity;
     }
 
-    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, bool forcePubOrSubChange = false)
+    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero()) //TODO check if forcePubOrSubChange is actually used
     {
+        auto startTime = std::chrono::system_clock::now();
+        bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
         if(!EntityFactory::contains(info.type))
-            throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory");
+            throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory?");
 
         QGenericArgument subscribeArg;
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
@@ -185,20 +204,39 @@ public:
         std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
         //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
 
-        //The following line recusivly rebuild the tree structure that was published before
+        //The following line recursively rebuild the tree structure that was published before
         if(rebuildHierarchy)
         {
-            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity,ComponentInfo parentInfo)
+            LOG(Debug) << "Childs: ";
+            for (auto& childId : info.childIds)
+            {
+                LOG(Debug) << childId << " ";
+            }
+            LOG(Debug) << std::endl;
+            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity, ComponentInfo parentInfo)
             {
                 for(auto & child_id: parentInfo.childIds)
                 {
-                    bool success = false;
-                    ComponentInfo childInfo = GetInfoToId(child_id,&success);
-                    if(!success)
+                    ComponentInfo childInfo;
+                    bool found_child = false;
+                    if (waitIndefinitely)
                     {
-                        LOG(Warning) << "Could not find info for: " << child_id << std::endl;
-                        continue;
+                        childInfo = GetInfoToId(child_id, &found_child, timeout);
                     }
+                    else
+                    {
+                        auto remaining_timeout = startTime + timeout - std::chrono::system_clock::now();
+                        if (remaining_timeout < std::chrono::milliseconds::zero())
+                        {
+                            remaining_timeout = std::chrono::milliseconds::zero();
+                        }
+                        childInfo = GetInfoToId(child_id, &found_child, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
+                    }
+                    if(!found_child)
+                    {
+                        throw std::runtime_error("Failed to find all children in time"); //FIXME exceptiontype
+                    }
+                    LOG(Debug) << "Found child: " << childInfo.name << ", id: " << childInfo.id << std::endl;
                     idArg = Q_ARG(int64_t, childInfo.id);
 
                     //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;
@@ -208,7 +246,7 @@ public:
                         subscribeArg = Q_ARG(bool, false);
                     std::shared_ptr<EntityBase> child_obj = EntityFactory::createInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
                     parentEntity->addChild(child_obj);
-                    rec_build(child_obj,childInfo);
+                    rec_build(child_obj, childInfo);
                 }
             };
             std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(ent);

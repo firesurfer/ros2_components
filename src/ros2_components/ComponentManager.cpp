@@ -35,7 +35,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, boo
     component_manager_profile = rmw_qos_profile_default;
     component_manager_profile.depth = 100;
     component_manager_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
-
+    component_manager_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
 
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
@@ -122,51 +122,58 @@ std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilte
     return filter.filter(this->Components);
 }
 
-ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success)
+ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chrono::milliseconds timeout)
 {
-    if(success != NULL)
-        *success = false;
-    for(auto & comp  : Components)
+    auto startTime = std::chrono::system_clock::now();
+    bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
+    ComponentInfo relevantInfo;
+    bool found = false;
+    for(auto & comp : Components)
     {
         if(id == comp.id)
         {
-            if(success != NULL)
-                *success= true;
-            return comp;
+            relevantInfo = comp;
+            found = true;
+            break;
         }
     }
-    ComponentInfo dummy;
-    return dummy;
-}
-
-void ComponentManager::UseInfoToId(int64_t id, std::function<void (ComponentInfo)> callback)
-{
-    auto func = [callback, id](ComponentInfo info)
+    if (!found)
     {
-        if (info.id == id)
+        auto newComponentFunc = [id, &relevantInfo, &found] (ComponentInfo info) -> void
         {
-            callback(info);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    };
-    RegisterComponentCallback(func);
-}
+            if (id == info.id)
+            {
+                relevantInfo = info;
+                found = true;
+            }
+        };
+        auto connection = QObject::connect(this, &ComponentManager::NewComponentFound, newComponentFunc);
+        //TODO make sure to disconnect always, even when throwing exception
 
-void ComponentManager::RegisterComponentCallback(std::function<bool (ComponentInfo)> callback)
-{
-    for (ComponentInfo info : Components)
-    {
-        if (callback(info))
+        while (!found && rclcpp::ok())
         {
-            return;
+            long hertz = 80L;
+            if (!waitIndefinitely)
+            {
+                auto diffTime = startTime + timeout - std::chrono::system_clock::now();
+                if (diffTime <= std::chrono::milliseconds::zero())
+                {
+                    break;
+                }
+                hertz = std::max(hertz, std::chrono::milliseconds(1000) / diffTime);
+            }
+
+            rclcpp::WallRate loop_rate(hertz);
+            rclcpp::spin_some(RosNode); //can throw exception FIXME rethrow with more descriptive exception?
+            loop_rate.sleep();
         }
+        QObject::disconnect(connection);
     }
-
-    new_component_callbacks.push_back(callback);
+    if (success != nullptr)
+    {
+        *success = found;
+    }
+    return relevantInfo;
 }
 
 void ComponentManager::UpdateComponentsList()
@@ -268,12 +275,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
             Components.erase(Components.begin()+pos);
         }
     }
-
 }
-
-
-
-
 
 void ComponentManager::GenerateResponse()
 {
