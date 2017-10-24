@@ -136,7 +136,7 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
                 {
                     break;
                 }
-                hertz = std::max(hertz, std::chrono::milliseconds(1000).count() / diffTime.count());
+                hertz = std::max(hertz, (long) (std::chrono::milliseconds(1000).count() / diffTime.count()));
             }
 
             rclcpp::WallRate loop_rate(hertz);
