@@ -25,7 +25,7 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
 
     //Initialise ros2
     rclcpp::init(argc, argv);
-    executor = std::make_shared<rclcpp::executors::SingleThreadedExecutor>();
+
 
     nodeName = _nodeName;
 
@@ -53,38 +53,14 @@ ManagedNode::~ManagedNode()
 void ManagedNode::SpinAsync()
 {
     if(!isSetup)
-        throw std::runtime_error("Node wasn't setup yet");
-    auto async_spin = [&]()
-    {
-        isSpinning = true;
-        rclcpp::WallRate loopRate(this->loopRate);
-        while(!abort && Ok())
-        {
-            rclcpp::spin_some(RosNode);
-            loopRate.sleep();
-
-        }
-        isSpinning = false;
-    };
-
-    SpinThread = std::make_shared<std::thread>(async_spin);
-    this->isSpinningAsync = true;
+        throw std::runtime_error("Node was NULL");
+    RosNode->SpinAsync();
 }
 void ManagedNode::Spin(std::chrono::nanoseconds timeout)
 {
     if(!isSetup)
-        throw std::runtime_error("Node wasn't setup yet");
-    isSpinning = true;
-    if(timeout == std::chrono::nanoseconds(-1))
-        rclcpp::spin_some(RosNode);
-    else
-    {
-        executor->add_node(RosNode);
-        executor->spin_once(timeout);
-        executor->remove_node(RosNode);
-
-    }
-    isSpinning = false;
+        throw std::runtime_error("Node was NULL");
+    RosNode->Spin(timeout);
 }
 
 
@@ -101,23 +77,28 @@ ComponentManager::SharedPtr ManagedNode::GetComponentManager()
 
 rclcpp::node::Node::SharedPtr ManagedNode::GetRosNode()
 {
-    return this->RosNode;
+    if(!isSetup)
+        throw std::runtime_error("Node was NULL");
+    return this->RosNode->GetRosNode();
 }
 
 int64_t ManagedNode::GetNodeId()
 {
-    return this->NodeId;
+    return this->RosNode->GetNodeId();
 }
-
 
 int ManagedNode::GetLoopRate() const
 {
-    return loopRate;
+    if(!RosNode)
+        throw std::runtime_error("RosNode was not initalized");
+    return RosNode->GetLoopRate();
 }
 
 void ManagedNode::SetLoopRate(int value)
 {
-    loopRate = value;
+    if(!RosNode)
+        throw std::runtime_error("RosNode was not initalized");
+    RosNode->SetLoopRate(value);
 }
 
 CLIParser ManagedNode::GetCliParser() const
@@ -129,13 +110,13 @@ ManagedNodeState ManagedNode::GetNodeState() const
 {
     if(!isSetup)
         return ManagedNodeState::NotInitialized;
-    if(isSetup && !isSpinning && !isSpinningAsync && !abort)
+    if(isSetup  && RosNode && !RosNode->GetIsSpinning() && !RosNode->GetIsSpinningAsync())
         return ManagedNodeState::Initialized;
-    if(isSetup && isSpinningAsync && !abort)
+    if(isSetup  && RosNode && RosNode->GetIsSpinningAsync() )
         return ManagedNodeState::SpinningAsync;
-    if(isSetup && !isSpinningAsync && !abort)
+    if(isSetup   && RosNode && RosNode->GetIsSpinningAsync() )
         return ManagedNodeState::SpinningSync;
-    if(abort)
+    if(! RosNode)
         return ManagedNodeState::ExitCalled;
 
     return ManagedNodeState::Unknown;
@@ -152,11 +133,8 @@ void ManagedNode::DoWork()
 
 void ManagedNode::Exit()
 {
-    LOG(Info) << "Called exit on: " << RosNode->get_name() << std::endl;
-    abort = true;
-    if(SpinThread)
-        SpinThread->join();
-    rclcpp::shutdown();
+    LOG(Info) << "Called exit on: " << RosNode->GetNodeName() << std::endl;
+
 }
 
 
@@ -174,18 +152,16 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
     }
 
     //Create the ros node base on the given node name and the specified id
-    RosNode = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
-    NodeId = id;
-    std::cout << "Started node: " << RosNode->get_name() << std::endl;
+    auto internal_node = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
+    RosNode = std::make_shared<NodeContainer>(internal_node, id, nodeName);
 
-    this->nodeEntity = std::make_shared<NodeEntity>(NodeId, this->nodeName, RosNode);
-    //If you want to implement a hardware node create base entity in derived class
-    //Check if rosnode is valid -> should be always the case
-    if( !this->RosNode)
-        throw std::runtime_error("RosNode may not be null - cant proceed with setup");
+    std::cout << "Started node: " << RosNode->GetRosNode()->get_name() << std::endl;
+
+    this->nodeEntity = std::make_shared<NodeEntity>(RosNode->GetNodeId(), this->nodeName, RosNode->GetRosNode());
+
 
     //Init logger
-    INIT_LOGGER(RosNode);
+    INIT_LOGGER(RosNode->GetRosNode());
     //Set loglevel to given loglevel
     LOGLEVEL(logLevel);
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
@@ -195,7 +171,7 @@ void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
 
 
     //Create Componentmanager with nodeEntity as base
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode,this->nodeEntity,true);
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode(),this->nodeEntity,true);
     this->isSetup = true; //Set setup to true
 }
 
