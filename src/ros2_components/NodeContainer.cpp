@@ -19,7 +19,7 @@ NodeContainer::~NodeContainer()
 void NodeContainer::Spin(std::chrono::nanoseconds timeout)
 {
     if(isSpinning)
-        throw std::runtime_error("Node already spinning");
+        throw AlreadySpinningException();
     isSpinning = true;
     if(timeout == std::chrono::nanoseconds(-1))
         rclcpp::spin_some(ros_node);
@@ -36,7 +36,7 @@ void NodeContainer::Spin(std::chrono::nanoseconds timeout)
 void NodeContainer::SpinAsync()
 {
     if(isSpinning)
-        throw std::runtime_error("Node already spinning");
+        throw AlreadySpinningException();
     auto async_spin = [&]()
     {
         isSpinning = true;
@@ -88,5 +88,10 @@ std::string NodeContainer::GetNodeName() const
 int64_t NodeContainer::GetNodeId() const
 {
     return node_id;
+}
+
+bool NodeContainer::Ok()
+{
+    return rclcpp::ok();
 }
 }

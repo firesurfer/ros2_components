@@ -3,6 +3,7 @@
 
 
 #include "rclcpp/rclcpp.hpp"
+#include "ros2_components_exceptions.h"
 namespace  ros2_components {
 
 
@@ -53,6 +54,12 @@ public:
     std::string GetNodeName() const;
 
     int64_t GetNodeId() const;
+
+    /**
+     * @brief Ok
+     * @return False in case node was destroyed or rclcpp::ok returns false
+     */
+    bool Ok();
 
 private:
     rclcpp::node::Node::SharedPtr ros_node;

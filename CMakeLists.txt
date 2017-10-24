@@ -33,6 +33,7 @@ file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/ComponentFilter/*.h*"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/CLI/*.h*"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/GUI/*.h*"
+     "${CMAKE_CURRENT_SOURCE_DIR}/src/ros2_components/Exceptions/*.h*"
 )
 
 install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components)

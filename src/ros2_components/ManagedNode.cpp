@@ -66,8 +66,7 @@ void ManagedNode::Spin(std::chrono::nanoseconds timeout)
 
 bool ManagedNode::Ok() const
 {
-    //TODO add &&abort ?
-    return rclcpp::ok();
+    return RosNode->Ok();
 }
 
 ComponentManager::SharedPtr ManagedNode::GetComponentManager()
@@ -78,7 +77,7 @@ ComponentManager::SharedPtr ManagedNode::GetComponentManager()
 rclcpp::node::Node::SharedPtr ManagedNode::GetRosNode()
 {
     if(!isSetup)
-        throw std::runtime_error("Node was NULL");
+        throw NodeNotInitializedException();
     return this->RosNode->GetRosNode();
 }
 
@@ -90,14 +89,14 @@ int64_t ManagedNode::GetNodeId()
 int ManagedNode::GetLoopRate() const
 {
     if(!RosNode)
-        throw std::runtime_error("RosNode was not initalized");
+        throw NodeNotInitializedException();
     return RosNode->GetLoopRate();
 }
 
 void ManagedNode::SetLoopRate(int value)
 {
     if(!RosNode)
-        throw std::runtime_error("RosNode was not initalized");
+        throw NodeNotInitializedException();
     RosNode->SetLoopRate(value);
 }
 
@@ -147,7 +146,7 @@ void ManagedNode::Setup()
 {
     Setup(LogLevel::Info);
 }
-void ManagedNode::Setup(LogLevel logLevel, bool no_executor)
+void ManagedNode::Setup(LogLevel logLevel)
 {
     uint64_t id = 100;
     if(id_str != "")
