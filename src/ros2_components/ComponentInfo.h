@@ -61,6 +61,20 @@ public:
         msg->subscriber = subscriber;
         return msg;
     }
+    std::string toString()
+    {
+        std::string ret =  "Name: " + name + " Type: " + type + " ParentId: " + std::to_string(parentId)  + " ParentType: " + parentType + " [";
+        for(unsigned int i= 0; i < childIds.size(); i++)
+        {
+            ret +=   std::to_string(childIds[i]) + " , " + childTypes[i];
+        }
+        ret += "]";
+        ret += " Node Name: " + nodename;
+        ret += " Machineip: " + machineip;
+
+        return ret;
+
+    }
 };
 
 }
