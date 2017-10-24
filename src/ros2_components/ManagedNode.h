@@ -127,6 +127,8 @@ public:
      */
     ManagedNodeState GetNodeState() const;
 
+    NodeContainer::SharedPtr GetRosNodeContainer() const;
+
 protected:
 
 

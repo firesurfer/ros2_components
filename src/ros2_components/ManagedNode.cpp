@@ -123,12 +123,17 @@ ManagedNodeState ManagedNode::GetNodeState() const
 
 }
 
+NodeContainer::SharedPtr ManagedNode::GetRosNodeContainer() const
+{
+    return RosNode;
+}
+
 
 
 
 void ManagedNode::DoWork()
 {
-
+    
 }
 
 void ManagedNode::Exit()
