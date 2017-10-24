@@ -98,7 +98,7 @@ std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilte
     return filter.filter(this->Components);
 }
 
-ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chrono::milliseconds timeout)
+ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const ComponentInfo &)> filter, bool *success, std::chrono::milliseconds timeout)
 {
     auto startTime = std::chrono::system_clock::now();
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
@@ -106,7 +106,7 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
     bool found = false;
     for(auto & comp : Components)
     {
-        if(id == comp.id)
+        if(filter(comp))
         {
             relevantInfo = comp;
             found = true;
@@ -115,9 +115,9 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
     }
     if (!found)
     {
-        auto newComponentFunc = [id, &relevantInfo, &found] (ComponentInfo info) -> void
+        auto newComponentFunc = [filter, &relevantInfo, &found] (ComponentInfo info) -> void
         {
-            if (id == info.id)
+            if (filter(info))
             {
                 relevantInfo = info;
                 found = true;
@@ -150,6 +150,15 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
         *success = found;
     }
     return relevantInfo;
+}
+
+ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chrono::milliseconds timeout)
+{
+    auto filter = [id] (const ComponentInfo& info) -> bool
+    {
+        return info.id == id;
+    };
+    return GetInfoWithFilter(filter, success, timeout);
 }
 
 void ComponentManager::UpdateComponentsList()

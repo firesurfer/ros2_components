@@ -90,13 +90,21 @@ public:
      */
     std::vector<ComponentInfo> ListComponentsBy(ComponentListFilter filter);
     /**
+     * @brief GetInfoWithFilter gets the first Component which matches the filter
+     * @param filter the filter
+     * @param success will be set to true if a Component was found before timeout and false if not
+     * @param timeout in milliseconds. Waits indefinitely if negative
+     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     */
+    ComponentInfo GetInfoWithFilter(std::function<bool(const ComponentInfo&)> filter, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    /**
      * @brief GetInfoToId
      * @param id
-     * @param success
-     * @return ComponentInfo to the given id
-     * @param timeout in milliseconds. Waits indefinitely if negative; defaults to 0ms
+     * @param success will be set to true if a Component was found before timeout and false if not
+     * @param timeout in milliseconds. Waits indefinitely if negative
+     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
      */
-    ComponentInfo GetInfoToId(int64_t id, bool* success = 0, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    ComponentInfo GetInfoToId(int64_t id, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -109,18 +117,19 @@ public:
      */
     bool CheckIfChildsAreAvailable(uint64_t id);
 
+
     /**
-     *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
+     *  Rebuild first Component which matches the given filter, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
      *  @param timeout in milliseconds, throws exception if no component is found before timeout. Waits indefinitely if negative; defaults to 0ms
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    std::shared_ptr<T> RebuildComponent(std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         auto startTime = std::chrono::system_clock::now();
         bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
         bool found;
-        ComponentInfo relevantInfo = GetInfoToId(id, &found, timeout);
+        ComponentInfo relevantInfo = GetInfoWithFilter(filter, &found, timeout);
 
         if (found)
         {
@@ -146,6 +155,20 @@ public:
         }
     }
     /**
+     *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
+     *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
+     *  @param timeout in milliseconds, throws exception if no component is found before timeout. Waits indefinitely if negative; defaults to 0ms
+     */
+    template<typename T>
+    std::shared_ptr<T> RebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    {
+        auto filter = [id] (const ComponentInfo& info) -> bool
+        {
+            return (info.id == id);
+        };
+        return RebuildComponent<T>(filter, rebuildHierarchy, timeout);
+    }
+    /**
      * Rebuild a component from a ComponentInfo object using the EntityFactory
      */
     template<typename T>
@@ -157,7 +180,7 @@ public:
         return entity;
     }
 
-    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero()) //TODO check if forcePubOrSubChange is actually used
+    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         auto startTime = std::chrono::system_clock::now();
         bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
@@ -167,7 +190,6 @@ public:
         QGenericArgument subscribeArg;
         QGenericArgument idArg = Q_ARG(int64_t, info.id);
 
-        //TODO - Check if this works
         if((!info.subscriber) != forcePubOrSubChange)
             subscribeArg = Q_ARG(bool, true);
         else
