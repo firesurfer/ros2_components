@@ -70,7 +70,7 @@ public:
         }
         ret += "]";
         ret += " Node Name: " + nodename;
-        ret += " Machineip: " + machineip;
+        ret += " Machineip: " + std::to_string(machineip);
 
         return ret;
 
