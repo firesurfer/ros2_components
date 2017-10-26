@@ -104,7 +104,7 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
     ComponentInfo relevantInfo;
     bool found = false;
-    for(auto & comp : Components)
+    for(const auto & comp : Components)
     {
         if(filter(comp))
         {
@@ -160,6 +160,51 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
         return info.id == id;
     };
     return GetInfoWithFilter(filter, success, timeout);
+}
+
+void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout)
+{
+    std::unique_lock<std::mutex> lck(callbacksMutex);
+    auto startTime = std::chrono::system_clock::now();
+    callbacks.push_front(QMetaObject::Connection());
+    auto callback_it = callbacks.begin();
+    auto full_callback = [callback, filter, startTime, timeout, this, callback_it] (ComponentInfo comp)
+    {
+        bool found = false;
+        bool timedOut = false;
+        if (timeout > std::chrono::milliseconds::zero() && std::chrono::system_clock::now() - timeout >= startTime)
+        {
+            timedOut = true;
+            LOG(Debug) << "A ComponentManager callback timed out!" << std::endl;
+            callback(ComponentInfo());
+        }
+        else
+        {
+            if (filter(comp))
+            {
+                found = true;
+                callback(comp);
+            }
+        }
+        if (found || timedOut)
+        {
+            std::unique_lock<std::mutex> lck(callbacksMutex);
+            QObject::disconnect(*callback_it);
+            this->callbacks.erase(callback_it);
+        }
+    };
+    *callback_it = QObject::connect(this, &ComponentManager::NewComponentFound, full_callback);
+
+    //TODO go through already existing ones
+}
+
+void ComponentManager::GetInfoToIdAsync(std::function<void (ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout)
+{
+    auto filter = [id] (const ComponentInfo& info) -> bool
+    {
+        return info.id == id;
+    };
+    return GetInfoWithFilterAsync(callback, filter, timeout);
 }
 
 void ComponentManager::UpdateComponentsList()

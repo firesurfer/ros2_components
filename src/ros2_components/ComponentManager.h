@@ -24,8 +24,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
-#include <queue>
+#include <list>
+#include <memory>
 #include <chrono>
+#include <mutex>
 
 /*ROS2*/
 #include "rclcpp/rclcpp.hpp"
@@ -102,9 +104,23 @@ public:
      * @param id
      * @param success will be set to true if a Component was found before timeout and false if not
      * @param timeout in milliseconds. Waits indefinitely if negative
-     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms.
      */
     ComponentInfo GetInfoToId(int64_t id, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    /**
+     * @brief GetInfoWithFilterAsync gets the first Component which matches the filter and calls the callback on it
+     * @param callback the callback to call when the component is found
+     * @param filter the filter
+     * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout <= 0ms
+     */
+    void GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    /**
+     * @brief GetInfoWithFilterAsync gets the first Component with given id and calls the callback on it
+     * @param callback the callback to call when the component is found
+     * @param id the id
+     * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout <= 0ms
+     */
+    void GetInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -309,6 +325,9 @@ private:
     rmw_qos_profile_t component_manager_profile;
     void GenerateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;
+
+    std::list<QMetaObject::Connection> callbacks;
+    std::mutex callbacksMutex;
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
