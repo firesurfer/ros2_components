@@ -126,13 +126,6 @@ public:
      * Publishes a message to the ListComponentsRequest topic.
      */
     void UpdateComponentsList();
-    /**
-     * @brief CheckIfChildsAreAvailable - Check if all needed ComponentInfos are available for a deep rebuild.
-     * @param id
-     * @return true in case all childs are available, else returns false
-     */
-    bool CheckIfChildsAreAvailable(uint64_t id);
-
 
     /**
      *  Rebuild first Component which matches the given filter, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)

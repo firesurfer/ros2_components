@@ -229,24 +229,6 @@ void ComponentManager::UpdateComponentsList()
     this->ListComponentsRequestPublisher->publish(request);
 }
 
-bool ComponentManager::CheckIfChildsAreAvailable(uint64_t id)
-{
-    std::function<bool(uint64_t)> checkChilds = [&](uint64_t id) ->bool
-    {
-        bool success = false;
-        ComponentInfo info = this->GetInfoToId(id,&success);
-        if(!success)
-            return false;
-        for(int64_t & childId : info.childIds )
-        {
-            bool result = checkChilds(childId);
-            return result;
-        }
-        return true;
-    };
-    return checkChilds(id);
-}
-
 void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
     if(RosNode->get_name() != msg->nodename)
