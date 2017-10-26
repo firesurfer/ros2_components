@@ -44,7 +44,6 @@
 #include "EntityFactory.h"
 #include "ComponentInfo.h"
 #include "ComponentInfoFactory.h"
-#include "ComponentListFilter.h"
 
 namespace ros2_components
 {
@@ -90,7 +89,7 @@ public:
      * @param filter
      * @return List of ComponentInfo objects that are matched by the given ComponentListFilter
      */
-    std::vector<ComponentInfo> ListComponentsBy(ComponentListFilter filter);
+    std::vector<ComponentInfo> ListComponentsBy(std::function<bool(const ComponentInfo&)> filter);
     /**
      * @brief GetInfoWithFilter gets the first Component which matches the filter
      * @param filter the filter

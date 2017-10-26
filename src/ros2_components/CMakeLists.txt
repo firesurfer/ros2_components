@@ -7,7 +7,6 @@ include_directories(
     ${Qt5Core_INCLUDE_DIRS} 
     ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter
     ${CMAKE_CURRENT_SOURCE_DIR}/CLI
     ${CMAKE_CURRENT_SOURCE_DIR}/Exceptions
     ${CMAKE_CURRENT_SOURCE_DIR}/GUI
@@ -18,9 +17,6 @@ include_directories(
 file(GLOB COMPONENTS_SRC_FILES 
     "${CMAKE_CURRENT_SOURCE_DIR}/*.c*"
     "${CMAKE_CURRENT_SOURCE_DIR}/*.h*"
-	
-    "${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.c*"
-    "${CMAKE_CURRENT_SOURCE_DIR}/ComponentFilter/*.h*"
 
     "${CMAKE_CURRENT_SOURCE_DIR}/CLI/*.c*"
     "${CMAKE_CURRENT_SOURCE_DIR}/CLI/*.h*"

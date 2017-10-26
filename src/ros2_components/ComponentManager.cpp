@@ -93,9 +93,17 @@ std::vector<string> ComponentManager::ListNodes()
     return this->RosNode->get_node_graph_interface()->get_node_names();
 }
 
-std::vector<ComponentInfo> ComponentManager::ListComponentsBy(ComponentListFilter filter)
+std::vector<ComponentInfo> ComponentManager::ListComponentsBy(std::function<bool(const ComponentInfo&)> filter)
 {
-    return filter.filter(this->Components);
+    std::vector<ComponentInfo> ret;
+    for (const auto & comp : Components)
+    {
+        if (filter(comp))
+        {
+            ret.emplace_back(comp);
+        }
+    }
+    return ret;
 }
 
 ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const ComponentInfo &)> filter, bool *success, std::chrono::milliseconds timeout)
