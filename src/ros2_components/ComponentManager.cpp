@@ -20,7 +20,7 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode)
+ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : componentsReader(0)
 {
     using namespace std::placeholders;
     //Variable Assignments
@@ -85,6 +85,7 @@ ComponentManager::~ComponentManager()
 
 std::vector<ComponentInfo> ComponentManager::ListComponents()
 {
+    ReaderGuard rg(this);
     return Components;
 }
 
@@ -96,11 +97,14 @@ std::vector<string> ComponentManager::ListNodes()
 std::vector<ComponentInfo> ComponentManager::ListComponentsBy(std::function<bool(const ComponentInfo&)> filter)
 {
     std::vector<ComponentInfo> ret;
-    for (const auto & comp : Components)
     {
-        if (filter(comp))
+        ReaderGuard rg(this);
+        for (const auto & comp : Components)
         {
-            ret.emplace_back(comp);
+            if (filter(comp))
+            {
+                ret.emplace_back(comp);
+            }
         }
     }
     return ret;
@@ -112,13 +116,16 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
     ComponentInfo relevantInfo;
     bool found = false;
-    for(const auto & comp : Components)
     {
-        if(filter(comp))
+        ReaderGuard rg(this);
+        for(const auto & comp : Components)
         {
-            relevantInfo = comp;
-            found = true;
-            break;
+            if(filter(comp))
+            {
+                relevantInfo = comp;
+                found = true;
+                break;
+            }
         }
     }
     if (!found)
@@ -255,51 +262,63 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         bool foundInList = false;
         bool toDelete = false;
         ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
-        for(ComponentInfo & myInfo: Components)
         {
-
-            if(myInfo.name == currentInfo.name)
+            ReaderGuard rg(this);
+            for(ComponentInfo & myInfo: Components)
             {
-                //LOG(Debug) << "My: " << myInfo.id << " " << myInfo.name << " Remote: " << currentInfo.id << " " << currentInfo.name << std::endl;
-                foundInList = true;
-                if(!msg->deleted)
+
+                if(myInfo.name == currentInfo.name)
                 {
-                    //TODO implement comparison for component info
-                    myInfo = currentInfo;
-                    emit ComponentChanged(myInfo);
+                    //LOG(Debug) << "My: " << myInfo.id << " " << myInfo.name << " Remote: " << currentInfo.id << " " << currentInfo.name << std::endl;
+                    foundInList = true;
+                    if(!msg->deleted)
+                    {
+                        //TODO implement comparison for component info
+                        myInfo = currentInfo;
+                        emit ComponentChanged(myInfo);
 
-                }
-                else
-                {
+                    }
+                    else
+                    {
 
-                    toDelete = true;
-                    //TODO delete from list more efficient
-                      LOG(Info) << "Deleting: " << myInfo.name << std::endl;
-                    emit ComponentDeleted(myInfo);
+                        toDelete = true;
+                        //TODO delete from list more efficient
+                          LOG(Info) << "Deleting: " << myInfo.name << std::endl;
+                        emit ComponentDeleted(myInfo);
 
-                }
-                break;
-            }
-        }
-
-        if(!foundInList)
-        {
-            Components.push_back(currentInfo);
-            emit NewComponentFound(currentInfo);
-        }
-        if(toDelete)
-        {
-
-            size_t pos = 0;
-            for(auto & info: Components)
-            {
-                if( info.id == msg->id)
-                {
+                    }
                     break;
                 }
-                pos++;
             }
-            Components.erase(Components.begin()+pos);
+        }
+
+        {
+            //Writing to Components
+            std::unique_lock<std::mutex> lck(componentsMutex);
+            while (componentsReader > 0)
+            {
+                componentsCV.wait(lck);
+            }
+
+            if(!foundInList)
+            {
+                Components.push_back(currentInfo);
+                emit NewComponentFound(currentInfo);
+            }
+            if(toDelete)
+            {
+
+                size_t pos = 0;
+                for(auto & info: Components)
+                {
+                    if( info.id == msg->id)
+                    {
+                        break;
+                    }
+                    pos++;
+                }
+                Components.erase(Components.begin()+pos);
+            }
         }
     }
 }
@@ -364,4 +383,20 @@ void ComponentManager::OnEntityDeleted(ComponentInfo info)
     msg->deleted = true;
     this->ListComponentsResponsePublisher->publish(msg);
 }
+
+ComponentManager::ReaderGuard::ReaderGuard(ComponentManager* comp) : cm(comp)
+{
+    std::unique_lock<std::mutex> lck(cm->componentsMutex);
+    cm->componentsReader++;
+}
+
+ComponentManager::ReaderGuard::~ReaderGuard()
+{
+    {
+        std::unique_lock<std::mutex> lck(cm->componentsMutex);
+        cm->componentsReader--;
+    }
+    cm->componentsCV.notify_all();
+}
+
 }

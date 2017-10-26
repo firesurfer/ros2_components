@@ -28,6 +28,7 @@
 #include <memory>
 #include <chrono>
 #include <mutex>
+#include <condition_variable>
 
 /*ROS2*/
 #include "rclcpp/rclcpp.hpp"
@@ -320,6 +321,9 @@ private:
      * Stored components
      */
     std::vector<ComponentInfo> Components;
+    std::mutex componentsMutex; //TODO Test this extensively
+    uint64_t componentsReader;
+    std::condition_variable componentsCV;
     EntityBase::SharedPtr BaseEntity;
     rmw_qos_profile_t component_manager_profile;
     void GenerateResponse();
@@ -327,6 +331,17 @@ private:
 
     std::list<QMetaObject::Connection> callbacks;
     std::mutex callbacksMutex;
+
+    //RAII helper to manage reader entrance on Components
+    class ReaderGuard
+    {
+    public:
+        ReaderGuard(ComponentManager*);
+        ~ReaderGuard();
+
+    private:
+        ComponentManager* cm;
+    };
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
