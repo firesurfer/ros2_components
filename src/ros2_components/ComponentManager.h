@@ -189,78 +189,69 @@ public:
         return entity;
     }
 
-    std::shared_ptr<EntityBase> RebuildComponent(ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    /**
+     *  Rebuild Component from the given id and call the callback with it, will return immediately
+     *  @param id the id of the component
+     *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
+     *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if <= 0ms; defaults to 0ms
+     */
+    template<typename T>
+    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
-        auto startTime = std::chrono::system_clock::now();
-        bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
-        if(!EntityFactory::contains(info.type))
-            throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory?");
-
-        QGenericArgument subscribeArg;
-        QGenericArgument idArg = Q_ARG(int64_t, info.id);
-
-        if((!info.subscriber) != forcePubOrSubChange)
-            subscribeArg = Q_ARG(bool, true);
-        else
-            subscribeArg = Q_ARG(bool, false);
-        QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
-
-        std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
-        //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
-
-        //The following line recursively rebuild the tree structure that was published before
-        if(rebuildHierarchy)
+        if (rebuildHierarchy)
         {
-            LOG(Debug) << "Childs: ";
-            for (auto& childId : info.childIds)
+            //TODO test this extensively
+            auto timeoutTimePoint = std::chrono::system_clock::now() + timeout;
+            std::shared_ptr<uint64_t> subComponentCount = std::make_shared<uint64_t>(0);
+            std::function<void(ComponentInfo)> parentCallback = [callback, id, timeoutTimePoint, subComponentCount, &parentCallback, this] (ComponentInfo childInfo)
             {
-                LOG(Debug) << childId << " ";
-            }
-            LOG(Debug) << std::endl;
-            std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity, ComponentInfo parentInfo)
-            {
-                for(auto & child_id: parentInfo.childIds)
+                if (childInfo.name.empty())
                 {
-                    ComponentInfo childInfo;
-                    bool found_child = false;
-                    if (waitIndefinitely)
-                    {
-                        childInfo = GetInfoToId(child_id, &found_child, timeout);
-                    }
-                    else
-                    {
-                        auto remaining_timeout = startTime + timeout - std::chrono::system_clock::now();
-                        if (remaining_timeout < std::chrono::milliseconds::zero())
-                        {
-                            remaining_timeout = std::chrono::milliseconds::zero();
-                        }
-                        childInfo = GetInfoToId(child_id, &found_child, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
-                    }
-                    if(!found_child)
-                    {
-                        throw std::runtime_error("Failed to find all children in time"); //FIXME exceptiontype
-                    }
-                    LOG(Debug) << "Found child: " << childInfo.name << ", id: " << childInfo.id << std::endl;
-                    idArg = Q_ARG(int64_t, childInfo.id);
-
-                    //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;
-                    if(!childInfo.subscriber)
-                        subscribeArg = Q_ARG(bool, true);
-                    else
-                        subscribeArg = Q_ARG(bool, false);
-                    std::shared_ptr<EntityBase> child_obj = EntityFactory::createInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
-                    parentEntity->addChild(child_obj);
-                    rec_build(child_obj, childInfo);
+                    callback(std::shared_ptr<T>());
+                    return;
+                }
+                *subComponentCount += childInfo.childIds.size();
+                for (auto childId : childInfo.childIds)
+                {
+                    this->GetInfoToIdAsync(parentCallback, childId, std::chrono::duration_cast<std::chrono::milliseconds>(timeoutTimePoint - std::chrono::system_clock::now()));
+                }
+                if (*subComponentCount == 0)
+                {
+                    //All callbacks have been called, so all childs are available
+                    std::shared_ptr<T> entity = RebuildComponent<T>(id, true);
+                    if(!entity)
+                        throw std::runtime_error("Could not cast entity to given type");
+                    callback(entity);
+                }
+                else
+                {
+                    (*subComponentCount)--;
                 }
             };
-            std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(ent);
-            rec_build(parentEnt,info);
+            GetInfoToIdAsync(parentCallback, id, timeout);
         }
-        ent->makeVirtual();
-        return ent;
+        else
+        {
+            auto fullCallback = [callback, this] (ComponentInfo info)
+            {
+                if (info.name.empty())
+                {
+                    callback(std::shared_ptr<T>());
+                    return;
+                }
+                std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, true, false));
+                if(!entity)
+                    throw std::runtime_error("Could not cast entity to given type");
+                callback(entity);
+            };
+            GetInfoToIdAsync(fullCallback, id, timeout);
+        }
     }
 
-
+    /**
+     * RebuildComponent helper method
+     */
+    std::shared_ptr<EntityBase> RebuildComponent(const ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
 
 private:
     /*Ros2 stuff*/

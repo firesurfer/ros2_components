@@ -239,6 +239,71 @@ void ComponentManager::UpdateComponentsList()
     this->ListComponentsRequestPublisher->publish(request);
 }
 
+std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentInfo & info, bool rebuildHierarchy, bool forcePubOrSubChange, std::chrono::milliseconds timeout)
+{
+    auto startTime = std::chrono::system_clock::now();
+    bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
+    if(!EntityFactory::contains(info.type))
+        throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory?");
+
+    QGenericArgument subscribeArg;
+    QGenericArgument idArg = Q_ARG(int64_t, info.id);
+
+    if((!info.subscriber) != forcePubOrSubChange)
+        subscribeArg = Q_ARG(bool, true);
+    else
+        subscribeArg = Q_ARG(bool, false);
+    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, RosNode);
+
+    std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
+    //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);
+
+    //The following line recursively rebuild the tree structure that was published before
+    if(rebuildHierarchy)
+    {
+        std::function<void(EntityBase::SharedPtr, ComponentInfo)> rec_build = [&](EntityBase::SharedPtr parentEntity, ComponentInfo parentInfo)
+        {
+            for(auto & child_id: parentInfo.childIds)
+            {
+                ComponentInfo childInfo;
+                bool found_child = false;
+                if (waitIndefinitely)
+                {
+                    childInfo = GetInfoToId(child_id, &found_child, timeout);
+                }
+                else
+                {
+                    auto remaining_timeout = startTime + timeout - std::chrono::system_clock::now();
+                    if (remaining_timeout < std::chrono::milliseconds::zero())
+                    {
+                        remaining_timeout = std::chrono::milliseconds::zero();
+                    }
+                    childInfo = GetInfoToId(child_id, &found_child, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
+                }
+                if(!found_child)
+                {
+                    throw std::runtime_error("Failed to find all children in time"); //FIXME exceptiontype
+                }
+                LOG(Debug) << "Found child: " << childInfo.name << ", id: " << childInfo.id << std::endl;
+                idArg = Q_ARG(int64_t, childInfo.id);
+
+                //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;
+                if(!childInfo.subscriber)
+                    subscribeArg = Q_ARG(bool, true);
+                else
+                    subscribeArg = Q_ARG(bool, false);
+                std::shared_ptr<EntityBase> child_obj = EntityFactory::createInstanceFromName(childInfo.type,idArg,subscribeArg,nodeArg);
+                parentEntity->addChild(child_obj);
+                rec_build(child_obj, childInfo);
+            }
+        };
+        std::shared_ptr<EntityBase> parentEnt = dynamic_pointer_cast<EntityBase>(ent);
+        rec_build(parentEnt,info);
+    }
+    ent->makeVirtual();
+    return ent;
+}
+
 void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
     if(RosNode->get_name() != msg->nodename)
@@ -275,7 +340,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
 
                         toDelete = true;
                         //TODO delete from list more efficient
-                          LOG(Info) << "Deleting: " << myInfo.name << std::endl;
+                        LOG(Info) << "Deleting: " << myInfo.name << std::endl;
                         emit ComponentDeleted(myInfo);
 
                     }
