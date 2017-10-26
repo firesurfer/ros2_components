@@ -179,38 +179,48 @@ ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chro
 
 void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout)
 {
-    std::unique_lock<std::mutex> lck(callbacksMutex);
     auto startTime = std::chrono::system_clock::now();
-    callbacks.push_front(QMetaObject::Connection());
-    auto callback_it = callbacks.begin();
-    auto full_callback = [callback, filter, startTime, timeout, this, callback_it] (ComponentInfo comp)
-    {
-        bool found = false;
-        bool timedOut = false;
-        if (timeout > std::chrono::milliseconds::zero() && std::chrono::system_clock::now() - timeout >= startTime)
-        {
-            timedOut = true;
-            LOG(Debug) << "A ComponentManager callback timed out!" << std::endl;
-            callback(ComponentInfo());
-        }
-        else
-        {
-            if (filter(comp))
-            {
-                found = true;
-                callback(comp);
-            }
-        }
-        if (found || timedOut)
-        {
-            std::unique_lock<std::mutex> lck(callbacksMutex);
-            QObject::disconnect(*callback_it);
-            this->callbacks.erase(callback_it);
-        }
-    };
-    *callback_it = QObject::connect(this, &ComponentManager::NewComponentFound, full_callback);
 
-    //TODO go through already existing ones
+    //Impersonating a Reader prevents the NewComponentFound signal to be sent and thus the callback to be called until ready
+    ReaderGuard rg(this);
+
+    bool found = false;
+    ComponentInfo info = GetInfoWithFilter(filter, &found);
+    if (found)
+    {
+        callback(info);
+    }
+    else
+    {
+        std::unique_lock<std::mutex> lck(callbacksMutex);
+        callbacks.push_front(QMetaObject::Connection());
+        auto callback_it = callbacks.begin();
+        auto full_callback = [callback, filter, startTime, timeout, this, callback_it] (ComponentInfo comp)
+        {
+            bool found = false;
+            bool timedOut = false;
+            if (timeout > std::chrono::milliseconds::zero() && std::chrono::system_clock::now() - timeout >= startTime)
+            {
+                timedOut = true;
+                callback(ComponentInfo());
+            }
+            else
+            {
+                if (filter(comp))
+                {
+                    found = true;
+                    callback(comp);
+                }
+            }
+            if (found || timedOut)
+            {
+                std::unique_lock<std::mutex> lck(callbacksMutex);
+                QObject::disconnect(*callback_it);
+                this->callbacks.erase(callback_it);
+            }
+        };
+        *callback_it = QObject::connect(this, &ComponentManager::NewComponentFound, full_callback);
+    }
 }
 
 void ComponentManager::GetInfoToIdAsync(std::function<void (ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout)
