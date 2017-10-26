@@ -123,8 +123,10 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
                 found = true;
             }
         };
-        auto connection = QObject::connect(this, &ComponentManager::NewComponentFound, newComponentFunc);
-        //TODO make sure to disconnect always, even when throwing exception
+
+        //Disconnects the connection when it goes out of scope
+        auto auto_disconnect = [] (QMetaObject::Connection* con) { QObject::disconnect(*con); delete con; };
+        std::unique_ptr<QMetaObject::Connection, decltype(auto_disconnect)> connection(new QMetaObject::Connection(QObject::connect(this, &ComponentManager::NewComponentFound, newComponentFunc)), auto_disconnect);
 
         while (!found && rclcpp::ok())
         {
@@ -143,7 +145,6 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
             rclcpp::spin_some(RosNode); //can throw exception FIXME rethrow with more descriptive exception?
             loop_rate.sleep();
         }
-        QObject::disconnect(connection);
     }
     if (success != nullptr)
     {
