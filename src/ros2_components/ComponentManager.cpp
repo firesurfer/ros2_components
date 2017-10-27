@@ -221,6 +221,8 @@ void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)>
         };
         *callback_it = QObject::connect(this, &ComponentManager::NewComponentFound, full_callback);
     }
+
+    //TODO start a timer to run into timeout even if no new components are coming in
 }
 
 void ComponentManager::GetInfoToIdAsync(std::function<void (ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout)

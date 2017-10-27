@@ -187,75 +187,64 @@ public:
     template<typename T>
     void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
     {
-        if (rebuildHierarchy)
+        //Nested shared_ptr is intended here
+        std::shared_ptr<std::shared_ptr<T> > entityCache = std::make_shared<std::shared_ptr<T> >(nullptr);
+        std::shared_ptr<ComponentInfo> parent = std::make_shared<ComponentInfo>();
+        std::shared_ptr<std::list<int64_t> > relevantIds = std::make_shared<std::list<int64_t> >();
+        auto fullFilter = [filter, rebuildHierarchy, entityCache, parent, relevantIds, this] (const ComponentInfo& info) -> bool
         {
-            //TODO test this extensively
-            bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
-            auto timeoutTimePoint = std::chrono::system_clock::now() + timeout;
-            std::shared_ptr<uint64_t> subComponentCount = std::make_shared<uint64_t>(0);
-            std::shared_ptr<int64_t> parentId = std::make_shared<int64_t>(0);
-            using CallbackType = std::function<void(ComponentInfo)>;
-            std::shared_ptr<CallbackType> callbackPtr = std::make_shared<std::function<void(ComponentInfo)> >();
-            CallbackType parentCallback = [callback, parentId, waitIndefinitely, timeoutTimePoint, subComponentCount, callbackPtr, this] (ComponentInfo childInfo) mutable
+            bool relevant = false;
+
+            if (filter(info) && parent->name.empty())
             {
-                if (childInfo.name.empty())
+                *parent = info;
+                relevant = true;
+            }
+            LOG (Debug) << "Checking component: " << info.id << std::endl;
+            for (auto it = relevantIds->begin(); it != relevantIds->end(); it++)
+            {
+                if (*it == info.id)
                 {
-                    //Timeout
-                    callback(std::shared_ptr<T>());
-                    return;
+                    relevant = true;
+                    relevantIds->erase(it);
+                    break;
                 }
-                if (*parentId == 0)
+            }
+
+            if (relevant)
+            {
+                try
                 {
-                    *parentId = childInfo.id;
+                    *entityCache = RebuildComponent<T>(*parent, rebuildHierarchy);
+                    return true;
                 }
-                *subComponentCount += childInfo.childIds.size();
-                for (auto childId : childInfo.childIds)
+                catch (std::runtime_error e) //TODO use timeout exception here
                 {
-                    std::chrono::milliseconds remainingTimeout;
-                    if (waitIndefinitely)
-                    {
-                        remainingTimeout = std::chrono::milliseconds(-1);
-                    }
-                    else
-                    {
-                        remainingTimeout = std::max(std::chrono::duration_cast<std::chrono::milliseconds>(timeoutTimePoint - std::chrono::system_clock::now()),
-                                                    std::chrono::milliseconds::zero());
-                    }
-                    this->GetInfoToIdAsync(*callbackPtr, childId, remainingTimeout);
+                    //Childrens are still missing
                 }
-                if (*subComponentCount == 0)
+                //Add own childs to relevant list
+                for (auto childId : info.childIds)
                 {
-                    //All callbacks have been called, so all childs are available
-                    std::shared_ptr<T> entity = RebuildComponent<T>(*parentId, true);
-                    if(!entity)
-                        throw std::runtime_error("Could not cast entity to given type");
-                    callback(entity);
-                    if (!callbackPtr.unique()) throw std::runtime_error("Memory leak!");
+                    relevantIds->push_back(childId);
                 }
-                else
-                {
-                    (*subComponentCount)--;
-                }
-            };
-            callbackPtr->swap(parentCallback);
-            GetInfoWithFilterAsync(*callbackPtr, filter, timeout);
-        }
-        else
+            }
+            return false;
+        };
+
+        auto fullCallback = [callback, entityCache] (ComponentInfo info)
         {
-            auto fullCallback = [callback, this] (ComponentInfo info)
+            if (info.name.empty())
             {
-                if (info.name.empty())
-                {
-                    callback(std::shared_ptr<T>());
-                    return;
-                }
-                std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, true, false));
-                if(!entity)
-                    throw std::runtime_error("Could not cast entity to given type");
-                callback(entity);
-            };
-            GetInfoWithFilterAsync(fullCallback, filter, timeout);
-        }
+                //Timeout
+                callback(std::shared_ptr<T>());
+            }
+            else
+            {
+                callback(*entityCache);
+            }
+        };
+
+        GetInfoWithFilterAsync(fullCallback, fullFilter, timeout);
     }
     /**
      *  Rebuild Component from the given id and call the callback with it, will return immediately
