@@ -176,6 +176,9 @@ void ManagedNode::Setup(LogLevel logLevel)
     //Create Componentmanager with nodeEntity as base
     this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode(),this->nodeEntity);
     this->isSetup = true; //Set setup to true
+
+    //TEMPORARY WORKAROUND -> https://github.com/ros2/rmw_fastrtps/issues/157
+        std::this_thread::sleep_for(std::chrono::milliseconds(1900));
 }
 
 }
