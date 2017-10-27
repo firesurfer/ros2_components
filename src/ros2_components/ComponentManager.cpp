@@ -43,6 +43,11 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : c
     this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
+
+
+    //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
+    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
+    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
 }
 
 ComponentManager::~ComponentManager()
@@ -71,12 +76,8 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
     //Call lambda
     BaseEntity->iterateThroughAllChilds(func);
 
-    //Subscriptions
-    using namespace std::placeholders;
-    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
-
-    //Publishers
-    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
+    //Tell other nodes about entities
+    GenerateResponse();
 }
 
 std::vector<ComponentInfo> ComponentManager::ListComponents()
