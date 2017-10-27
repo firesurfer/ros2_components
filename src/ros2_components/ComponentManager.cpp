@@ -88,8 +88,6 @@ std::vector<ComponentInfo> ComponentManager::ListComponents()
 
 std::vector<string> ComponentManager::ListNodes()
 {
-    std::unique_lock<std::mutex> lck(componentsMutex);
-    LOG(Debug) << callbacks.size() << " Callbacks registered" << std::endl;
     return this->RosNode->get_node_graph_interface()->get_node_names();
 }
 
