@@ -179,6 +179,7 @@ void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)>
     auto startTime = std::chrono::system_clock::now();
 
     //Impersonating a Reader prevents the NewComponentFound signal to be sent and thus the callback to be called until ready
+    //Not really anymore FIXME
     ReaderGuard rg(this);
 
     bool found = false;
@@ -196,7 +197,7 @@ void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)>
         {
             bool found = false;
             bool timedOut = false;
-            if (timeout > std::chrono::milliseconds::zero() && std::chrono::system_clock::now() - timeout >= startTime)
+            if (timeout >= std::chrono::milliseconds::zero() && std::chrono::system_clock::now() - timeout >= startTime)
             {
                 timedOut = true;
                 callback(ComponentInfo());
