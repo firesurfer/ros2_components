@@ -410,6 +410,8 @@ void ComponentManager::GenerateResponse()
 
 void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
+    UNUSED(parent);
+    UNUSED(remote);
     LOG(Info) << "Child added: " << child->getName() << std::endl;
     //Connect to add events
     connect(child.get(),&EntityBase::childAdded,this, &ComponentManager::OnChildAdded);
@@ -425,6 +427,8 @@ void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::Sha
 
 void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
+    UNUSED(parent);
+    UNUSED(remote);
     LOG(Info) << "Child removed: " << child->getName() << std::endl;
     disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded);
     disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
@@ -437,6 +441,8 @@ void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::S
 
 void ComponentManager::OnEntityDeleted(ComponentInfo info)
 {
+
+
     LOG(Warning) << info.name << " got deleted" << std::endl;
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = info.toRosMessage();
     msg->nodename = RosNode->get_name();
