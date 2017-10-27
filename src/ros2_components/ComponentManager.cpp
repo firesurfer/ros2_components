@@ -360,7 +360,10 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
             if(!foundInList)
             {
                 Components.push_back(currentInfo);
+
+                lck.unlock(); //Connected functions could try to read -> deadlock!
                 emit NewComponentFound(currentInfo);
+                lck.lock();
             }
             if(toDelete)
             {
