@@ -177,38 +177,33 @@ public:
         };
         return RebuildComponent<T>(filter, rebuildHierarchy, timeout);
     }
-    /**
-     * Rebuild a component from a ComponentInfo object using the EntityFactory
-     */
-    template<typename T>
-    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
-    {
-        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy, false, timeout));
-        if(!entity)
-            throw std::runtime_error("Could not cast entity to given type");
-        return entity;
-    }
 
     /**
-     *  Rebuild Component from the given id and call the callback with it, will return immediately
-     *  @param id the id of the component
+     *  Rebuild first Component which matches the given filter and call the callback with it, will return immediately
+     *  @param filter the filter
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
      *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if <= 0ms; defaults to 0ms
      */
     template<typename T>
-    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         if (rebuildHierarchy)
         {
             //TODO test this extensively
             auto timeoutTimePoint = std::chrono::system_clock::now() + timeout;
             std::shared_ptr<uint64_t> subComponentCount = std::make_shared<uint64_t>(0);
-            std::function<void(ComponentInfo)> parentCallback = [callback, id, timeoutTimePoint, subComponentCount, &parentCallback, this] (ComponentInfo childInfo)
+            std::shared_ptr<int64_t> parentId = std::make_shared<int64_t>(0);
+            std::function<void(ComponentInfo)> parentCallback = [callback, parentId, timeoutTimePoint, subComponentCount, &parentCallback, this] (ComponentInfo childInfo)
             {
                 if (childInfo.name.empty())
                 {
+                    //Timeout
                     callback(std::shared_ptr<T>());
                     return;
+                }
+                if (*parentId == 0)
+                {
+                    *parentId = childInfo.id;
                 }
                 *subComponentCount += childInfo.childIds.size();
                 for (auto childId : childInfo.childIds)
@@ -218,7 +213,7 @@ public:
                 if (*subComponentCount == 0)
                 {
                     //All callbacks have been called, so all childs are available
-                    std::shared_ptr<T> entity = RebuildComponent<T>(id, true);
+                    std::shared_ptr<T> entity = RebuildComponent<T>(*parentId, true);
                     if(!entity)
                         throw std::runtime_error("Could not cast entity to given type");
                     callback(entity);
@@ -228,7 +223,7 @@ public:
                     (*subComponentCount)--;
                 }
             };
-            GetInfoToIdAsync(parentCallback, id, timeout);
+            GetInfoWithFilterAsync(parentCallback, filter, timeout);
         }
         else
         {
@@ -244,10 +239,36 @@ public:
                     throw std::runtime_error("Could not cast entity to given type");
                 callback(entity);
             };
-            GetInfoToIdAsync(fullCallback, id, timeout);
+            GetInfoWithFilterAsync(fullCallback, filter, timeout);
         }
     }
+    /**
+     *  Rebuild Component from the given id and call the callback with it, will return immediately
+     *  @param id the id of the component
+     *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
+     *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if <= 0ms; defaults to 0ms
+     */
+    template<typename T>
+    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    {
+        auto filter = [id] (const ComponentInfo& info) -> bool
+        {
+            return (info.id == id);
+        };
+        RebuildComponentAsync(callback, filter, rebuildHierarchy, timeout);
+    }
 
+    /**
+     * Rebuild a component from a ComponentInfo object using the EntityFactory
+     */
+    template<typename T>
+    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    {
+        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy, false, timeout));
+        if(!entity)
+            throw std::runtime_error("Could not cast entity to given type");
+        return entity;
+    }
     /**
      * RebuildComponent helper method
      */
