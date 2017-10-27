@@ -45,9 +45,16 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : c
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
 
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity): ComponentManager(_localNode)
+ComponentManager::~ComponentManager()
 {
+    this->BaseEntity.reset();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
+    LOG(Warning) << "Deletion of component manager" << std::endl;
+}
+
+void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
+{
     //Variable Assignments
     this->BaseEntity = _baseEntity;
 
@@ -70,17 +77,6 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode, Ent
 
     //Publishers
     this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
-   // this->updateTimer = RosNode->create_wall_timer(1s, std::bind(&ComponentManager::GenerateResponse,this));
-
-
-}
-
-ComponentManager::~ComponentManager()
-{
-    this->BaseEntity.reset();
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-    LOG(Warning) << "Deletion of component manager" << std::endl;
 }
 
 std::vector<ComponentInfo> ComponentManager::ListComponents()

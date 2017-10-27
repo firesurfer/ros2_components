@@ -174,7 +174,7 @@ void ManagedNode::Setup(LogLevel logLevel)
     LOG(Info) <<"Build at: "<< BuildInfo::get_build_date() << std::endl;
 
     //Create Componentmanager with nodeEntity as base
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode(),this->nodeEntity);
+    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode());
     this->isSetup = true; //Set setup to true
 
     //TEMPORARY WORKAROUND -> https://github.com/ros2/rmw_fastrtps/issues/157

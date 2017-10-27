@@ -60,25 +60,24 @@ public:
     /**
      * @brief ComponentManager
      * @param _localNode
-     * Use this constructor if your having a node that doesnt need a base entity (for example an algorithm node)
      */
     ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
-    /**
-     * @brief ComponentManager
-     * @param _localNode
-     * @param _baseEntity
-     * Use this constructor if your having a node that needs a base entity (for example a hardware sensor/actor node)
-     */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode, EntityBase::SharedPtr _baseEntity);
     /**
      * @brief ~ComponentManager - destructor. Waits for responder thread
      */
     virtual ~ComponentManager();
     /**
+     * Tell the component manager to start publishing its entities. This should be called once the base entity is ready
+     * and all its childs are added to it (usually at the end of Setup()). After calling this, dynamically added components will be published automatically.
+     * If the node does not have components it wants to publish, this does not have to be called
+     * @param _baseEntity the nodes' base entity
+     */
+    void registerComponents(EntityBase::SharedPtr _baseEntity);
+    /**
      * @brief ListComponents
      * @return vector of all currently listed components
-     * TODO think of a better way to access all components
      */
+
     std::vector<ComponentInfo> ListComponents();
     /**
      * @brief ListNodes
