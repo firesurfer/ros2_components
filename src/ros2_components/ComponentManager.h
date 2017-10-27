@@ -112,14 +112,14 @@ public:
      * @param filter the filter
      * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout negative (default)
      */
-    void GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout = std::chrono::milliseconds::min());
+    void GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
     /**
      * @brief GetInfoWithFilterAsync gets the first Component with given id and calls the callback on it
      * @param callback the callback to call when the component is found
      * @param id the id
      * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout negative (default)
      */
-    void GetInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds::min());
+    void GetInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
     /**
      * @brief UpdateComponentsList
      * Publishes a message to the ListComponentsRequest topic.
@@ -179,12 +179,13 @@ public:
 
     /**
      *  Rebuild first Component which matches the given filter and call the callback with it, will return immediately
+     *  @param callback the callback expecting the rebuild component or an empty ptr if it timed out
      *  @param filter the filter
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
      *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if negative; defaults to negative
      */
     template<typename T>
-    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::min())
+    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
     {
         if (rebuildHierarchy)
         {
@@ -193,9 +194,10 @@ public:
             auto timeoutTimePoint = std::chrono::system_clock::now() + timeout;
             std::shared_ptr<uint64_t> subComponentCount = std::make_shared<uint64_t>(0);
             std::shared_ptr<int64_t> parentId = std::make_shared<int64_t>(0);
-            std::function<void(ComponentInfo)> parentCallback = [callback, parentId, waitIndefinitely, timeoutTimePoint, subComponentCount, &parentCallback, this] (ComponentInfo childInfo)
+            using CallbackType = std::function<void(ComponentInfo)>;
+            std::shared_ptr<CallbackType> callbackPtr = std::make_shared<std::function<void(ComponentInfo)> >();
+            CallbackType parentCallback = [callback, parentId, waitIndefinitely, timeoutTimePoint, subComponentCount, callbackPtr, this] (ComponentInfo childInfo) mutable
             {
-                //FIXME currently broken
                 if (childInfo.name.empty())
                 {
                     //Timeout
@@ -212,14 +214,14 @@ public:
                     std::chrono::milliseconds remainingTimeout;
                     if (waitIndefinitely)
                     {
-                        remainingTimeout = std::chrono::milliseconds::min();
+                        remainingTimeout = std::chrono::milliseconds(-1);
                     }
                     else
                     {
                         remainingTimeout = std::max(std::chrono::duration_cast<std::chrono::milliseconds>(timeoutTimePoint - std::chrono::system_clock::now()),
                                                     std::chrono::milliseconds::zero());
                     }
-                    this->GetInfoToIdAsync(parentCallback, childId, remainingTimeout);
+                    this->GetInfoToIdAsync(*callbackPtr, childId, remainingTimeout);
                 }
                 if (*subComponentCount == 0)
                 {
@@ -228,13 +230,15 @@ public:
                     if(!entity)
                         throw std::runtime_error("Could not cast entity to given type");
                     callback(entity);
+                    if (!callbackPtr.unique()) throw std::runtime_error("Memory leak!");
                 }
                 else
                 {
                     (*subComponentCount)--;
                 }
             };
-            GetInfoWithFilterAsync(parentCallback, filter, timeout);
+            callbackPtr->swap(parentCallback);
+            GetInfoWithFilterAsync(*callbackPtr, filter, timeout);
         }
         else
         {
@@ -255,12 +259,13 @@ public:
     }
     /**
      *  Rebuild Component from the given id and call the callback with it, will return immediately
+     *  @param callback the callback expecting the rebuild component or an empty ptr if it timed out
      *  @param id the id of the component
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
-     *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if <= 0ms; defaults to 0ms
+     *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if negative (default)
      */
     template<typename T>
-    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
     {
         auto filter = [id] (const ComponentInfo& info) -> bool
         {
