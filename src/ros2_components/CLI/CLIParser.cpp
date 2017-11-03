@@ -8,10 +8,8 @@ CLIParser::CLIParser(char *argv[], int argc, std::string _programDescription):ba
     for(int i=0; i < argc;i++)
     {
         this->arguments.push_back(std::string(argv[i]));
-
     }
     //0 arg is the program name
-
     baseVerb.addArgument(helpArgument);
 }
 

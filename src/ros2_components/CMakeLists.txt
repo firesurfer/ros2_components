@@ -1,7 +1,5 @@
 include_directories(
     ${rclcpp_INCLUDE_DIRS}
-    ${rmw_INCLUDE_DIRS}
-    ${rmw_implementation_INCLUDE_DIRS}
     ${ros2_components_msg_INCLUDE_DIRS}
     ${ros2_simple_logger_INCLUDE_DIRS}
     ${Qt5Core_INCLUDE_DIRS} 
@@ -31,11 +29,8 @@ file(GLOB COMPONENTS_SRC_FILES
 add_library(ros2_components
     ${COMPONENTS_SRC_FILES}
 )
-target_link_libraries(ros2_components
-    
+target_link_libraries(ros2_components 
     ${rclcpp_LIBRARIES}
-    ${rmw_LIBRARIES}
-    ${rmw_implementation_LIBRARIES}
     ${std_msgs_LIBRARIES}
     ${builtin_interfaces_LIBRARIES}
     ${ros2_components_msg_LIBRARIES}
