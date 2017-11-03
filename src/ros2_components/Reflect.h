@@ -170,6 +170,10 @@ public:
         std::memcpy(bytes.data(),data.c_str(),data.length());
         return bytes;
     }
+    std::string& to_string()
+    {
+        return data;
+    }
 };
 
 template <>

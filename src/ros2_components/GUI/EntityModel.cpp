@@ -32,6 +32,22 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
     model->insertRow(model->rowCount(), descItem);
     model->setVerticalHeaderItem(model->rowCount()-1, desclabeItem);
 
+
+    auto func = [&](Element* elem )
+    {
+        QStandardItem* reflLabelItem = new QStandardItem(QString::fromStdString(elem->getKey()));
+        if(elem->getType() == "std::string" || elem->getType() == "string")
+        {
+            std::string val = ((SpecificElement<std::string>*)elem)->to_string();
+            QStandardItem* reflItem = new QStandardItem(QString::fromStdString(val));
+
+            model->insertRow(model->rowCount(), reflItem);
+            model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
+        }
+
+    };
+    entity->IterateThroughAllProperties(func);
+
 }
 
 EntityModel::~EntityModel()

@@ -167,7 +167,7 @@ public:
      * @brief IterateThroughAllProperties
      * @param func
      */
-    void IterateThroughAllProperties(std::function<void(QMetaProperty)> func);
+    void IterateThroughAllProperties(std::function<void(Element*)> func);
 
     /**
      * @brief IterateThroughAllChilds

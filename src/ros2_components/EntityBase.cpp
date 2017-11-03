@@ -182,17 +182,13 @@ string EntityBase::getTopicName()
 }
 
 
-void EntityBase::IterateThroughAllProperties(std::function<void(QMetaProperty)> func)
+void EntityBase::IterateThroughAllProperties(std::function<void(Element *)> func)
 {
-    const QMetaObject* metaObj = this->metaObject();
-    while(metaObj != NULL)
-    {
-        for (int i = metaObj->propertyOffset(); i < metaObj->propertyCount(); ++i)
-        {
-            func(metaObj->property(i));
-        }
-        metaObj = metaObj->superClass();
-    }
+   for(Element* elem: this->internalmap)
+   {
+       if(func != NULL)
+        func(elem);
+   }
 }
 
 void EntityBase::iterateThroughAllChilds(std::function<void (EntityBase::SharedPtr)> func)
