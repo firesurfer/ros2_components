@@ -61,6 +61,10 @@ ComponentManager::~ComponentManager()
 void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 {
     //Variable Assignments
+    while (_baseEntity->getParent() != nullptr)
+    {
+        _baseEntity = _baseEntity->getParent();
+    }
     this->BaseEntity = _baseEntity;
 
     //Connect to entity structure change callbacks
