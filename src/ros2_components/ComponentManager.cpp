@@ -354,23 +354,28 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
         }
 
         {
-            //Writing to Components
-            std::unique_lock<std::mutex> lck(componentsMutex);
-            while (componentsReader > 0)
-            {
-                componentsCV.wait(lck);
-            }
 
             if(!foundInList)
             {
+                //Writing to Components
+                std::unique_lock<std::mutex> lck(componentsMutex);
+                while (componentsReader > 0)
+                {
+                    componentsCV.wait(lck);
+                }
                 Components.push_back(currentInfo);
 
                 lck.unlock(); //Connected functions could try to read -> deadlock!
                 emit NewComponentFound(currentInfo);
-                lck.lock();
             }
             if(toDelete)
             {
+                //Writing to Components
+                std::unique_lock<std::mutex> lck(componentsMutex);
+                while (componentsReader > 0)
+                {
+                    componentsCV.wait(lck);
+                }
 
                 size_t pos = 0;
                 for(auto & info: Components)
