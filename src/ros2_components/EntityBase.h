@@ -297,6 +297,7 @@ signals:
     void childRemoved(EntityBase::SharedPtr child,std::shared_ptr<EntityBase> parent, bool remote);
     void entityDeleted(ComponentInfo info);
     void newData(); //TODO SharedPtr ?
+    void storageUpdate(std::string key);
 
 private:
     /**
