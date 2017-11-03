@@ -197,36 +197,31 @@ public:
 
             if (filter(info) && parent->name.empty())
             {
-                *parent = info;
                 relevant = true;
+                *parent = info;
+                for (auto childId : info.childIds)
+                {
+                    relevantIds->push_back(childId);
+                }
             }
-            LOG (Debug) << "Checking component: " << info.id << std::endl;
             for (auto it = relevantIds->begin(); it != relevantIds->end(); it++)
             {
                 if (*it == info.id)
                 {
                     relevant = true;
                     relevantIds->erase(it);
+                    for (auto childId : info.childIds)
+                    {
+                        relevantIds->push_back(childId);
+                    }
                     break;
                 }
             }
 
-            if (relevant)
+            if (relevant && relevantIds->empty())
             {
-                try
-                {
-                    *entityCache = RebuildComponent<T>(*parent, rebuildHierarchy);
-                    return true;
-                }
-                catch (std::runtime_error e) //TODO use timeout exception here
-                {
-                    //Childrens are still missing
-                }
-                //Add own childs to relevant list
-                for (auto childId : info.childIds)
-                {
-                    relevantIds->push_back(childId);
-                }
+                *entityCache = RebuildComponent<T>(*parent, rebuildHierarchy);
+                return true;
             }
             return false;
         };
