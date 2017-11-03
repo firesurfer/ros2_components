@@ -40,6 +40,7 @@
 
 /*ros2_components*/
 #include "ros2_simple_logger/Logger.h"
+#include "ros2_components_exceptions.h"
 
 #include "AdvertisementType.h"
 #include "EntityFactory.h"
@@ -95,7 +96,8 @@ public:
      * @param filter the filter
      * @param success will be set to true if a Component was found before timeout and false if not
      * @param timeout in milliseconds. Waits indefinitely if negative
-     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     * @throws TimeoutException when no component matching the filter was found after {@param timeout} time
      */
     ComponentInfo GetInfoWithFilter(std::function<bool(const ComponentInfo&)> filter, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
@@ -103,7 +105,8 @@ public:
      * @param id
      * @param success will be set to true if a Component was found before timeout and false if not
      * @param timeout in milliseconds. Waits indefinitely if negative
-     * @throws std::runtime_error if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms.
+     * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     * @throws TimeoutException when no component with id {@param id} was found after {@param timeout} time
      */
     ComponentInfo GetInfoToId(int64_t id, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
@@ -130,6 +133,9 @@ public:
      *  Rebuild first Component which matches the given filter, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
      *  @param timeout in milliseconds, throws exception if no component is found before timeout. Waits indefinitely if negative; defaults to 0ms
+     *  @throws TimeoutException when no component matching the filter was found after {@param timeout} time and/ or not all its children were found if {@param rebuildHierarchy} is true
+     * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     *  @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
     std::shared_ptr<T> RebuildComponent(std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
@@ -159,13 +165,16 @@ public:
         }
         else
         {
-            throw  std::runtime_error("Could not find Component in time"); //FIXME more descriptive exception
+            throw TimeoutException();
         }
     }
     /**
      *  Rebuild Component from the given id, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)
      *  @param rebuildHierarchy, wait for and rebuild all childs as well, defaults to false
      *  @param timeout in milliseconds, throws exception if no component is found before timeout. Waits indefinitely if negative; defaults to 0ms
+     *  @throws TimeoutException when no component with id {@param id} was found after {@param timeout} time and/ or not all its children were found if {@param rebuildHierarchy} is true
+     * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
+     *  @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
     std::shared_ptr<T> RebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
@@ -260,13 +269,14 @@ public:
 
     /**
      * Rebuild a component from a ComponentInfo object using the EntityFactory
+     * @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
     std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy, false, timeout));
         if(!entity)
-            throw std::runtime_error("Could not cast entity to given type");
+            throw EntityCastException();
         return entity;
     }
     /**

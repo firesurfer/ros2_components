@@ -158,7 +158,14 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
             }
 
             rclcpp::WallRate loop_rate(hertz);
-            rclcpp::spin_some(RosNode); //can throw exception FIXME rethrow with more descriptive exception?
+            try
+            {
+                rclcpp::spin_some(RosNode);
+            }
+            catch (std::runtime_error e)
+            {
+                throw AlreadySpinningException();
+            }
             loop_rate.sleep();
         }
     }
@@ -263,7 +270,7 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
     auto startTime = std::chrono::system_clock::now();
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
     if(!EntityFactory::contains(info.type))
-        throw std::runtime_error("Can't auto-rebuild this component: \" "+info.type +"\" - did register it to the EntityFactory?");
+        throw std::runtime_error("Cannot auto-rebuild this component: \" "+info.type +"\" - did it register to the EntityFactory?");
 
     QGenericArgument subscribeArg;
     QGenericArgument idArg = Q_ARG(int64_t, info.id);
@@ -301,7 +308,7 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
                 }
                 if(!found_child)
                 {
-                    throw std::runtime_error("Failed to find all children in time"); //FIXME exceptiontype
+                    throw TimeoutException();
                 }
                 LOG(Debug) << "Found child: " << childInfo.name << ", id: " << childInfo.id << std::endl;
                 idArg = Q_ARG(int64_t, childInfo.id);
