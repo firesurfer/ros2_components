@@ -44,6 +44,17 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
             model->insertRow(model->rowCount(), reflItem);
             model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
         }
+        else if(elem->getType() == "int64_t")
+        {
+            std::string key = "";
+            std::string type ="";
+            int64_t val = *(int64_t*)((SpecificElement<int64_t>*)elem)->getBytes(key,type).data();
+            QStandardItem* reflItem = new QStandardItem(QString::number(val));
+
+            model->insertRow(model->rowCount(), reflItem);
+            model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
+
+        }
 
     };
     entity->IterateThroughAllProperties(func);
