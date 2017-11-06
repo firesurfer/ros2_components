@@ -124,7 +124,7 @@ public:
      * @brief GetCliParser
      * @return
      */
-    CLIParser GetCliParser() const;
+    CLIParser& GetCliParser();
     /**
      * @brief GetNodeState
      * @return The current state of the node

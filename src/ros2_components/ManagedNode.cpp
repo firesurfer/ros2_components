@@ -100,7 +100,7 @@ void ManagedNode::SetLoopRate(int value)
     RosNode->SetLoopRate(value);
 }
 
-CLIParser ManagedNode::GetCliParser() const
+CLIParser& ManagedNode::GetCliParser()
 {
     return cliParser;
 }
