@@ -82,7 +82,8 @@ void NodeContainer::SetLoopRate(int value)
 
 std::string NodeContainer::GetNodeName() const
 {
-    return node_name;
+    //TODO difference between name and real node name!
+    return ros_node->get_name();
 }
 
 int64_t NodeContainer::GetNodeId() const
