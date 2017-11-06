@@ -110,6 +110,7 @@ public:
      * @brief GetNodeId
      * @return
      */
+    [[deprecated("Use GetRosNodeContainer instead")]]
     int64_t GetNodeId();
     /**
      * @brief GetLoopRate
