@@ -76,7 +76,7 @@ public:
      */
     virtual bool publish()
     {
-        LOG(Error) << "Entity:Please override publish function" << std::endl;
+        LOG(Error) << "Entity : Please override publish function" << std::endl;
         return true;
     }
 

@@ -33,7 +33,8 @@ namespace ros2_components
  * @brief The EntityFactory class
  * This is a factory that helps you creating instances of classes that inherit from Entity<MessageType> and that are registered via METAOBJS_INSERT
  * simply call: METAOBJS_INSERT(MyType) for all Types you want to register to the system.
- * Your classes may only have 3 constructor arguments
+ * Your classes may only have 3 constructor arguments.
+ * Usually you will never use this class by yourself. It is always covered by the rebuild methods in the component manager.
  */
 class EntityFactory
 {

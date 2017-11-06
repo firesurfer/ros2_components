@@ -3,6 +3,9 @@
 #include <string>
 namespace  ros2_components {
 
+/**
+ * @brief The BuildInfo class provides a string that contains the date and time of the build. (The time when this file was processed by the preprocessor)
+ */
 class BuildInfo
 {
 public:

@@ -18,6 +18,11 @@ public:
     NodeEntity(uint64_t _id, std::string _name, rclcpp::node::Node::SharedPtr _rosNode);
 
     virtual ~NodeEntity();
+
+    std::string getNode_name() const;
+
+private:
+    std::string node_name;
 };
 }
 

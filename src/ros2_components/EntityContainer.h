@@ -5,6 +5,11 @@
 
 namespace ros2_components
 {
+/**
+ * @brief The EntityContainer class
+ * This is a helper class that wraps a shared pointer to an Entity.
+ * It provides helper functions for determine the type and casting the Entity.
+ */
 class EntityContainer
 {
 public:
@@ -12,7 +17,6 @@ public:
     {
         this->instance =_entity;
         this->className = _entity->getClassName();
-
     }
 
     template<class U>

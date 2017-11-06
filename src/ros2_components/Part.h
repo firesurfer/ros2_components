@@ -34,13 +34,10 @@ public:
     std::shared_ptr<T> getConcreteChildById(int id)
     {
         std::shared_ptr<T> con_ch;
-
-
         con_ch = dynamic_pointer_cast<T>(this->getChildById(id));
         if(con_ch == NULL)
             throw std::runtime_error("Wrong type - can't cast");
         return con_ch;
-
     }
 
 };
