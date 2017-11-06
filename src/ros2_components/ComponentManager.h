@@ -42,7 +42,7 @@
 #include "ros2_simple_logger/Logger.h"
 #include "ros2_components_exceptions.h"
 
-#include "AdvertisementType.h"
+
 #include "EntityFactory.h"
 #include "ComponentInfo.h"
 #include "ComponentInfoFactory.h"
