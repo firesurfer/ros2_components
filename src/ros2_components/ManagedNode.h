@@ -104,6 +104,7 @@ public:
      * @throws NodeNotInitializedException
      * @deprecated Use GetRosNodeContainer instead!
      */
+    [[deprecated("Use GetRosNodeContainer instead")]]
     rclcpp::node::Node::SharedPtr GetRosNode();
     /**
      * @brief GetNodeId
@@ -138,15 +139,10 @@ public:
     NodeContainer::SharedPtr GetRosNodeContainer() const;
 
 protected:
-
-
-
     /**
      * @brief RosNode
      */
     NodeContainer::SharedPtr RosNode;
-
-
     /**
      * @brief BaseEntity
      * The basic entity where the abstraction structure of this node starts from
@@ -168,17 +164,12 @@ protected:
      * @brief cliParser - Parse for commandline arguments
      */
     CLIParser cliParser;
-
     /**
       * @brief nodeEntity Entity that represents this node.
       */
     NodeEntity::SharedPtr nodeEntity;
 
-    std::string nodeName;
-
-
 private:
-
 
     /**
      * @brief CompManager
@@ -186,8 +177,17 @@ private:
      */
     ComponentManager::SharedPtr CompManager;
 
-
+    /**
+     * @brief id_str
+     * Helper variable for the parser
+     */
     std::string id_str= "";
+
+    /**
+     * @brief nodeName
+     * used to store the node name until creation of the node in the Setup method.
+     */
+    std::string nodeName;
 
 
 

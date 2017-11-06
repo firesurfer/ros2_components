@@ -86,6 +86,11 @@ std::string NodeContainer::GetNodeName() const
     return ros_node->get_name();
 }
 
+std::string NodeContainer::GetNodeNameBase() const
+{
+    return node_name;
+}
+
 int64_t NodeContainer::GetNodeId() const
 {
     return node_id;

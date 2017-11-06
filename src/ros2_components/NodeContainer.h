@@ -15,6 +15,7 @@ class NodeContainer
 public:
     typedef std::shared_ptr<NodeContainer> SharedPtr;
     NodeContainer(rclcpp::node::Node::SharedPtr _ros_node, int64_t _node_id, std::string _name);
+
     virtual ~NodeContainer();
     /**
      * @brief Spin the node synchronous.
@@ -51,8 +52,21 @@ public:
      */
     void SetLoopRate(int value);
 
+    /**
+     * @brief GetNodeName
+     * @return - the full name of the node. The full name consists of the base name and the id
+     */
     std::string GetNodeName() const;
-
+    /**
+     * @brief GetNodeNameBase
+     * @return - only the base name
+     * Example: MyNode110 would be the full name. The base name would be MyNode
+     */
+    std::string GetNodeNameBase() const;
+    /**
+     * @brief GetNodeId
+     * @return
+     */
     int64_t GetNodeId() const;
 
     /**
