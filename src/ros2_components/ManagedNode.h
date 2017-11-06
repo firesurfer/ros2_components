@@ -102,6 +102,7 @@ public:
      * @brief GetRosNode
      * @return The encapsulated ros node
      * @throws NodeNotInitializedException
+     * @deprecated Use GetRosNodeContainer instead!
      */
     rclcpp::node::Node::SharedPtr GetRosNode();
     /**
@@ -130,7 +131,10 @@ public:
      * @return The current state of the node
      */
     ManagedNodeState GetNodeState() const;
-
+    /**
+     * @brief GetRosNodeContainer
+     * @return SharedPtr to the NodeContainer
+     */
     NodeContainer::SharedPtr GetRosNodeContainer() const;
 
 protected:
