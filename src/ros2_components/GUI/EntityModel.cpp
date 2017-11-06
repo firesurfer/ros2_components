@@ -33,9 +33,10 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
     model->setVerticalHeaderItem(model->rowCount()-1, desclabeItem);
 
 
+
     auto func = [&](Element* elem )
     {
-        QStandardItem* reflLabelItem = new QStandardItem(QString::fromStdString(elem->getKey()));
+        QStandardItem* reflLabelItem = new QStandardItem("Auto prop: " + QString::fromStdString(elem->getKey()));
         if(elem->getType() == "std::string" || elem->getType() == "string")
         {
             std::string val = ((SpecificElement<std::string>*)elem)->to_string();
@@ -50,6 +51,28 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
             std::string type ="";
             int64_t val = *(int64_t*)((SpecificElement<int64_t>*)elem)->getBytes(key,type).data();
             QStandardItem* reflItem = new QStandardItem(QString::number(val));
+
+            model->insertRow(model->rowCount(), reflItem);
+            model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
+
+        }
+        else if(elem->getType() == "double")
+        {
+
+            std::string key = "";
+            std::string type ="";
+            double val = *(double*)((SpecificElement<double>*)elem)->getBytes(key,type).data();
+            QStandardItem* reflItem = new QStandardItem(QString::number(val));
+
+            model->insertRow(model->rowCount(), reflItem);
+            model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
+        }
+        else if(elem->getType() == "bool")
+        {
+            std::string key = "";
+            std::string type ="";
+            bool val = *(bool*)((SpecificElement<bool>*)elem)->getBytes(key,type).data();
+            QStandardItem* reflItem = new QStandardItem(QString::fromStdString(val ? "true" : "false"));
 
             model->insertRow(model->rowCount(), reflItem);
             model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
