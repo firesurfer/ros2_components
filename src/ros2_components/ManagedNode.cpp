@@ -170,6 +170,7 @@ void ManagedNode::Setup(LogLevel logLevel)
         simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
     //Print the build time. This only works if the file was rebuilt at the moment
     LOG(Info) <<"Build at: "<< BuildInfo::get_build_date() << std::endl;
+    LOG(Info) << "Version: " << BuildInfo::get_build_version() << std::endl;
 
     //Create Componentmanager with nodeEntity as base
     this->CompManager = std::make_shared<ComponentManager>(this->RosNode->GetRosNode());

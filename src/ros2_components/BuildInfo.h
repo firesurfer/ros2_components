@@ -13,6 +13,16 @@ public:
     {
         return std::string(__DATE__) + "  " + std::string(__TIME__);
     }
+
+    static std::string get_build_version()
+    {
+#ifndef BUILD_VERSION
+#warning "BUILD_VERSION variable not set"
+#define BUILD_VERSION "not set"
+#endif
+        return std::string(BUILD_VERSION);
+
+    }
 };
 }
 #endif // BUILDINFO_H
