@@ -41,7 +41,7 @@ public:
     std::string parentType;
     std::vector<int64_t> childIds;
     std::vector<std::string> childTypes;
-    int64_t machineip;
+    uint32_t machineip;
     std::string nodename;
     bool subscriber;
 
