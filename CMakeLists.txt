@@ -7,6 +7,11 @@ if(NOT WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wall -Wextra -fPIC")
 endif()
 
+IF (NOT DEFINED BUILD_VERSION)
+    SET(BUILD_VERSION "not set")
+ENDIF()
+ADD_DEFINITIONS(-DBUILD_VERSION="${BUILD_VERSION}")
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package (Threads REQUIRED)
 find_package(ament_cmake REQUIRED)
