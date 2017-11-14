@@ -73,9 +73,9 @@ ComponentInfo ComponentInfoFactory::fromComponentChangedMessage(ros2_components_
     return info;
 }
 
-int64_t ComponentInfoFactory::getLocalIpV4()
+uint32_t ComponentInfoFactory::getLocalIpV4()
 {
-    int64_t ipAddr =0;
+    uint32_t ipAddr = 0;
     foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if(!interface.name().contains("vmnet"))

@@ -48,7 +48,7 @@ public:
      * @brief GetLocalIpV4
      * @return The local ipv4 address
      */
-    static int64_t getLocalIpV4();
+    static uint32_t getLocalIpV4();
     /**
      * @brief getLocalIpV6
      * @return  The local ipv6 address
