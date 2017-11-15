@@ -15,7 +15,7 @@ NodeEntity::~NodeEntity()
 
 }
 
-std::string NodeEntity::getNode_name() const
+std::string NodeEntity::getNodeName() const
 {
     return node_name;
 }

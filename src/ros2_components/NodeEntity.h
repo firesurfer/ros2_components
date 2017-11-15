@@ -19,7 +19,7 @@ public:
 
     virtual ~NodeEntity();
 
-    std::string getNode_name() const;
+    std::string getNodeName() const;
 
 private:
     std::string node_name;
