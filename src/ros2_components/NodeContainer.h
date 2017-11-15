@@ -18,62 +18,62 @@ public:
 
     virtual ~NodeContainer();
     /**
-     * @brief Spin the node synchronous.
+     * @brief spin the node synchronous.
      * @param timeout - in case timeout is != -1 it will add the node to an singlethreaded executor and call spin once on the node with the given timeout. Otherwise spin_some is called.
      */
-    void Spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
+    void spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
     /**
-     * @brief SpinAsync - Spins the node in a second thread by calling spin_some on the node with the given loop rate
+     * @brief spinAsync - Spins the node in a second thread by calling spin_some on the node with the given loop rate
      */
-    void SpinAsync();
+    void spinAsync();
     /**
-     * @brief GetRosNode
+     * @brief getRosNode
      * @return  The internal rosnode
      */
-    rclcpp::node::Node::SharedPtr GetRosNode();
+    rclcpp::node::Node::SharedPtr getRosNode();
     /**
-     * @brief GetIsSpinning
+     * @brief getIsSpinning
      * @return True in case the node is spinning at the moment (Is also set to true in case of async spin)
      */
-    bool GetIsSpinning() const;
+    bool getIsSpinning() const;
     /**
-     * @brief GetIsSpinningAsync
+     * @brief getIsSpinningAsync
      * @return True in case the node is spinning async.
      */
-    bool GetIsSpinningAsync() const;
+    bool getIsSpinningAsync() const;
     /**
-     * @brief GetLoopRate
+     * @brief getLoopRate
      * @return  The loop rate for async spinning
      */
-    int GetLoopRate() const;
+    int getLoopRate() const;
     /**
-     * @brief SetLoopRate
+     * @brief setLoopRate
      * @param value The loop rate for async spinning
      */
-    void SetLoopRate(int value);
+    void setLoopRate(int value);
 
     /**
-     * @brief GetNodeName
+     * @brief getNodeName
      * @return - the full name of the node. The full name consists of the base name and the id
      */
-    std::string GetNodeName() const;
+    std::string getNodeName() const;
     /**
-     * @brief GetNodeNameBase
+     * @brief getNodeNameBase
      * @return - only the base name
      * Example: MyNode110 would be the full name. The base name would be MyNode
      */
-    std::string GetNodeNameBase() const;
+    std::string getNodeNameBase() const;
     /**
-     * @brief GetNodeId
+     * @brief getNodeId
      * @return
      */
-    int64_t GetNodeId() const;
+    int64_t getNodeId() const;
 
     /**
-     * @brief Ok
+     * @brief ok
      * @return False in case node was destroyed or rclcpp::ok returns false
      */
-    bool Ok();
+    bool ok();
 
 private:
     rclcpp::node::Node::SharedPtr ros_node;

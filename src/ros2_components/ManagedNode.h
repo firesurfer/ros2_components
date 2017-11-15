@@ -56,88 +56,88 @@ public:
     ManagedNode(std::string nodeName,int argc, char* argv[], bool parseCli = true);
     virtual ~ManagedNode();
     /**
-     * @brief DoWork
+     * @brief doWork
      * Override this function in order to perform tasks that need to be performed more than once.
      */
-    virtual void DoWork();
+    virtual void doWork();
     /**
-     * @brief Exit
-     * Call Exit in order to stop the spin function and in case Start(true) was called the call of the DoWork function.
-     * Exit gets called in the destructor.
+     * @brief exit
+     * Call exit in order to stop the spin function and in case Start(true) was called the call of the doWork function.
+     * exit gets called in the destructor.
      */
-    virtual void Exit();
+    virtual void exit();
     /**
-     * @brief Setup
+     * @brief setup
      * Do basic setup tasks after creating a node
      */
-    void Setup();
+    void setup();
     /**
-     * @brief Setup
+     * @brief setup
      * @param logLevel
-     * Initiate the logger with a specific log level instead of LogLevel::Info @see Setup
+     * Initiate the logger with a specific log level instead of LogLevel::Info @see setup
      */
-    virtual void Setup(LogLevel logLevel);
+    virtual void setup(LogLevel logLevel);
     /**
-     * @brief Spin - Spin this node (manually)
+     * @brief spin - Spin this node (manually)
      * @throws NodeNotInitializedException
      */
-    virtual void Spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
+    virtual void spin(std::chrono::nanoseconds timeout = std::chrono::nanoseconds(-1));
     /**
-     * @brief SpinAsync
+     * @brief spinAsync
      * Start the spin function in an extra thread
      * @throws NodeNotInitializedException
      */
-    virtual void SpinAsync();
+    virtual void spinAsync();
     /**
-     * @brief Ok
+     * @brief ok
      * @return If the node is still ok -> Otherwise you should stop spinning!
      */
-    virtual bool Ok() const;
+    virtual bool ok() const;
     /**
-     * @brief GetComponentManager
+     * @brief getComponentManager
      * @return The component manager
      */
-    ComponentManager::SharedPtr GetComponentManager();
+    ComponentManager::SharedPtr getComponentManager();
     /**
-     * @brief GetRosNode
+     * @brief getRosNode
      * @return The encapsulated ros node
      * @throws NodeNotInitializedException
-     * @deprecated Use GetRosNodeContainer instead!
+     * @deprecated Use getRosNodeContainer instead!
      */
-    [[deprecated("Use GetRosNodeContainer instead")]]
-    rclcpp::node::Node::SharedPtr GetRosNode();
+    [[deprecated("Use getRosNodeContainer instead")]]
+    rclcpp::node::Node::SharedPtr getRosNode();
     /**
-     * @brief GetNodeId
+     * @brief getNodeId
      * @return
      */
-    [[deprecated("Use GetRosNodeContainer instead")]]
-    int64_t GetNodeId();
+    [[deprecated("Use getRosNodeContainer instead")]]
+    int64_t getNodeId();
     /**
-     * @brief GetLoopRate
+     * @brief getLoopRate
      * @return Looprate for async spin
      * @throws NodeNotInitializedException
      */
-    int GetLoopRate() const;
+    int getLoopRate() const;
     /**
-     * @brief SetLoopRate
+     * @brief setLoopRate
      * @param value - loop rate for async spin
      */
-    void SetLoopRate(int value);
+    void setLoopRate(int value);
     /**
-     * @brief GetCliParser
+     * @brief getCliParser
      * @return
      */
-    CLIParser& GetCliParser();
+    CLIParser& getCliParser();
     /**
-     * @brief GetNodeState
+     * @brief getNodeState
      * @return The current state of the node
      */
-    ManagedNodeState GetNodeState() const;
+    ManagedNodeState getNodeState() const;
     /**
-     * @brief GetRosNodeContainer
+     * @brief getRosNodeContainer
      * @return SharedPtr to the NodeContainer
      */
-    NodeContainer::SharedPtr GetRosNodeContainer() const;
+    NodeContainer::SharedPtr getRosNodeContainer() const;
 
 protected:
     /**
@@ -186,7 +186,7 @@ private:
 
     /**
      * @brief nodeName
-     * used to store the node name until creation of the node in the Setup method.
+     * used to store the node name until creation of the node in the setup method.
      */
     std::string nodeName;
 

@@ -69,7 +69,7 @@ public:
     virtual ~ComponentManager();
     /**
      * Tell the component manager to start publishing its entities. This should be called once the base entity is ready
-     * and all its childs are added to it (usually at the end of Setup()). After calling this, dynamically added components will be published automatically.
+     * and all its childs are added to it (usually at the end of setup()). After calling this, dynamically added components will be published automatically.
      * If the node does not have components it wants to publish, this does not have to be called
      * @param _baseEntity the nodes' base entity
      */

@@ -16,7 +16,7 @@ NodeContainer::~NodeContainer()
         spinThread->join();
 }
 
-void NodeContainer::Spin(std::chrono::nanoseconds timeout)
+void NodeContainer::spin(std::chrono::nanoseconds timeout)
 {
     if(isSpinning)
         throw AlreadySpinningException();
@@ -33,7 +33,7 @@ void NodeContainer::Spin(std::chrono::nanoseconds timeout)
     isSpinning = false;
 }
 
-void NodeContainer::SpinAsync()
+void NodeContainer::spinAsync()
 {
     if(isSpinning)
         throw AlreadySpinningException();
@@ -55,48 +55,48 @@ void NodeContainer::SpinAsync()
     this->isSpinningAsync = true;
 }
 
-rclcpp::node::Node::SharedPtr NodeContainer::GetRosNode()
+rclcpp::node::Node::SharedPtr NodeContainer::getRosNode()
 {
     return ros_node;
 }
 
-bool NodeContainer::GetIsSpinning() const
+bool NodeContainer::getIsSpinning() const
 {
     return isSpinning;
 }
 
-bool NodeContainer::GetIsSpinningAsync() const
+bool NodeContainer::getIsSpinningAsync() const
 {
     return isSpinningAsync;
 }
 
-int NodeContainer::GetLoopRate() const
+int NodeContainer::getLoopRate() const
 {
     return loop_rate;
 }
 
-void NodeContainer::SetLoopRate(int value)
+void NodeContainer::setLoopRate(int value)
 {
     loop_rate = value;
 }
 
-std::string NodeContainer::GetNodeName() const
+std::string NodeContainer::getNodeName() const
 {
     //TODO difference between name and real node name!
     return ros_node->get_name();
 }
 
-std::string NodeContainer::GetNodeNameBase() const
+std::string NodeContainer::getNodeNameBase() const
 {
     return node_name;
 }
 
-int64_t NodeContainer::GetNodeId() const
+int64_t NodeContainer::getNodeId() const
 {
     return node_id;
 }
 
-bool NodeContainer::Ok()
+bool NodeContainer::ok()
 {
     return rclcpp::ok();
 }

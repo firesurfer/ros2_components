@@ -20,7 +20,7 @@ public:
     }
 
     template<class U>
-    bool IsType()
+    bool isType()
     {
         return dynamic_pointer_cast<U>(instance) != nullptr;
     }
@@ -30,7 +30,7 @@ public:
      * @throws EntityCastException if the cast was unsucessfull
      */
     template<class U>
-    std::shared_ptr<U> Cast()
+    std::shared_ptr<U> cast()
     {
         std::shared_ptr<U> ent = dynamic_pointer_cast<U>(instance);
         if(!ent)
