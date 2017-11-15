@@ -270,7 +270,9 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
     auto startTime = std::chrono::system_clock::now();
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
     if(!EntityFactory::contains(info.type))
-        throw std::runtime_error("Cannot auto-rebuild this component: \" "+info.type +"\" - did it register to the EntityFactory?");
+    {
+        throw EntityNotRegisteredException();
+    }
 
     QGenericArgument subscribeArg;
     QGenericArgument idArg = Q_ARG(int64_t, info.id);
@@ -310,7 +312,6 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
                 {
                     throw TimeoutException();
                 }
-                LOG(Debug) << "Found child: " << childInfo.name << ", id: " << childInfo.id << std::endl;
                 idArg = Q_ARG(int64_t, childInfo.id);
 
                 //LOG(Debug) << "Childinfo : subscriber: " << childInfo.subscriber << std::endl;

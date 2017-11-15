@@ -7,6 +7,8 @@
 #include <QHash>
 #include "EntityWidget.h"
 
+#include "ros2_components_exceptions.h"
+
 namespace  ros2_components {
 
 //As proposed in https://stackoverflow.com/questions/19503583/qt-meta-system-call-constructor-with-parameters

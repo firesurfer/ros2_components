@@ -39,6 +39,7 @@
 /*ros2_components*/
 #include "Reflect.h"
 #include "ComponentInfo.h"
+#include "ros2_components_exceptions.h"
 
 /*Qt5*/
 #include <QObject>
@@ -124,7 +125,7 @@ public:
         EntityBase::SharedPtr child = getChildById(id);
         std::shared_ptr<T> casted_child = dynamic_pointer_cast<T>(child);
         if(!casted_child)
-            throw std::runtime_error("Could not cast child: " + std::to_string(id) + " to given type T");
+            throw EntityCastException();
         return casted_child;
     }
     /**

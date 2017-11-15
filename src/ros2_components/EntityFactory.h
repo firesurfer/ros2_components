@@ -23,6 +23,8 @@
 #include <QHash>
 #include "Entity.h"
 
+#include "ros2_components_exceptions.h"
+
 namespace ros2_components
 {
 

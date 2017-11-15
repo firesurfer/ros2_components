@@ -12,7 +12,7 @@ EntityWidgetFactory::EntityWidgetFactory()
 EntityWidget *EntityWidgetFactory::CreateInstanceFromName(string className, QGenericArgument arg1, QGenericArgument arg2)
 {
     if(!metaWidgetObjs.keys().contains(QString::fromStdString(className)))
-        throw std::runtime_error("Class with name: " +className+" not registered");
+        throw EntityWidgetNotRegisteredException("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaWidgetObjs[QString::fromStdString(className)];
     LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;
@@ -24,7 +24,7 @@ EntityWidget *EntityWidgetFactory::CreateInstanceFromName(string className, QGen
     EntityWidget* widget = dynamic_cast<EntityWidget*>(o);
 
     if(widget == NULL)
-        throw std::runtime_error("Could not cast QObject* to EntityWidget* - The EntityWidgetFactory is for EntityWidgets only");
+        throw EntityWidgetCastException("Could not cast QObject* to EntityWidget* - The EntityWidgetFactory is for EntityWidgets only");
     return widget;
 
 }
@@ -32,7 +32,7 @@ EntityWidget *EntityWidgetFactory::CreateInstanceFromName(string className, QGen
 EntityWidget *EntityWidgetFactory::CreateInstanceFromName(string className, QGenericArgument arg1)
 {
     if(!metaWidgetObjs.keys().contains(QString::fromStdString(className)))
-        throw std::runtime_error("Class with name: " +className+" not registered");
+        throw EntityWidgetNotRegisteredException("Class with name: " +className+" not registered");
 
     const QMetaObject *meta = metaWidgetObjs[QString::fromStdString(className)];
     LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;
@@ -44,7 +44,7 @@ EntityWidget *EntityWidgetFactory::CreateInstanceFromName(string className, QGen
     EntityWidget* widget = dynamic_cast<EntityWidget*>(o);
 
     if(widget == NULL)
-        throw std::runtime_error("Could not cast QObject* to EntityWidget* - The EntityWidgetFactory is for EntityWidgets only");
+        throw EntityWidgetCastException("Could not cast QObject* to EntityWidget* - The EntityWidgetFactory is for EntityWidgets only");
     return widget;
 }
 

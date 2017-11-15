@@ -18,6 +18,8 @@
 
 #pragma once
 #include "Entity.h"
+
+#include "ros2_components_exceptions.h"
 namespace ros2_components
 {
 template <typename MessageType>
@@ -36,7 +38,7 @@ public:
         std::shared_ptr<T> con_ch;
         con_ch = dynamic_pointer_cast<T>(this->getChildById(id));
         if(con_ch == NULL)
-            throw std::runtime_error("Wrong type - can't cast");
+            throw EntityCastException("Wrong type - can't cast");
         return con_ch;
     }
 

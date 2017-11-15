@@ -125,7 +125,7 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
     };
     if (has_child(child, this))
     {
-      throw std::runtime_error("Adding Child " + child->getName() + " to " + getName()
+      throw EntityCircleException("Adding Child " + child->getName() + " to " + getName()
                                + " creates cycle");
     }
 
@@ -142,7 +142,7 @@ void EntityBase::removeChild(std::shared_ptr<EntityBase> child, bool remote)
         childs.erase(iteratorPos);
     }
     else
-        throw std::runtime_error("Can't remove given child - child not found!");
+        throw MissingChildException("Can't remove given child - child not found!");
     emit childRemoved(child,shared_from_this(), remote);
 }
 
@@ -155,7 +155,7 @@ std::shared_ptr<EntityBase> EntityBase::getChildById(int64_t id)
             return child;
         }
     }
-    throw std::runtime_error("Child with id: " + std::to_string(id) + " not found");
+    throw MissingChildException("Child with id: " + std::to_string(id) + " not found");
 }
 
 uint64_t EntityBase::countChilds()

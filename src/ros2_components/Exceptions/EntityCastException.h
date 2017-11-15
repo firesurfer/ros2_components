@@ -2,16 +2,19 @@
 #define ENTITYCASTEXCEPTION
 
 #include <exception>
+#include <string>
 
 class EntityCastException: public std::exception
 {
 public:
-    EntityCastException();
+    explicit EntityCastException(const std::string& msg = "Could not cast entity to given type");
 
     virtual const char* what() const throw()
     {
-        return "Could not cast entity to given type";
+        return message.c_str();
     }
+private:
+    std::string message;
 };
 
 #endif //ENTITYCASTEXCEPTION

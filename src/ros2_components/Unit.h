@@ -17,6 +17,8 @@
 #pragma once
 
 #include "Entity.h"
+
+#include "ros2_components_exceptions.h"
 /**
  * This class represents a unit of an actor and a sensor. Usefull e.g. if you have a part of your robot e.g. a joint
  * that can be used for setting commands to the hardware and reading parameter from the hardware
@@ -50,7 +52,7 @@ public:
                 return  actor;
         }
 
-        throw std::runtime_error("Could not find any actor");
+        throw MissingChildException("Could not find any actor");
 
     }
     std::shared_ptr<SensorType> getFirstSensor()
@@ -61,7 +63,7 @@ public:
             if(sensor != NULL)
                 return  sensor;
         }
-        throw std::runtime_error("Could not find any sensor");
+        throw MissingChildException("Could not find any sensor");
 
     }
     virtual bool publish()
