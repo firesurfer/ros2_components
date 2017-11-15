@@ -37,17 +37,17 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : c
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Subscriptions
-    this->ListComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse", std::bind(&ComponentManager::ListComponentsResponseCallback, this,_1), component_manager_profile);
+    this->listComponentsResponseSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
 
     //Publishers
-    this->ListComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest",component_manager_profile);
+    this->listComponentsRequestPublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
     std::srand(std::time(0)); // use current time as seed for random generator
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 
 
     //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
-    this->ListComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("ListComponentsRequest", std::bind(&ComponentManager::ListComponentsRequestCallback, this,_1), component_manager_profile);
-    this->ListComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("ListComponentsResponse",component_manager_profile);
+    this->listComponentsRequestSubscription = RosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest", std::bind(&ComponentManager::listComponentsRequestCallback, this,_1), component_manager_profile);
+    this->listComponentsResponsePublisher = RosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse",component_manager_profile);
 }
 
 ComponentManager::~ComponentManager()
@@ -70,32 +70,32 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
     //Connect to entity structure change callbacks
     auto func = [&](EntityBase::SharedPtr child)
     {
-        connect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
-        connect(child.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
-        connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
+        connect(child.get(), &EntityBase::childAdded, this, &ComponentManager::onChildAdded, Qt::DirectConnection);
+        connect(child.get(), &EntityBase::childRemoved,this, &ComponentManager::onChildRemoved, Qt::DirectConnection);
+        connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::onEntityDeleted, Qt::DirectConnection);
     };
-    connect(BaseEntity.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded, Qt::DirectConnection);
-    connect(BaseEntity.get(), &EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved, Qt::DirectConnection);
-    connect(BaseEntity.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted, Qt::DirectConnection);
+    connect(BaseEntity.get(), &EntityBase::childAdded, this, &ComponentManager::onChildAdded, Qt::DirectConnection);
+    connect(BaseEntity.get(), &EntityBase::childRemoved,this, &ComponentManager::onChildRemoved, Qt::DirectConnection);
+    connect(BaseEntity.get(), &EntityBase::entityDeleted,this, &ComponentManager::onEntityDeleted, Qt::DirectConnection);
     //Call lambda
     BaseEntity->iterateThroughAllChilds(func);
 
     //Tell other nodes about entities
-    GenerateResponse();
+    generateResponse();
 }
 
-std::vector<ComponentInfo> ComponentManager::ListComponents()
+std::vector<ComponentInfo> ComponentManager::listComponents()
 {
     ReaderGuard rg(this);
     return Components;
 }
 
-std::vector<string> ComponentManager::ListNodes()
+std::vector<string> ComponentManager::listNodes()
 {
     return this->RosNode->get_node_graph_interface()->get_node_names();
 }
 
-std::vector<ComponentInfo> ComponentManager::ListComponentsBy(std::function<bool(const ComponentInfo&)> filter)
+std::vector<ComponentInfo> ComponentManager::listComponentsBy(std::function<bool(const ComponentInfo&)> filter)
 {
     std::vector<ComponentInfo> ret;
     {
@@ -111,7 +111,7 @@ std::vector<ComponentInfo> ComponentManager::ListComponentsBy(std::function<bool
     return ret;
 }
 
-ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const ComponentInfo &)> filter, bool *success, std::chrono::milliseconds timeout)
+ComponentInfo ComponentManager::getInfoWithFilter(std::function<bool (const ComponentInfo &)> filter, bool *success, std::chrono::milliseconds timeout)
 {
     auto startTime = std::chrono::system_clock::now();
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
@@ -142,7 +142,7 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
 
         //Disconnects the connection when it goes out of scope
         auto auto_disconnect = [] (QMetaObject::Connection* con) { QObject::disconnect(*con); delete con; };
-        std::unique_ptr<QMetaObject::Connection, decltype(auto_disconnect)> connection(new QMetaObject::Connection(QObject::connect(this, &ComponentManager::NewComponentFound, newComponentFunc)), auto_disconnect);
+        std::unique_ptr<QMetaObject::Connection, decltype(auto_disconnect)> connection(new QMetaObject::Connection(QObject::connect(this, &ComponentManager::newComponentFound, newComponentFunc)), auto_disconnect);
 
         while (!found && rclcpp::ok())
         {
@@ -176,24 +176,24 @@ ComponentInfo ComponentManager::GetInfoWithFilter(std::function<bool (const Comp
     return relevantInfo;
 }
 
-ComponentInfo ComponentManager::GetInfoToId(int64_t id, bool *success, std::chrono::milliseconds timeout)
+ComponentInfo ComponentManager::getInfoToId(int64_t id, bool *success, std::chrono::milliseconds timeout)
 {
     auto filter = [id] (const ComponentInfo& info) -> bool
     {
         return info.id == id;
     };
-    return GetInfoWithFilter(filter, success, timeout);
+    return getInfoWithFilter(filter, success, timeout);
 }
 
-void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout)
+void ComponentManager::getInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout)
 {
     auto startTime = std::chrono::system_clock::now();
 
-    //Impersonating a Reader prevents this to miss a NewComponentFound signal after checking already existing components
+    //Impersonating a Reader prevents this to miss a newComponentFound signal after checking already existing components
     ReaderGuard rg(this);
 
     bool found = false;
-    ComponentInfo info = GetInfoWithFilter(filter, &found);
+    ComponentInfo info = getInfoWithFilter(filter, &found);
     if (found)
     {
         callback(info);
@@ -222,7 +222,7 @@ void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)>
                 this->callbacks.erase(callback_it);
             }
         };
-        *callback_it = QObject::connect(this, &ComponentManager::NewComponentFound, full_callback);
+        *callback_it = QObject::connect(this, &ComponentManager::newComponentFound, full_callback);
 
         if (timeout >= std::chrono::milliseconds::zero())
         {
@@ -249,23 +249,23 @@ void ComponentManager::GetInfoWithFilterAsync(std::function<void(ComponentInfo)>
     }
 }
 
-void ComponentManager::GetInfoToIdAsync(std::function<void (ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout)
+void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout)
 {
     auto filter = [id] (const ComponentInfo& info) -> bool
     {
         return info.id == id;
     };
-    return GetInfoWithFilterAsync(callback, filter, timeout);
+    return getInfoWithFilterAsync(callback, filter, timeout);
 }
 
 void ComponentManager::UpdateComponentsList()
 {
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
     request->nodename = RosNode->get_name();
-    this->ListComponentsRequestPublisher->publish(request);
+    this->listComponentsRequestPublisher->publish(request);
 }
 
-std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentInfo & info, bool rebuildHierarchy, bool forcePubOrSubChange, std::chrono::milliseconds timeout)
+std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentInfo & info, bool rebuildHierarchy, bool forcePubOrSubChange, std::chrono::milliseconds timeout)
 {
     auto startTime = std::chrono::system_clock::now();
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
@@ -297,7 +297,7 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
                 bool found_child = false;
                 if (waitIndefinitely)
                 {
-                    childInfo = GetInfoToId(child_id, &found_child, timeout);
+                    childInfo = getInfoToId(child_id, &found_child, timeout);
                 }
                 else
                 {
@@ -306,7 +306,7 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
                     {
                         remaining_timeout = std::chrono::milliseconds::zero();
                     }
-                    childInfo = GetInfoToId(child_id, &found_child, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
+                    childInfo = getInfoToId(child_id, &found_child, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
                 }
                 if(!found_child)
                 {
@@ -331,21 +331,21 @@ std::shared_ptr<EntityBase> ComponentManager::RebuildComponent(const ComponentIn
     return ent;
 }
 
-void ComponentManager::ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
+void ComponentManager::listComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
     if(RosNode->get_name() != msg->nodename)
     {
-        GenerateResponse();
+        generateResponse();
     }
 }
 
-void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
+void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
 {
     if(RosNode->get_name() != msg->nodename)
     {
         bool foundInList = false;
         bool toDelete = false;
-        ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
+        ComponentInfo currentInfo = ComponentInfoFactory::fromlistComponentsResponseMessage(msg);
         {
             ReaderGuard rg(this);
             for(ComponentInfo & myInfo: Components)
@@ -359,7 +359,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
                     {
                         //TODO implement comparison for component info
                         myInfo = currentInfo;
-                        emit ComponentChanged(myInfo);
+                        emit componentChanged(myInfo);
 
                     }
                     else
@@ -368,7 +368,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
                         toDelete = true;
                         //TODO delete from list more efficient
                         LOG(Info) << "Deleting: " << myInfo.name << std::endl;
-                        emit ComponentDeleted(myInfo);
+                        emit componentDeleted(myInfo);
 
                     }
                     break;
@@ -389,7 +389,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
                 Components.push_back(currentInfo);
 
                 lck.unlock(); //Connected functions could try to read -> deadlock!
-                emit NewComponentFound(currentInfo);
+                emit newComponentFound(currentInfo);
             }
             if(toDelete)
             {
@@ -415,7 +415,7 @@ void ComponentManager::ListComponentsResponseCallback(ros2_components_msg::msg::
     }
 }
 
-void ComponentManager::GenerateResponse()
+void ComponentManager::generateResponse()
 {
     auto responseFunc = [&]()
     {
@@ -424,13 +424,13 @@ void ComponentManager::GenerateResponse()
             ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(this->BaseEntity).toRosMessage();
             msg->nodename = RosNode->get_name();
             msg->deleted = false;
-            this->ListComponentsResponsePublisher->publish(msg);
+            this->listComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
             {
                 auto respMsg = ComponentInfoFactory::fromEntity(ent).toRosMessage();
                 respMsg->nodename = RosNode->get_name();
                 respMsg->deleted = false;
-                this->ListComponentsResponsePublisher->publish(respMsg);
+                this->listComponentsResponsePublisher->publish(respMsg);
             };
 
             this->BaseEntity->iterateThroughAllChilds(iteratingFunc);
@@ -440,38 +440,38 @@ void ComponentManager::GenerateResponse()
     responseFunc();
 }
 
-void ComponentManager::OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
+void ComponentManager::onChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
     UNUSED(parent);
     UNUSED(remote);
     LOG(Info) << "Child added: " << child->getName() << std::endl;
     //Connect to add events
-    connect(child.get(),&EntityBase::childAdded,this, &ComponentManager::OnChildAdded);
-    connect(child.get(),&EntityBase::childRemoved,this, &ComponentManager::OnChildRemoved);
-    connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::OnEntityDeleted);
+    connect(child.get(),&EntityBase::childAdded,this, &ComponentManager::onChildAdded);
+    connect(child.get(),&EntityBase::childRemoved,this, &ComponentManager::onChildRemoved);
+    connect(child.get(), &EntityBase::entityDeleted,this, &ComponentManager::onEntityDeleted);
     //Publish component information
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = false;
-    this->ListComponentsResponsePublisher->publish(msg);
+    this->listComponentsResponsePublisher->publish(msg);
 
 }
 
-void ComponentManager::OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
+void ComponentManager::onChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote)
 {
     UNUSED(parent);
     UNUSED(remote);
     LOG(Info) << "Child removed: " << child->getName() << std::endl;
-    disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::OnChildAdded);
-    disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::OnChildRemoved);
+    disconnect(child.get(), &EntityBase::childAdded, this, &ComponentManager::onChildAdded);
+    disconnect(child.get(), &EntityBase::childRemoved, this, &ComponentManager::onChildRemoved);
 
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(child).toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = true;
-    this->ListComponentsResponsePublisher->publish(msg);
+    this->listComponentsResponsePublisher->publish(msg);
 }
 
-void ComponentManager::OnEntityDeleted(ComponentInfo info)
+void ComponentManager::onEntityDeleted(ComponentInfo info)
 {
 
 
@@ -479,7 +479,7 @@ void ComponentManager::OnEntityDeleted(ComponentInfo info)
     ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = info.toRosMessage();
     msg->nodename = RosNode->get_name();
     msg->deleted = true;
-    this->ListComponentsResponsePublisher->publish(msg);
+    this->listComponentsResponsePublisher->publish(msg);
 }
 
 ComponentManager::ReaderGuard::ReaderGuard(ComponentManager* comp) : cm(comp)

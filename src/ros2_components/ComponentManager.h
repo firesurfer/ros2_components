@@ -75,57 +75,57 @@ public:
      */
     void registerComponents(EntityBase::SharedPtr _baseEntity);
     /**
-     * @brief ListComponents
+     * @brief listComponents
      * @return vector of all currently listed components
      */
 
-    std::vector<ComponentInfo> ListComponents();
+    std::vector<ComponentInfo> listComponents();
     /**
-     * @brief ListNodes
+     * @brief listNodes
      * @return List of all found nodes
      */
-    std::vector<std::string> ListNodes(); //TODO move?
+    std::vector<std::string> listNodes(); //TODO move?
     /**
-     * @brief ListComponentsBy
+     * @brief listComponentsBy
      * @param filter
      * @return List of ComponentInfo objects that are matched by the given ComponentListFilter
      */
-    std::vector<ComponentInfo> ListComponentsBy(std::function<bool(const ComponentInfo&)> filter);
+    std::vector<ComponentInfo> listComponentsBy(std::function<bool(const ComponentInfo&)> filter);
     /**
-     * @brief GetInfoWithFilter gets the first Component which matches the filter
+     * @brief getInfoWithFilter gets the first Component which matches the filter
      * @param filter the filter
      * @param success will be set to true if a Component was found before timeout and false if not
      * @param timeout in milliseconds. Waits indefinitely if negative
      * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
      * @throws TimeoutException when no component matching the filter was found after {@param timeout} time
      */
-    ComponentInfo GetInfoWithFilter(std::function<bool(const ComponentInfo&)> filter, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    ComponentInfo getInfoWithFilter(std::function<bool(const ComponentInfo&)> filter, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
-     * @brief GetInfoToId
+     * @brief getInfoToId
      * @param id
      * @param success will be set to true if a Component was found before timeout and false if not
      * @param timeout in milliseconds. Waits indefinitely if negative
      * @throws AlreadySpinningException if a rclcpp::executor is already running, and this method waits for the Component. Will not happen with a timeout of 0ms
      * @throws TimeoutException when no component with id {@param id} was found after {@param timeout} time
      */
-    ComponentInfo GetInfoToId(int64_t id, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    ComponentInfo getInfoToId(int64_t id, bool* success = nullptr, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
     /**
-     * @brief GetInfoWithFilterAsync gets the first Component which matches the filter and calls the callback on it
+     * @brief getInfoWithFilterAsync gets the first Component which matches the filter and calls the callback on it
      * @param callback the callback to call when the component is found
      * @param filter the filter
      * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout negative (default)
      */
-    void GetInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
+    void getInfoWithFilterAsync(std::function<void(ComponentInfo)> callback, std::function<bool(const ComponentInfo&)> filter, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
     /**
-     * @brief GetInfoWithFilterAsync gets the first Component with given id and calls the callback on it
+     * @brief getInfoWithFilterAsync gets the first Component with given id and calls the callback on it
      * @param callback the callback to call when the component is found
      * @param id the id
      * @param timeout will call @callback with an default-initialized ComponentInfo when it timeouts. Will not time out if @param timeout negative (default)
      */
-    void GetInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
+    void getInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
     /**
      * @brief UpdateComponentsList
-     * Publishes a message to the ListComponentsRequest topic.
+     * Publishes a message to the listComponentsRequest topic.
      */
     void UpdateComponentsList();
 
@@ -138,19 +138,19 @@ public:
      *  @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    std::shared_ptr<T> rebuildComponent(std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         auto startTime = std::chrono::system_clock::now();
         bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
         bool found;
-        ComponentInfo relevantInfo = GetInfoWithFilter(filter, &found, timeout);
+        ComponentInfo relevantInfo = getInfoWithFilter(filter, &found, timeout);
 
         if (found)
         {
             std::shared_ptr<T> ent;
             if (waitIndefinitely)
             {
-                ent = RebuildComponent<T>(relevantInfo, rebuildHierarchy, timeout);
+                ent = rebuildComponent<T>(relevantInfo, rebuildHierarchy, timeout);
             }
             else
             {
@@ -159,7 +159,7 @@ public:
                 {
                     remaining_timeout = std::chrono::milliseconds::zero();
                 }
-                ent = RebuildComponent<T>(relevantInfo, rebuildHierarchy, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
+                ent = rebuildComponent<T>(relevantInfo, rebuildHierarchy, std::chrono::duration_cast<std::chrono::milliseconds>(remaining_timeout));
             }
             return ent;
         }
@@ -177,13 +177,13 @@ public:
      *  @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    std::shared_ptr<T> rebuildComponent(int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
         auto filter = [id] (const ComponentInfo& info) -> bool
         {
             return (info.id == id);
         };
-        return RebuildComponent<T>(filter, rebuildHierarchy, timeout);
+        return rebuildComponent<T>(filter, rebuildHierarchy, timeout);
     }
 
     /**
@@ -194,7 +194,7 @@ public:
      *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if negative; defaults to negative
      */
     template<typename T>
-    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
+    void rebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, std::function<bool(const ComponentInfo&)> filter, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
     {
         //Nested shared_ptr is intended here
         std::shared_ptr<std::shared_ptr<T> > entityCache = std::make_shared<std::shared_ptr<T> >(nullptr);
@@ -229,7 +229,7 @@ public:
 
             if (relevant && relevantIds->empty())
             {
-                *entityCache = RebuildComponent<T>(*parent, rebuildHierarchy);
+                *entityCache = rebuildComponent<T>(*parent, rebuildHierarchy);
                 return true;
             }
             return false;
@@ -248,7 +248,7 @@ public:
             }
         };
 
-        GetInfoWithFilterAsync(fullCallback, fullFilter, timeout);
+        getInfoWithFilterAsync(fullCallback, fullFilter, timeout);
     }
     /**
      *  Rebuild Component from the given id and call the callback with it, will return immediately
@@ -258,13 +258,13 @@ public:
      *  @param timeout in milliseconds, will pass empty shared_ptr to the callback if it times out. Waits indefinitely if negative (default)
      */
     template<typename T>
-    void RebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
+    void rebuildComponentAsync(std::function<void(std::shared_ptr<T>)> callback, int64_t id, bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1))
     {
         auto filter = [id] (const ComponentInfo& info) -> bool
         {
             return (info.id == id);
         };
-        RebuildComponentAsync(callback, filter, rebuildHierarchy, timeout);
+        rebuildComponentAsync(callback, filter, rebuildHierarchy, timeout);
     }
 
     /**
@@ -272,17 +272,17 @@ public:
      * @throws EntityCastException when the filter-matching component can not be cast to type T
      */
     template<typename T>
-    std::shared_ptr<T> RebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
+    std::shared_ptr<T> rebuildComponent(ComponentInfo & info,bool rebuildHierarchy = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero())
     {
-        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(RebuildComponent(info, rebuildHierarchy, false, timeout));
+        std::shared_ptr<T> entity = dynamic_pointer_cast<T>(rebuildComponent(info, rebuildHierarchy, false, timeout));
         if(!entity)
             throw EntityCastException();
         return entity;
     }
     /**
-     * RebuildComponent helper method
+     * rebuildComponent helper method
      */
-    std::shared_ptr<EntityBase> RebuildComponent(const ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
+    std::shared_ptr<EntityBase> rebuildComponent(const ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
 
 private:
     /*Ros2 stuff*/
@@ -291,45 +291,45 @@ private:
      */
     rclcpp::node::Node::SharedPtr RosNode;
     /**
-     * @brief ComponentChangedSubscription
+     * @brief componentChangedSubscription
      * This topic keeps you informed about changes to components (entities) in the system - but not about new components
      */
-    std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::ComponentChanged>> ComponentChangedSubscription;
+    std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::ComponentChanged>> componentChangedSubscription;
     /**
-     * @brief ListComponentsRequestSubscription
+     * @brief listComponentsRequestSubscription
      * On this topic a component manager can publish a request to all other component manager instances in the system in order to have them publish all their managed components to the
      * ListComponentResponse topic
      */
-    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr ListComponentsRequestSubscription;
+    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestSubscription;
     /**
-     * @brief ListComponentsResponseSubscription
-     * On this topic the answer to the ListComponentsRequest is published
+     * @brief listComponentsResponseSubscription
+     * On this topic the answer to the listComponentsRequest is published
      */
-    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponseSubscription;
+    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponseSubscription;
 
     /**
-     * @brief ListComponentsRequestPublisher
-     * @see ListComponentsRequestSubscription
+     * @brief listComponentsRequestPublisher
+     * @see listComponentsRequestSubscription
      */
-    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr ListComponentsRequestPublisher;
+    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestPublisher;
     /**
-     * @brief ListComponentsResponsePublisher
-     * @see ListComponentsResponseSubscription
+     * @brief listComponentsResponsePublisher
+     * @see listComponentsResponseSubscription
      */
-    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr ListComponentsResponsePublisher;
+    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponsePublisher;
 
     /**
-     * @brief ListComponentsRequestCallback
+     * @brief listComponentsRequestCallback
      * @param msg
-     * Gets called if a new message on the ListComponentsRequest topic is available
+     * Gets called if a new message on the listComponentsRequest topic is available
      */
-    void ListComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg);
+    void listComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg);
     /**
-     * @brief ListComponentsResponseCallback
+     * @brief listComponentsResponseCallback
      * @param msg
-     * Gets called if a new message on the ListComponentsResponse topic is available
+     * Gets called if a new message on the listComponentsResponse topic is available
      */
-    void ListComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
+    void listComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
 
     /**
      * @brief Components
@@ -341,7 +341,7 @@ private:
     std::condition_variable componentsCV;
     EntityBase::SharedPtr BaseEntity;
     rmw_qos_profile_t component_manager_profile;
-    void GenerateResponse();
+    void generateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;
 
     std::list<QMetaObject::Connection> callbacks;
@@ -360,13 +360,13 @@ private:
 
 signals:
     //Qt signals that can be used in order to stay informed about changes in the system
-    void NewComponentFound(ComponentInfo info);
-    void ComponentDeleted(ComponentInfo info);
-    void ComponentChanged(ComponentInfo info);
+    void newComponentFound(ComponentInfo info);
+    void componentDeleted(ComponentInfo info);
+    void componentChanged(ComponentInfo info);
 private slots:
-    void OnChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
-    void OnChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
-    void OnEntityDeleted(ComponentInfo info);
+    void onChildAdded(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
+    void onChildRemoved(EntityBase::SharedPtr child, EntityBase::SharedPtr parent, bool remote);
+    void onEntityDeleted(ComponentInfo info);
 };
 }
 
