@@ -80,7 +80,7 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
         }
 
     };
-    entity->IterateThroughAllProperties(func);
+    entity->iterateThroughAllProperties(func);
 
 }
 

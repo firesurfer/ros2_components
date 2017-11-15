@@ -345,7 +345,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
     {
         bool foundInList = false;
         bool toDelete = false;
-        ComponentInfo currentInfo = ComponentInfoFactory::fromlistComponentsResponseMessage(msg);
+        ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
         {
             ReaderGuard rg(this);
             for(ComponentInfo & myInfo: Components)

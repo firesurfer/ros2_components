@@ -165,10 +165,10 @@ public:
     virtual void setDescription(std::string des){this->description = des;}
 
     /**
-     * @brief IterateThroughAllProperties
+     * @brief iterateThroughAllProperties
      * @param func
      */
-    void IterateThroughAllProperties(std::function<void(Element*)> func);
+    void iterateThroughAllProperties(std::function<void(Element*)> func);
 
     /**
      * @brief IterateThroughAllChilds

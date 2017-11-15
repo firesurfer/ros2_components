@@ -182,7 +182,7 @@ string EntityBase::getTopicName()
 }
 
 
-void EntityBase::IterateThroughAllProperties(std::function<void(Element *)> func)
+void EntityBase::iterateThroughAllProperties(std::function<void(Element *)> func)
 {
    for(Element* elem: this->internalmap)
    {
