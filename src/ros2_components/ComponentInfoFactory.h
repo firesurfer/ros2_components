@@ -2,15 +2,12 @@
 /*ros2_components*/
 #include "EntityBase.h"
 #include "ComponentInfo.h"
-
+#include "Networking.h"
 /*Message*/
 #include "ros2_components_msg/msg/list_components_response.hpp"
 #include "ros2_components_msg/msg/component_changed.hpp"
 
-/*Qt*/
-#include <QHostAddress>
-#include <QHostInfo>
-#include <QNetworkInterface>
+
 
 
 
@@ -44,16 +41,7 @@ public:
      */
     static ComponentInfo fromComponentChangedMessage(ros2_components_msg::msg::ComponentChanged::SharedPtr msg);
 
-    /**
-     * @brief GetLocalIpV4
-     * @return The local ipv4 address
-     */
-    static uint32_t getLocalIpV4();
-    /**
-     * @brief getLocalIpV6
-     * @return  The local ipv6 address
-     */
-    static std::vector<uint8_t> getLocalIpV6();
+
 };
 }
 

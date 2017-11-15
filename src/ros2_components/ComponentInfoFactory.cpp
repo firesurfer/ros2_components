@@ -14,7 +14,7 @@ ComponentInfo ComponentInfoFactory::fromEntity(EntityBase::SharedPtr ent)
 
     //TODO move this into a more general place
 
-    info.machineip = getLocalIpV4();
+    info.machineip = Networking::getLocalIpV4();
     if(ent->getParent() != NULL)
     {
         info.parentId = ent->getParent()->getId();
@@ -73,55 +73,5 @@ ComponentInfo ComponentInfoFactory::fromComponentChangedMessage(ros2_components_
     return info;
 }
 
-uint32_t ComponentInfoFactory::getLocalIpV4()
-{
-    uint32_t ipAddr = 0;
-    foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if(!interface.name().contains("vmnet"))
-        {
-            foreach (const QHostAddress &address, interface.allAddresses())
-            {
-                if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-                {
-                    //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
-                    if(!address.isLoopback())
-                    {
-                        ipAddr = address.toIPv4Address();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    return ipAddr;
-}
 
-std::vector<uint8_t> ComponentInfoFactory::getLocalIpV6()
-{
-    std::vector<uint8_t> returnAddr;
-    foreach(const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
-    {
-        if(!interface.name().contains("vmnet"))
-        {
-            foreach (const QHostAddress &address, interface.allAddresses())
-            {
-                if (address.protocol() == QAbstractSocket::IPv6Protocol && address != QHostAddress(QHostAddress::LocalHost))
-                {
-                    //LOG(Debug) << "Ip address is:" << address.toString().toStdString() << std::endl;
-                    if(!address.isLoopback())
-                    {
-                        Q_IPV6ADDR ipAddr = address.toIPv6Address();
-                        for(int i = 0; i < 16;i++)
-                        {
-                            returnAddr.push_back(ipAddr[i]);
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    return returnAddr;
-}
 }
