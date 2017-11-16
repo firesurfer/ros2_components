@@ -287,9 +287,9 @@ public:
 private:
     /*Ros2 stuff*/
     /**
-     * @brief RosNode
+     * @brief rosNode
      */
-    rclcpp::node::Node::SharedPtr RosNode;
+    rclcpp::node::Node::SharedPtr rosNode;
     /**
      * @brief componentChangedSubscription
      * This topic keeps you informed about changes to components (entities) in the system - but not about new components
@@ -339,7 +339,7 @@ private:
     std::mutex componentsMutex; //TODO Test this extensively
     uint64_t componentsReader;
     std::condition_variable componentsCV;
-    EntityBase::SharedPtr BaseEntity;
+    EntityBase::SharedPtr baseEntity;
     rmw_qos_profile_t component_manager_profile;
     void generateResponse();
     rclcpp::timer::TimerBase::SharedPtr updateTimer;

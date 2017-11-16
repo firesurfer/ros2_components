@@ -32,8 +32,8 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
     //TODO put additional help information into parser
 
     CLIArgument idArg = {"id","Specify id used for the node", &id_str};
-    CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->LogfilePath};
-    CLIArgument configArg = {"configpath","Path to a configfile", &this->ConfigfilePath};
+    CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->logfilePath};
+    CLIArgument configArg = {"configpath","Path to a configfile", &this->configfilePath};
     cliParser.addArgument(idArg);
     cliParser.addArgument(logArg);
     cliParser.addArgument(configArg);
@@ -54,19 +54,19 @@ void ManagedNode::spinAsync()
 {
     if(!isSetup)
         throw NodeNotInitializedException();
-    RosNode->spinAsync();
+    rosNode->spinAsync();
 }
 
 void ManagedNode::spin(std::chrono::nanoseconds timeout)
 {
     if(!isSetup)
         throw NodeNotInitializedException();
-    RosNode->spin(timeout);
+    rosNode->spin(timeout);
 }
 
 bool ManagedNode::ok() const
 {
-    return RosNode->ok();
+    return rosNode->ok();
 }
 
 ComponentManager::SharedPtr ManagedNode::getComponentManager()
@@ -78,26 +78,26 @@ rclcpp::node::Node::SharedPtr ManagedNode::getRosNode()
 {
     if(!isSetup)
         throw NodeNotInitializedException();
-    return this->RosNode->getRosNode();
+    return this->rosNode->getRosNode();
 }
 
 int64_t ManagedNode::getNodeId()
 {
-    return this->RosNode->getNodeId();
+    return this->rosNode->getNodeId();
 }
 
 int ManagedNode::getLoopRate() const
 {
-    if(!RosNode)
+    if(!rosNode)
         throw NodeNotInitializedException();
-    return RosNode->getLoopRate();
+    return rosNode->getLoopRate();
 }
 
 void ManagedNode::setLoopRate(int value)
 {
-    if(!RosNode)
+    if(!rosNode)
         throw NodeNotInitializedException();
-    RosNode->setLoopRate(value);
+    rosNode->setLoopRate(value);
 }
 
 CLIParser& ManagedNode::getCliParser()
@@ -109,13 +109,13 @@ ManagedNodeState ManagedNode::getNodeState() const
 {
     if(!isSetup)
         return ManagedNodeState::NotInitialized;
-    if(isSetup  && RosNode && !RosNode->getIsSpinning() && !RosNode->getIsSpinningAsync())
+    if(isSetup  && rosNode && !rosNode->getIsSpinning() && !rosNode->getIsSpinningAsync())
         return ManagedNodeState::Initialized;
-    if(isSetup  && RosNode && RosNode->getIsSpinningAsync() )
+    if(isSetup  && rosNode && rosNode->getIsSpinningAsync() )
         return ManagedNodeState::SpinningAsync;
-    if(isSetup   && RosNode && RosNode->getIsSpinningAsync() )
+    if(isSetup   && rosNode && rosNode->getIsSpinningAsync() )
         return ManagedNodeState::SpinningSync;
-    if(! RosNode)
+    if(! rosNode)
         return ManagedNodeState::ExitCalled;
 
     return ManagedNodeState::Unknown;
@@ -124,7 +124,7 @@ ManagedNodeState ManagedNode::getNodeState() const
 
 NodeContainer::SharedPtr ManagedNode::getRosNodeContainer() const
 {
-    return RosNode;
+    return rosNode;
 }
 
 void ManagedNode::doWork()
@@ -134,7 +134,7 @@ void ManagedNode::doWork()
 
 void ManagedNode::exit()
 {
-    LOG(Info) << "Called exit on: " << RosNode->getNodeName() << std::endl;
+    LOG(Info) << "Called exit on: " << rosNode->getNodeName() << std::endl;
 
 }
 
@@ -154,26 +154,26 @@ void ManagedNode::setup(LogLevel logLevel)
 
     //Create the ros node base on the given node name and the specified id
     auto internal_node = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
-    RosNode = std::make_shared<NodeContainer>(internal_node, id, nodeName);
+    rosNode = std::make_shared<NodeContainer>(internal_node, id, nodeName);
     //Some info before the logger was started
-    std::cout << "Started node: " << RosNode->getRosNode()->get_name() << std::endl;
+    std::cout << "Started node: " << rosNode->getRosNode()->get_name() << std::endl;
     //Create the entity that represents the node (This is the real base)
-    this->nodeEntity = std::make_shared<NodeEntity>(RosNode->getNodeId(), this->nodeName, RosNode->getRosNode());
+    this->nodeEntity = std::make_shared<NodeEntity>(rosNode->getNodeId(), this->nodeName, rosNode->getRosNode());
 
 
     //Init logger
-    INIT_LOGGER(RosNode->getRosNode());
+    INIT_LOGGER(rosNode->getRosNode());
     //Set loglevel to given loglevel
     LOGLEVEL(logLevel);
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
-    if(this->LogfilePath != "")
-        simpleLogger::getInstance()->setLogFilePath(this->LogfilePath);
+    if(this->logfilePath != "")
+        simpleLogger::getInstance()->setLogFilePath(this->logfilePath);
     //Print the build time. This only works if the file was rebuilt at the moment
     LOG(Info) <<"Build at: "<< BuildInfo::get_build_date() << std::endl;
     LOG(Info) << "Version: " << BuildInfo::get_build_version() << std::endl;
 
     //Create Componentmanager with nodeEntity as base
-    this->CompManager = std::make_shared<ComponentManager>(this->RosNode->getRosNode());
+    this->CompManager = std::make_shared<ComponentManager>(this->rosNode->getRosNode());
     this->isSetup = true; //Set setup to true
 
     //TEMPORARY WORKAROUND -> https://github.com/ros2/rmw_fastrtps/issues/157

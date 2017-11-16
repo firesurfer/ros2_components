@@ -141,26 +141,26 @@ public:
 
 protected:
     /**
-     * @brief RosNode
+     * @brief rosNode
      */
-    NodeContainer::SharedPtr RosNode;
+    NodeContainer::SharedPtr rosNode;
     /**
-     * @brief BaseEntity
+     * @brief baseEntity
      * The basic entity where the abstraction structure of this node starts from
      */
-    EntityBase::SharedPtr BaseEntity;
+    EntityBase::SharedPtr baseEntity;
     /**
      * @brief isSetup - was the setup function called
      */
     bool isSetup = false;
     /**
-     * @brief LogfilePath - Path to the logfile. Parsed from commandline arguments.
+     * @brief logfilePath - Path to the logfile. Parsed from commandline arguments.
      */
-    std::string LogfilePath;
+    std::string logfilePath;
     /**
-     * @brief ConfigfilePath - Path to the configfile. Parsed from commandline arguments.
+     * @brief configfilePath - Path to the configfile. Parsed from commandline arguments.
      */
-    std::string ConfigfilePath;
+    std::string configfilePath;
     /**
      * @brief cliParser - Parse for commandline arguments
      */
