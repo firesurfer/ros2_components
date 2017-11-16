@@ -124,10 +124,10 @@ public:
      */
     void getInfoToIdAsync(std::function<void(ComponentInfo)> callback, int64_t id, std::chrono::milliseconds timeout = std::chrono::milliseconds(-1));
     /**
-     * @brief UpdateComponentsList
+     * @brief updateComponentsList
      * Publishes a message to the listComponentsRequest topic.
      */
-    void UpdateComponentsList();
+    void updateComponentsList();
 
     /**
      *  Rebuild first Component which matches the given filter, pass true for rebuild Hierarchy to rebuild an entity tree (for example give the robot and and pass true in order to rebuild the whole component tree)

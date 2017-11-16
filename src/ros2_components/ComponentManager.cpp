@@ -258,7 +258,7 @@ void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> call
     return getInfoWithFilterAsync(callback, filter, timeout);
 }
 
-void ComponentManager::UpdateComponentsList()
+void ComponentManager::updateComponentsList()
 {
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
     request->nodename = RosNode->get_name();
