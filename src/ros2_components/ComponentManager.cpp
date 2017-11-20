@@ -30,7 +30,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : c
     //Qos Profile
     //rmw_qos_profile_services_default
     component_manager_profile = rmw_qos_profile_default;
-    component_manager_profile.depth = 100;
+    component_manager_profile.depth = 2000;
     component_manager_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
     component_manager_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
 
@@ -41,7 +41,7 @@ ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : c
 
     //Publishers
     this->listComponentsRequestPublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
-    std::srand(std::time(0)); // use current time as seed for random generator
+
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 
 

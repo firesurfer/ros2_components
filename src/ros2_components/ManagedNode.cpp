@@ -143,6 +143,7 @@ void ManagedNode::setup()
     setup(LogLevel::Info);
 }
 
+
 void ManagedNode::setup(LogLevel logLevel)
 {
     //Check if we could parse the id argument. Otherwise the default id is 100

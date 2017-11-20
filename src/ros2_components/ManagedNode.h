@@ -139,6 +139,7 @@ public:
      */
     NodeContainer::SharedPtr getRosNodeContainer() const;
 
+
 protected:
     /**
      * @brief rosNode
