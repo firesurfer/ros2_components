@@ -63,12 +63,12 @@ public:
     static std::shared_ptr<EntityBase> createInstanceFromName(std::string className, QGenericArgument arg1, QGenericArgument arg2, QGenericArgument arg3);
 
     template<typename T>
-    static std::shared_ptr<T> createInstanceFromName(std::string className, int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
+    static std::shared_ptr<T> createInstanceFromName(std::string className, int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode);
     /**
      *  @brief CreateInstanceGiven by the type.
      */
     template<typename T>
-    static std::shared_ptr<T> createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode);
+    static std::shared_ptr<T> createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode);
     /**
      * @brief GetQMetaObject
      * @param className

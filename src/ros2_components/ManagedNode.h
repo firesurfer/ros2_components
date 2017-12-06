@@ -105,7 +105,7 @@ public:
      * @deprecated Use getRosNodeContainer instead!
      */
     [[deprecated("Use getRosNodeContainer instead")]]
-    rclcpp::node::Node::SharedPtr getRosNode();
+    rclcpp::Node::SharedPtr getRosNode();
     /**
      * @brief getNodeId
      * @return

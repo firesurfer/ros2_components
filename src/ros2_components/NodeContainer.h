@@ -14,7 +14,7 @@ class NodeContainer
 {
 public:
     typedef std::shared_ptr<NodeContainer> SharedPtr;
-    NodeContainer(rclcpp::node::Node::SharedPtr _ros_node, int64_t _node_id, std::string _name);
+    NodeContainer(rclcpp::Node::SharedPtr _ros_node, int64_t _node_id, std::string _name);
 
     virtual ~NodeContainer();
     /**
@@ -30,7 +30,7 @@ public:
      * @brief getRosNode
      * @return  The internal rosnode
      */
-    rclcpp::node::Node::SharedPtr getRosNode();
+    rclcpp::Node::SharedPtr getRosNode();
     /**
      * @brief getIsSpinning
      * @return True in case the node is spinning at the moment (Is also set to true in case of async spin)
@@ -76,7 +76,7 @@ public:
     bool ok();
 
 private:
-    rclcpp::node::Node::SharedPtr ros_node;
+    rclcpp::Node::SharedPtr ros_node;
     rclcpp::executors::SingleThreadedExecutor executor;
 
     bool isSpinning = false;

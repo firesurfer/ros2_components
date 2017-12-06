@@ -70,17 +70,17 @@ bool EntityFactory::contains(string className)
 }
 
 template<typename T>
-std::shared_ptr<T> EntityFactory::createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
+std::shared_ptr<T> EntityFactory::createInstanceFromType(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode)
 {
     return std::make_shared<T>(_id,_subscribe,_parentNode);
 }
 
 template<typename T>
-std::shared_ptr<T> EntityFactory::createInstanceFromName(string className, int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode)
+std::shared_ptr<T> EntityFactory::createInstanceFromName(string className, int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode)
 {
     QGenericArgument subscribeArg = Q_ARG(bool, _subscribe);
     QGenericArgument idArg = Q_ARG(int64_t, _id);
-    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, _parentNode);
+    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::Node >, _parentNode);
 
     return dynamic_pointer_cast<T>(createInstanceFromName(className, idArg, subscribeArg,nodeArg));
 }

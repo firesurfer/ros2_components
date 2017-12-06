@@ -27,7 +27,7 @@ class Part : public Entity<MessageType>
 {
 
 public:
-    Part( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name) : Entity<MessageType>(_id,_subscribe,parentNode, name)
+    Part( int64_t _id, bool _subscribe ,std::shared_ptr<rclcpp::Node> parentNode,std::string name) : Entity<MessageType>(_id,_subscribe,parentNode, name)
     {
 
     }

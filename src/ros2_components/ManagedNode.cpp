@@ -74,7 +74,7 @@ ComponentManager::SharedPtr ManagedNode::getComponentManager()
     return this->CompManager;
 }
 
-rclcpp::node::Node::SharedPtr ManagedNode::getRosNode()
+rclcpp::Node::SharedPtr ManagedNode::getRosNode()
 {
     if(!isSetup)
         throw NodeNotInitializedException();
@@ -154,7 +154,7 @@ void ManagedNode::setup(LogLevel logLevel)
     }
 
     //Create the ros node base on the given node name and the specified id
-    auto internal_node = rclcpp::node::Node::make_shared(nodeName+ std::to_string(id));
+    auto internal_node = rclcpp::Node::make_shared(nodeName+ std::to_string(id));
     rosNode = std::make_shared<NodeContainer>(internal_node, id, nodeName);
     //Some info before the logger was started
     std::cout << "Started node: " << rosNode->getRosNode()->get_name() << std::endl;

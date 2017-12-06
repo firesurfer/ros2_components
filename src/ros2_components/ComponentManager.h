@@ -62,7 +62,7 @@ public:
      * @brief ComponentManager
      * @param _localNode
      */
-    ComponentManager(rclcpp::node::Node::SharedPtr _localNode);
+    ComponentManager(rclcpp::Node::SharedPtr _localNode);
     /**
      * @brief ~ComponentManager - destructor. Waits for responder thread
      */
@@ -289,34 +289,34 @@ private:
     /**
      * @brief rosNode
      */
-    rclcpp::node::Node::SharedPtr rosNode;
+    rclcpp::Node::SharedPtr rosNode;
     /**
      * @brief componentChangedSubscription
      * This topic keeps you informed about changes to components (entities) in the system - but not about new components
      */
-    std::shared_ptr<rclcpp::subscription::Subscription<ros2_components_msg::msg::ComponentChanged>> componentChangedSubscription;
+    std::shared_ptr<rclcpp::Subscription<ros2_components_msg::msg::ComponentChanged>> componentChangedSubscription;
     /**
      * @brief listComponentsRequestSubscription
      * On this topic a component manager can publish a request to all other component manager instances in the system in order to have them publish all their managed components to the
      * ListComponentResponse topic
      */
-    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestSubscription;
+    rclcpp::Subscription<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestSubscription;
     /**
      * @brief listComponentsResponseSubscription
      * On this topic the answer to the listComponentsRequest is published
      */
-    rclcpp::subscription::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponseSubscription;
+    rclcpp::Subscription<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponseSubscription;
 
     /**
      * @brief listComponentsRequestPublisher
      * @see listComponentsRequestSubscription
      */
-    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestPublisher;
+    rclcpp::Publisher<ros2_components_msg::msg::ListComponentsRequest>::SharedPtr listComponentsRequestPublisher;
     /**
      * @brief listComponentsResponsePublisher
      * @see listComponentsResponseSubscription
      */
-    rclcpp::publisher::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponsePublisher;
+    rclcpp::Publisher<ros2_components_msg::msg::ListComponentsResponse>::SharedPtr listComponentsResponsePublisher;
 
     /**
      * @brief listComponentsRequestCallback
@@ -342,7 +342,7 @@ private:
     EntityBase::SharedPtr baseEntity;
     rmw_qos_profile_t component_manager_profile;
     void generateResponse();
-    rclcpp::timer::TimerBase::SharedPtr updateTimer;
+    rclcpp::TimerBase::SharedPtr updateTimer;
 
     std::list<QMetaObject::Connection> callbacks;
     std::mutex callbacksMutex;

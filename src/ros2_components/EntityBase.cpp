@@ -18,7 +18,7 @@
 #include "EntityBase.h"
 namespace ros2_components {
 
-EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, string _className)
+EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, string _className)
 {
     this->id = _id;
     this->subscriber = _subscribe;
@@ -39,7 +39,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::nod
 
 }
 
-EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, string _className, string _componentName):EntityBase(_id,_subscribe, _parentNode,_className)
+EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, string _className, string _componentName):EntityBase(_id,_subscribe, _parentNode,_className)
 {
     this->name = _componentName + std::to_string(_id);
 }
@@ -98,7 +98,7 @@ bool EntityBase::isSubscriber()
     return subscriber;
 }
 
-rclcpp::node::Node::SharedPtr EntityBase::getParentNode()
+rclcpp::Node::SharedPtr EntityBase::getParentNode()
 {
     return parentNode;
 }

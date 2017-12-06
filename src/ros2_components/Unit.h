@@ -31,7 +31,7 @@ class Unit :  public Entity<MessageType>
 {
 
 public:
-    Unit( int32_t _id, bool _subscribe ,std::shared_ptr<rclcpp::node::Node> parentNode,std::string name) : Entity<MessageType>(_id,_subscribe,parentNode, name)
+    Unit( int32_t _id, bool _subscribe ,std::shared_ptr<rclcpp::Node> parentNode,std::string name) : Entity<MessageType>(_id,_subscribe,parentNode, name)
     {
 
     }

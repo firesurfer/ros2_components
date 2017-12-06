@@ -20,7 +20,7 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::node::Node::SharedPtr _localNode) : componentsReader(0)
+ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : componentsReader(0)
 {
     using namespace std::placeholders;
     //Variable Assignments
@@ -281,7 +281,7 @@ std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentIn
         subscribeArg = Q_ARG(bool, true);
     else
         subscribeArg = Q_ARG(bool, false);
-    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::node::Node >, rosNode);
+    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::Node >, rosNode);
 
     std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
     //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);

@@ -63,8 +63,8 @@ class EntityBase : public QObject, public std::enable_shared_from_this<EntityBas
 public:
 
     typedef std::shared_ptr<EntityBase> SharedPtr;
-    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className);
-    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::node::Node > _parentNode, std::string _className, std::string _componentName);
+    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode, std::string _className);
+    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode, std::string _className, std::string _componentName);
     virtual ~EntityBase();
 
     /**
@@ -97,7 +97,7 @@ public:
      * @brief getParentNode
      * @return The rosnode associated with this entity
      */
-    rclcpp::node::Node::SharedPtr getParentNode();
+    rclcpp::Node::SharedPtr getParentNode();
 
     /**
      * @brief addChild
@@ -249,7 +249,7 @@ protected:
      * @brief parent
      * The node -> we need to pass in order to create the publisher, subscription and parameter client
      */
-    std::shared_ptr<rclcpp::node::Node> parentNode;
+    std::shared_ptr<rclcpp::Node> parentNode;
     /**
      * Helper method so we can use REFLECT on a variable
      */
@@ -274,12 +274,12 @@ protected:
     /**
      * @brief pubBase
      */
-    std::shared_ptr<rclcpp::publisher::PublisherBase> pubBase;
+    std::shared_ptr<rclcpp::PublisherBase> pubBase;
     /**
      * @brief subBase
      * Baseclass for the subscription -> used for determing topic name
      */
-    std::shared_ptr<rclcpp::subscription::SubscriptionBase> subBase;
+    std::shared_ptr<rclcpp::SubscriptionBase> subBase;
 
     /**
      * @brief active

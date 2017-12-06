@@ -30,7 +30,7 @@ public:
      * @brief Constructor of Entity
      * @param className is used together with the id to itentify topics, etc. of this entity
      */
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
@@ -47,7 +47,7 @@ public:
         }
         LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
     }
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::node::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
@@ -124,9 +124,9 @@ protected:
     //ROS 2 Stuff
     rmw_qos_profile_t custom_qos_profile;
 
-    std::shared_ptr<rclcpp::publisher::Publisher<MessageType>> entityPublisher;
-    std::shared_ptr<rclcpp::subscription::Subscription<MessageType>> entitySubscription;
-    rclcpp::subscription::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameterEventSubscription;
+    std::shared_ptr<rclcpp::Publisher<MessageType>> entityPublisher;
+    std::shared_ptr<rclcpp::Subscription<MessageType>> entitySubscription;
+    rclcpp::Subscription<rcl_interfaces::msg::ParameterEvent>::SharedPtr parameterEventSubscription;
 
 
 
