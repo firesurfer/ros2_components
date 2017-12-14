@@ -134,8 +134,10 @@ void ManagedNode::doWork()
 
 void ManagedNode::exit()
 {
-    LOG(Info) << "Called exit on: " << rosNode->getNodeName() << std::endl;
-
+    if (rosNode)
+    {
+        LOG(Info) << "Called exit on: " << rosNode->getNodeName() << std::endl;
+    }
 }
 
 void ManagedNode::setup()
