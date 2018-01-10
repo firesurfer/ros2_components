@@ -18,7 +18,9 @@
 #pragma once
 #include "EntityBase.h"
 #include "EntityContainer.h"
+#include <std_msgs/msg/empty.hpp>
 namespace ros2_components {
+
 
 template <typename MessageType>
 class Entity : public EntityBase
@@ -47,6 +49,8 @@ public:
         }
         LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
     }
+
+
     Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
@@ -161,6 +165,55 @@ private:
 
 };
 
+//Specialisation for empty messages -> don't create publisher and subscription
+template<>
+class Entity<std_msgs::msg::Empty> :public EntityBase
+{
+public:
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
+    {
+
+    }
+
+    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
+    {
+
+    }
+
+    /**
+     * @brief publish - Tell class to publish the current data to the world
+     * @return
+     */
+    virtual bool publish()
+    {
+        LOG(Error) << "Entity : Please override publish function" << std::endl;
+        return true;
+    }
+
+
+    void addListener(std::function<void(EntityContainer)> listener)
+    {
+
+    }
+private:
+    void internalListenerCallback(const typename std_msgs::msg::Empty::SharedPtr msg)
+    {
+
+    }
+protected:
+    virtual void listenerCallback(const typename std_msgs::msg::Empty::SharedPtr  msg)
+    {
+        LOG(Error) << "Please override listenerCallback" << std::endl;
+        //To ignore warning
+        UNUSED(msg);
+
+    }
+    bool publishMsg(typename std_msgs::msg::Empty::SharedPtr msg)
+    {
+        return true;
+    }
+
+};
 }
 
 

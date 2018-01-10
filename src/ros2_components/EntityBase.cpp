@@ -33,7 +33,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Nod
     REFLECT(className);
     REFLECT(active);
     REFLECT(description)
-    qRegisterMetaType<int64_t>("int64_t");
+            qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
 
 
@@ -48,7 +48,7 @@ EntityBase::~EntityBase()
 {
     for (auto e : internalmap)
     {
-      delete e;
+        delete e;
     }
 
     if (!isVirtual())
@@ -58,8 +58,8 @@ EntityBase::~EntityBase()
         std::shared_ptr<EntityBase> parent_ptr = parent.lock();
         if (parent_ptr)
         {
-          info.parentId = parent_ptr->getId();
-          info.parentType = parent_ptr->getClassName();
+            info.parentId = parent_ptr->getId();
+            info.parentType = parent_ptr->getClassName();
         }
         info.name = getName();
         info.nodename = parentNode->get_name();
@@ -108,25 +108,25 @@ void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)
     LOG(LogLevel::Debug) << "addChild called with: " << child->getName() << " from: " << getName()<< std::endl;
 
     std::function<bool (std::shared_ptr<EntityBase>, EntityBase*)> has_child =
-      [&] (std::shared_ptr<EntityBase> entity, EntityBase* child)
+            [&] (std::shared_ptr<EntityBase> entity, EntityBase* child)
     {
-      if (entity.get() == child)
-      {
-        return true;
-      }
-      for (auto e : entity->childs)
-      {
-        if (has_child(e, child))
+        if (entity.get() == child)
         {
-          return true;
+            return true;
         }
-      }
-      return false;
+        for (auto e : entity->childs)
+        {
+            if (has_child(e, child))
+            {
+                return true;
+            }
+        }
+        return false;
     };
     if (has_child(child, this))
     {
-      throw EntityCircleException("Adding Child " + child->getName() + " to " + getName()
-                               + " creates cycle");
+        throw EntityCircleException("Adding Child " + child->getName() + " to " + getName()
+                                    + " creates cycle");
     }
 
     childs.push_back(child);
@@ -175,20 +175,25 @@ void EntityBase::setParent(std::shared_ptr<EntityBase> par)
 
 string EntityBase::getTopicName()
 {
-    if(!isSubscriber())
-        return pubBase->get_topic_name();
+    if(subBase || pubBase)
+    {
+        if(!isSubscriber())
+            return pubBase->get_topic_name();
+        else
+            return subBase->get_topic_name();
+    }
     else
-        return subBase->get_topic_name();
+        return name;
 }
 
 
 void EntityBase::iterateThroughAllProperties(std::function<void(Element *)> func)
 {
-   for(Element* elem: this->internalmap)
-   {
-       if(func != NULL)
-        func(elem);
-   }
+    for(Element* elem: this->internalmap)
+    {
+        if(func != NULL)
+            func(elem);
+    }
 }
 
 void EntityBase::iterateThroughAllChilds(std::function<void (EntityBase::SharedPtr)> func)
