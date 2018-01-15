@@ -191,6 +191,8 @@ private:
      */
     std::string nodeName;
 
+    std::string logLevelStr = "";
+
 
 
 };

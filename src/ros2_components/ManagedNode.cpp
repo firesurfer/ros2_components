@@ -34,10 +34,11 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
     CLIArgument idArg = {"id","Specify id used for the node", &id_str};
     CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->logfilePath};
     CLIArgument configArg = {"configpath","Path to a configfile", &this->configfilePath};
+    CLIArgument logLevelArg = {"loglevel", "The wanted minimum loglevel", &this->logLevelStr};
     cliParser.addArgument(idArg);
     cliParser.addArgument(logArg);
     cliParser.addArgument(configArg);
-
+    cliParser.addArgument(logLevelArg);
     //This defaults to true. You can pass parseCli = false to the constructor in case you want to add your own arguments in an inherited node.
     if(parseCli)
     {
@@ -167,6 +168,9 @@ void ManagedNode::setup(LogLevel logLevel)
     //Init logger
     INIT_LOGGER(rosNode->getRosNode());
     //Set loglevel to given loglevel
+    if(logLevelStr != "")
+         logLevel = simpleLogger::getInstance()->fromString(logLevelStr);
+
     LOGLEVEL(logLevel);
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
     if(this->logfilePath != "")

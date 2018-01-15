@@ -84,7 +84,7 @@ public:
      * @brief listNodes
      * @return List of all found nodes
      */
-    std::vector<ComponentInfo> listNodes(); //TODO move?
+    std::vector<ComponentInfo> listNodes();
     /**
      * @brief listComponentsBy
      * @param filter
@@ -332,11 +332,16 @@ private:
     void listComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg);
 
     /**
+     * @brief collect_timed_out_components
+     */
+    void collect_timed_out_components();
+    /**
      * @brief Components
      * Stored components
      */
     std::vector<ComponentInfo> components;
     std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
     std::mutex componentsMutex; //TODO Test this extensively
     uint64_t componentsReader;
     std::condition_variable componentsCV;

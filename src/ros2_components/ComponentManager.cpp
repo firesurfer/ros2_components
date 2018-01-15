@@ -355,6 +355,9 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
         ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
         {
             ReaderGuard rg(this);
+            //Save time we found the component
+            auto current_time = std::chrono::steady_clock::now();
+            components_times[currentInfo.id] = current_time;
             for(ComponentInfo & myInfo: components)
             {
 
@@ -371,7 +374,6 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                     }
                     else
                     {
-
                         toDelete = true;
                         //TODO delete from list more efficient
                         LOG(Info) << "Deleting: " << myInfo.name << std::endl;
@@ -383,8 +385,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             }
         }
 
-        {
-
+        {//TODO is this scope needed ?
             if(!foundInList)
             {
                 //Writing to Components
@@ -393,6 +394,8 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                 {
                     componentsCV.wait(lck);
                 }
+
+
                 components.push_back(currentInfo);
 
                 lck.unlock(); //Connected functions could try to read -> deadlock!
@@ -419,6 +422,24 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                 components.erase(components.begin()+pos);
             }
         }
+    }
+}
+
+void ComponentManager::collect_timed_out_components()
+{
+    auto current_time = std::chrono::steady_clock::now();
+    for(ComponentInfo & currentInfo: components)
+    {
+        //We haven't heard about the component for a long time
+
+        if((current_time - components_times[currentInfo.id]) > std::chrono::seconds(components_timeout_garbage_collect_time))
+        {
+            //Ask for it
+            updateComponentsList();
+            //Save the component into a second list
+            components_last_request_times[currentInfo.id] = current_time;
+        }
+
     }
 }
 

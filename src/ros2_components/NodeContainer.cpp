@@ -12,8 +12,10 @@ NodeContainer::NodeContainer(rclcpp::Node::SharedPtr _ros_node, int64_t _node_id
 NodeContainer::~NodeContainer()
 {
     abort = true;
+    rclcpp::shutdown();
     if(spinThread)
         spinThread->join();
+
 }
 
 void NodeContainer::spin(std::chrono::nanoseconds timeout)
@@ -45,7 +47,6 @@ void NodeContainer::spinAsync()
         {
             rclcpp::spin_some(ros_node);
             loopRate.sleep();
-
         }
         isSpinning = false;
         isSpinningAsync = false;
