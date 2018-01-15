@@ -193,12 +193,12 @@ public:
 
     void addListener(std::function<void(EntityContainer)> listener)
     {
-
+        UNUSED(listener);
     }
 private:
     void internalListenerCallback(const typename std_msgs::msg::Empty::SharedPtr msg)
     {
-
+        UNUSED(msg);
     }
 protected:
     virtual void listenerCallback(const typename std_msgs::msg::Empty::SharedPtr  msg)
@@ -210,6 +210,7 @@ protected:
     }
     bool publishMsg(typename std_msgs::msg::Empty::SharedPtr msg)
     {
+        UNUSED(msg);
         return true;
     }
 

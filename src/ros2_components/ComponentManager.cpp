@@ -87,12 +87,19 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 std::vector<ComponentInfo> ComponentManager::listComponents()
 {
     ReaderGuard rg(this);
-    return Components;
+    return components;
 }
 
-std::vector<string> ComponentManager::listNodes()
+std::vector<ComponentInfo> ComponentManager::listNodes()
 {
-    return this->rosNode->get_node_graph_interface()->get_node_names();
+    //return this->rosNode->get_node_graph_interface()->get_node_names();
+    std::vector<ComponentInfo> node_infos;
+    for(ComponentInfo& info: components)
+    {
+        if(info.type == "NodeEntity")
+            node_infos.push_back(info);
+    }
+    return node_infos;
 }
 
 std::vector<ComponentInfo> ComponentManager::listComponentsBy(std::function<bool(const ComponentInfo&)> filter)
@@ -100,7 +107,7 @@ std::vector<ComponentInfo> ComponentManager::listComponentsBy(std::function<bool
     std::vector<ComponentInfo> ret;
     {
         ReaderGuard rg(this);
-        for (const auto & comp : Components)
+        for (const auto & comp : components)
         {
             if (filter(comp))
             {
@@ -119,7 +126,7 @@ ComponentInfo ComponentManager::getInfoWithFilter(std::function<bool (const Comp
     bool found = false;
     {
         ReaderGuard rg(this);
-        for(const auto & comp : Components)
+        for(const auto & comp : components)
         {
             if(filter(comp))
             {
@@ -348,7 +355,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
         ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
         {
             ReaderGuard rg(this);
-            for(ComponentInfo & myInfo: Components)
+            for(ComponentInfo & myInfo: components)
             {
 
                 if(myInfo.name == currentInfo.name)
@@ -386,7 +393,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                 {
                     componentsCV.wait(lck);
                 }
-                Components.push_back(currentInfo);
+                components.push_back(currentInfo);
 
                 lck.unlock(); //Connected functions could try to read -> deadlock!
                 emit newComponentFound(currentInfo);
@@ -401,7 +408,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                 }
 
                 size_t pos = 0;
-                for(auto & info: Components)
+                for(auto & info: components)
                 {
                     if( info.id == msg->id)
                     {
@@ -409,7 +416,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                     }
                     pos++;
                 }
-                Components.erase(Components.begin()+pos);
+                components.erase(components.begin()+pos);
             }
         }
     }

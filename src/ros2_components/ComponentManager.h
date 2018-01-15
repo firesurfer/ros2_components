@@ -84,7 +84,7 @@ public:
      * @brief listNodes
      * @return List of all found nodes
      */
-    std::vector<std::string> listNodes(); //TODO move?
+    std::vector<ComponentInfo> listNodes(); //TODO move?
     /**
      * @brief listComponentsBy
      * @param filter
@@ -335,7 +335,8 @@ private:
      * @brief Components
      * Stored components
      */
-    std::vector<ComponentInfo> Components;
+    std::vector<ComponentInfo> components;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
     std::mutex componentsMutex; //TODO Test this extensively
     uint64_t componentsReader;
     std::condition_variable componentsCV;
@@ -347,6 +348,9 @@ private:
     std::list<QMetaObject::Connection> callbacks;
     std::mutex callbacksMutex;
 
+    //The time in seconds we will ask if a component is still there and if it doesn't answer in the
+    //same amount of time we remove it from the components list
+    const int components_timeout_garbage_collect_time = 60;
     //RAII helper to manage reader entrance on Components
     class ReaderGuard
     {
