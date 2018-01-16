@@ -94,6 +94,8 @@ std::vector<ComponentInfo> ComponentManager::listNodes()
 {
     //return this->rosNode->get_node_graph_interface()->get_node_names();
     std::vector<ComponentInfo> node_infos;
+
+    ReaderGuard rg(this);
     for(ComponentInfo& info: components)
     {
         if(info.type == "NodeEntity")
@@ -385,44 +387,44 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             }
         }
 
-        {//TODO is this scope needed ?
-            if(!foundInList)
+
+        if(!foundInList)
+        {
+            //Writing to Components
+            std::unique_lock<std::mutex> lck(componentsMutex);
+            while (componentsReader > 0)
             {
-                //Writing to Components
-                std::unique_lock<std::mutex> lck(componentsMutex);
-                while (componentsReader > 0)
-                {
-                    componentsCV.wait(lck);
-                }
-
-
-                components.push_back(currentInfo);
-
-                lck.unlock(); //Connected functions could try to read -> deadlock!
-                emit newComponentFound(currentInfo);
+                componentsCV.wait(lck);
             }
-            if(toDelete)
+
+
+            components.push_back(currentInfo);
+
+            lck.unlock(); //Connected functions could try to read -> deadlock!
+            emit newComponentFound(currentInfo);
+        }
+        if(toDelete)
+        {
+            //Writing to Components
+            std::unique_lock<std::mutex> lck(componentsMutex);
+            while (componentsReader > 0)
             {
-                //Writing to Components
-                std::unique_lock<std::mutex> lck(componentsMutex);
-                while (componentsReader > 0)
-                {
-                    componentsCV.wait(lck);
-                }
-
-                size_t pos = 0;
-                for(auto & info: components)
-                {
-                    if( info.id == msg->id)
-                    {
-                        break;
-                    }
-                    pos++;
-                }
-                components.erase(components.begin()+pos);
+                componentsCV.wait(lck);
             }
+
+            size_t pos = 0;
+            for(auto & info: components)
+            {
+                if( info.id == msg->id)
+                {
+                    break;
+                }
+                pos++;
+            }
+            components.erase(components.begin()+pos);
         }
     }
+
 }
 
 void ComponentManager::collect_timed_out_components()
