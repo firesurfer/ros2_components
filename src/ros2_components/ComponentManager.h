@@ -342,7 +342,7 @@ private:
     std::vector<ComponentInfo> components;
     std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
     std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
-    std::mutex componentsMutex; //TODO Test this extensively
+    std::mutex componentsMutex;
     uint64_t componentsReader;
     std::condition_variable componentsCV;
     EntityBase::SharedPtr baseEntity;
@@ -355,7 +355,8 @@ private:
 
     //The time in seconds we will ask if a component is still there and if it doesn't answer in the
     //same amount of time we remove it from the components list
-    const int components_timeout_garbage_collect_time = 60;
+    const std::chrono::seconds components_timeout_garbage_collect_time = std::chrono::seconds(60);
+
     //RAII helper to manage reader entrance on Components
     class ReaderGuard
     {
