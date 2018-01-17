@@ -441,8 +441,19 @@ void ComponentManager::collect_timed_out_components()
             //Save the component into a second list
             components_last_request_times[currentInfo.id] = current_time;
         }
+        else
+        {
+            //Remove from list in case an answer came in
+            auto it = std::find(components_last_request_times.begin(),components_last_request_times.end(), currentInfo.id);
+            if(it != components_last_request_times.end())
+            {
+                components_last_request_times.erase(it);
+            }
+
+        }
 
     }
+
     for(auto & it: components_last_request_times)
     {
         if(current > it->second > std::chrono::seconds(components_timeout_garbage_collect_time) )
