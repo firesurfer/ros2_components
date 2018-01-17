@@ -433,7 +433,7 @@ void ComponentManager::collect_timed_out_components()
     for(ComponentInfo & currentInfo: components)
     {
         //We haven't heard about the component for a long time
-
+        //TODO save componentInfo instead of id
         if((current_time - components_times[currentInfo.id]) > std::chrono::seconds(components_timeout_garbage_collect_time))
         {
             //Ask for it
@@ -442,6 +442,49 @@ void ComponentManager::collect_timed_out_components()
             components_last_request_times[currentInfo.id] = current_time;
         }
 
+    }
+    for(auto & it: components_last_request_times)
+    {
+        if(current > it->second > std::chrono::seconds(components_timeout_garbage_collect_time) )
+        {
+            //Delete component
+            int64_t component_id = it->first;
+            ComponentInfo component_info;
+            bool info_found = false;
+
+            ReaderGuard rg(this);
+            for(ComponentInfo & info: components)
+            {
+                if(info.id == component_id)
+                {
+                    component_info = info;
+                    info_found = true;
+                }
+
+            }
+            if(info_found)
+            {
+                emit componentDeleted(component_info);
+                //Delete it
+                //Writing to Components
+                std::unique_lock<std::mutex> lck(componentsMutex);
+                while (componentsReader > 0)
+                {
+                    componentsCV.wait(lck);
+                }
+
+                size_t pos = 0;
+                for(auto & info: components)
+                {
+                    if( info.id == component_id)
+                    {
+                        break;
+                    }
+                    pos++;
+                }
+                components.erase(components.begin()+pos);
+            }
+        }
     }
 }
 
