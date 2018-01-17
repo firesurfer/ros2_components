@@ -444,11 +444,11 @@ void ComponentManager::collect_timed_out_components()
         else
         {
             //Remove from list in case an answer came in
-            /*auto it = std::find(components_last_request_times.begin(),components_last_request_times.end(), currentInfo.id);
+            auto it = components_last_request_times.find(currentInfo.id);
             if(it != components_last_request_times.end())
             {
                 components_last_request_times.erase(it);
-            }*/
+            }
 
         }
 
