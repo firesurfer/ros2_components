@@ -48,6 +48,8 @@ ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : compone
     //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
     this->listComponentsRequestSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest", std::bind(&ComponentManager::listComponentsRequestCallback, this,_1), component_manager_profile);
     this->listComponentsResponsePublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse",component_manager_profile);
+
+
 }
 
 ComponentManager::~ComponentManager()
@@ -340,6 +342,12 @@ std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentIn
     return ent;
 }
 
+void ComponentManager::enableComponentTimeout()
+{
+    this->enable_components_timeout = true;
+    components_timeout_timer = rosNode->create_wall_timer(500ms, std::bind(&ComponentManager::collect_timed_out_components,this));
+}
+
 void ComponentManager::listComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
     if(rosNode->get_name() != msg->nodename)
@@ -429,73 +437,76 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
 
 void ComponentManager::collect_timed_out_components()
 {
-    auto current_time = std::chrono::steady_clock::now();
-    for(ComponentInfo & currentInfo: components)
+    if(enable_components_timeout)
     {
-        //We haven't heard about the component for a long time
-        //TODO save componentInfo instead of id
-        if((current_time - components_times[currentInfo.id]) > components_timeout_garbage_collect_time)
+        auto current_time = std::chrono::steady_clock::now();
+        for(ComponentInfo & currentInfo: components)
         {
-            //Ask for it
-            updateComponentsList();
-            //Save the component into a second list
-            components_last_request_times[currentInfo.id] = current_time;
-        }
-        else
-        {
-            //Remove from list in case an answer came in
-            auto it = components_last_request_times.find(currentInfo.id);
-            if(it != components_last_request_times.end())
+            //We haven't heard about the component for a long time
+            //TODO save componentInfo instead of id
+            if((current_time - components_times[currentInfo.id]) > components_timeout_garbage_collect_time)
             {
-                components_last_request_times.erase(it);
+                //Ask for it
+                updateComponentsList();
+                //Save the component into a second list
+                components_last_request_times[currentInfo.id] = current_time;
+            }
+            else
+            {
+                //Remove from list in case an answer came in
+                auto it = components_last_request_times.find(currentInfo.id);
+                if(it != components_last_request_times.end())
+                {
+                    components_last_request_times.erase(it);
+                }
+
             }
 
         }
 
-    }
-
-    for(auto & it: components_last_request_times)
-    {
-        if(current_time - it.second > components_timeout_garbage_collect_time)
+        for(auto & it: components_last_request_times)
         {
-            //Delete component
-            int64_t component_id = it.first;
-            ComponentInfo component_info;
-            bool info_found = false;
-
+            if(current_time - it.second > components_timeout_garbage_collect_time)
             {
-                ReaderGuard rg(this);
-                for(ComponentInfo & info: components)
-                {
-                    if(info.id == component_id)
-                    {
-                        component_info = info;
-                        info_found = true;
-                    }
-                }
-            } //Cannot write while own ReaderGuard is open, close it first
+                //Delete component
+                int64_t component_id = it.first;
+                ComponentInfo component_info;
+                bool info_found = false;
 
-            if(info_found)
-            {
-                emit componentDeleted(component_info);
-                //Delete it
-                //Writing to Components
-                std::unique_lock<std::mutex> lck(componentsMutex);
-                while (componentsReader > 0)
                 {
-                    componentsCV.wait(lck);
-                }
-
-                size_t pos = 0;
-                for(auto & info: components)
-                {
-                    if( info.id == component_id)
+                    ReaderGuard rg(this);
+                    for(ComponentInfo & info: components)
                     {
-                        break;
+                        if(info.id == component_id)
+                        {
+                            component_info = info;
+                            info_found = true;
+                        }
                     }
-                    pos++;
+                } //Cannot write while own ReaderGuard is open, close it first
+
+                if(info_found)
+                {
+                    emit componentDeleted(component_info);
+                    //Delete it
+                    //Writing to Components
+                    std::unique_lock<std::mutex> lck(componentsMutex);
+                    while (componentsReader > 0)
+                    {
+                        componentsCV.wait(lck);
+                    }
+
+                    size_t pos = 0;
+                    for(auto & info: components)
+                    {
+                        if( info.id == component_id)
+                        {
+                            break;
+                        }
+                        pos++;
+                    }
+                    components.erase(components.begin()+pos);
                 }
-                components.erase(components.begin()+pos);
             }
         }
     }

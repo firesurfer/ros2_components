@@ -284,6 +284,13 @@ public:
      */
     std::shared_ptr<EntityBase> rebuildComponent(const ComponentInfo & info, bool rebuildHierarchy = false, bool forcePubOrSubChange = false, std::chrono::milliseconds timeout = std::chrono::milliseconds::zero());
 
+    /**
+     * @brief enableComponentTimeout
+     * Enables a timer that checks if we haven't heard from a components for 60 seconds,
+     * then aks if the component is still there and if there havn't been an answer in 60 seconds it deletes the components.
+     */
+    void enableComponentTimeout();
+
 private:
     /*Ros2 stuff*/
     /**
@@ -340,22 +347,27 @@ private:
      * Stored components
      */
     std::vector<ComponentInfo> components;
-    std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
-    std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
+
     std::mutex componentsMutex;
     uint64_t componentsReader;
     std::condition_variable componentsCV;
     EntityBase::SharedPtr baseEntity;
     rmw_qos_profile_t component_manager_profile;
     void generateResponse();
-    rclcpp::TimerBase::SharedPtr updateTimer;
+
+    /*Needed stuff for components timeout*/
+    bool enable_components_timeout = false;
+    rclcpp::TimerBase::SharedPtr components_timeout_timer;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
+    //The time in seconds we will ask if a component is still there and if it doesn't answer in the
+    //same amount of time we remove it from the components list
+    const std::chrono::seconds components_timeout_garbage_collect_time = std::chrono::seconds(60);
 
     std::list<QMetaObject::Connection> callbacks;
     std::mutex callbacksMutex;
 
-    //The time in seconds we will ask if a component is still there and if it doesn't answer in the
-    //same amount of time we remove it from the components list
-    const std::chrono::seconds components_timeout_garbage_collect_time = std::chrono::seconds(60);
+
 
     //RAII helper to manage reader entrance on Components
     class ReaderGuard
