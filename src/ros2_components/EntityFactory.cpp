@@ -63,10 +63,7 @@ std::shared_ptr<QMetaObject> EntityFactory::getQMetaObject(string className)
 bool EntityFactory::contains(string className)
 {
     QString name = QString::fromStdString(className);
-    if(metaObjs.contains(name))
-        return true;
-    else
-        return false;
+    return metaObjs.contains(name);
 }
 
 template<typename T>
