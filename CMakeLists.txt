@@ -18,11 +18,8 @@ find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Widgets REQUIRED)
-find_package(builtin_interfaces REQUIRED)
-find_package(rclcpp REQUIRED)
 find_package(ros2_components_msg REQUIRED)
 find_package(ros2_simple_logger REQUIRED)
-find_package(std_msgs REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
@@ -46,8 +43,6 @@ ament_export_include_directories(
     ${Qt5Core_INCLUDE_DIRS}
     ${Qt5Network_INCLUDE_DIRS}
     ${Qt5Widgets_INCLUDE_DIRS}
-    ${rclcpp_INCLUDE_DIRS}
-    ${std_msgs_INCLUDE_DIRS}
     ${ros2_simple_logger_INCLUDE_DIRS}
     ${ros2_components_msg_INCLUDE_DIRS}
 )

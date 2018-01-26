@@ -29,12 +29,10 @@ file(GLOB COMPONENTS_SRC_FILES
 add_library(ros2_components
     ${COMPONENTS_SRC_FILES}
 )
+ament_target_dependencies(ros2_components
+    ros2_simple_logger
+    ros2_components_msgs)
 target_link_libraries(ros2_components 
-    ${rclcpp_LIBRARIES}
-    ${std_msgs_LIBRARIES}
-    ${builtin_interfaces_LIBRARIES}
-    ${ros2_components_msg_LIBRARIES}
-    ${ros2_simple_logger_LIBRARIES}
     Threads::Threads
     Qt5::Core
     Qt5::Network
