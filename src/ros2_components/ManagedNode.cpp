@@ -153,7 +153,7 @@ void ManagedNode::setup(LogLevel logLevel)
     uint64_t id = 100;
     if(id_str != "")
     {
-        id = std::stoi(id_str);
+        id = std::stoul(id_str);
     }
 
     //Create the ros node base on the given node name and the specified id
