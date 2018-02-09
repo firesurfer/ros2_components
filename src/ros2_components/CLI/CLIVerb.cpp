@@ -113,7 +113,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
     {
         for(auto it=cliArguments.begin();it !=cliArguments.end();it++)
         {
-            std::cout << argument << std::endl;
+            //std::cout << argument << std::endl;
             if(it->parse(argument))
             {
                 if(it->getName() != "help")

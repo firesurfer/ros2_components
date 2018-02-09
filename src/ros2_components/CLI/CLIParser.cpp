@@ -29,6 +29,7 @@ void CLIParser::parse()
             std::cout << printInColor("Bad console argument!", ConsoleColor::FG_RED) << std::endl;
         }
         printHelp(this->helpString);
+        exit(0);
     }
 }
 

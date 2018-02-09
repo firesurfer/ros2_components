@@ -193,6 +193,8 @@ private:
 
     std::string logLevelStr = "";
 
+    bool printBuildInfoFound = false;
+
 
 
 };
