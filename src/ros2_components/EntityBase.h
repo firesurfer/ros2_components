@@ -256,7 +256,9 @@ protected:
     template <class T>
     void addElement(string type,T &data)
     {
-        internalmap.push_back( (Element*)new SpecificElement<T>(type , data));
+        Element* elem = dynamic_cast<Element*>(new SpecificElement<T>(type , data));
+        if(elem != nullptr)
+            internalmap.push_back(elem);
     }
     /**
      * Vector all elements that had used REFLECT on them are stored in

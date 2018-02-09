@@ -13,7 +13,7 @@ ENDIF()
 ADD_DEFINITIONS(-DBUILD_VERSION="${BUILD_VERSION}")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package (Threads REQUIRED)
+find_package(Threads REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
@@ -36,8 +36,6 @@ file(GLOB INCLUDE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/"
 )
 
 install(FILES ${INCLUDE_FILES} DESTINATION include/ros2_components)
-
-
 
 ament_export_include_directories(
     ${Qt5Core_INCLUDE_DIRS}

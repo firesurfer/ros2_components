@@ -33,7 +33,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Nod
     REFLECT(className);
     REFLECT(active);
     REFLECT(description)
-            qRegisterMetaType<int64_t>("int64_t");
+    qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
 
 
