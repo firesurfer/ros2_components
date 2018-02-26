@@ -292,11 +292,31 @@ public:
     void enableComponentTimeout();
 
 private:
+    std::mutex componentsMutex;
+    std::vector<ComponentInfo> components;
+
+    std::mutex callbacksMutex;
+    std::list<QMetaObject::Connection> callbacks;
+    uint64_t componentsReader;
+    std::condition_variable componentsCV;
+    rmw_qos_profile_t component_manager_profile;
+    void generateResponse();
+
+    /*Needed stuff for components timeout*/
+    bool enable_components_timeout = false;
+    rclcpp::TimerBase::SharedPtr components_timeout_timer;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
+    std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
+    //The time in seconds we will ask if a component is still there and if it doesn't answer in the
+    //same amount of time we remove it from the components list
+    const std::chrono::seconds components_timeout_garbage_collect_time = std::chrono::seconds(60);
+
     /*Ros2 stuff*/
     /**
      * @brief rosNode
      */
     rclcpp::Node::SharedPtr rosNode;
+    EntityBase::SharedPtr baseEntity;
     /**
      * @brief componentChangedSubscription
      * This topic keeps you informed about changes to components (entities) in the system - but not about new components
@@ -342,31 +362,6 @@ private:
      * @brief collect_timed_out_components
      */
     void collect_timed_out_components();
-    /**
-     * @brief Components
-     * Stored components
-     */
-    std::vector<ComponentInfo> components;
-
-    std::mutex componentsMutex;
-    uint64_t componentsReader;
-    std::condition_variable componentsCV;
-    EntityBase::SharedPtr baseEntity;
-    rmw_qos_profile_t component_manager_profile;
-    void generateResponse();
-
-    /*Needed stuff for components timeout*/
-    bool enable_components_timeout = false;
-    rclcpp::TimerBase::SharedPtr components_timeout_timer;
-    std::map<int64_t, std::chrono::steady_clock::time_point> components_times;
-    std::map<int64_t, std::chrono::steady_clock::time_point> components_last_request_times;
-    //The time in seconds we will ask if a component is still there and if it doesn't answer in the
-    //same amount of time we remove it from the components list
-    const std::chrono::seconds components_timeout_garbage_collect_time = std::chrono::seconds(60);
-
-    std::list<QMetaObject::Connection> callbacks;
-    std::mutex callbacksMutex;
-
 
 
     //RAII helper to manage reader entrance on Components

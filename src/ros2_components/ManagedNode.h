@@ -139,6 +139,13 @@ public:
      */
     NodeContainer::SharedPtr getRosNodeContainer() const;
 
+private:
+
+    /**
+     * @brief CompManager
+     * One component manager per node
+     */
+    ComponentManager::SharedPtr CompManager;
 
 protected:
     /**
@@ -172,12 +179,6 @@ protected:
     NodeEntity::SharedPtr nodeEntity;
 
 private:
-
-    /**
-     * @brief CompManager
-     * One component manager per node
-     */
-    ComponentManager::SharedPtr CompManager;
 
     /**
      * @brief id_str
