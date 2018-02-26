@@ -137,8 +137,10 @@ void ManagedNode::exit()
 {
     if (rosNode)
     {
-        LOG(Info) << "Called exit on: " << rosNode->getNodeName() << std::endl;
+        std::cout << "Called exit on: " << rosNode->getNodeName() << std::endl;
     }
+
+    rclcpp::shutdown();
 }
 
 void ManagedNode::setup()
@@ -169,7 +171,7 @@ void ManagedNode::setup(LogLevel logLevel)
     INIT_LOGGER(rosNode->getRosNode());
     //Set loglevel to given loglevel
     if(logLevelStr != "")
-         logLevel = simpleLogger::getInstance()->fromString(logLevelStr);
+        logLevel = simpleLogger::getInstance()->fromString(logLevelStr);
 
     LOGLEVEL(logLevel);
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)

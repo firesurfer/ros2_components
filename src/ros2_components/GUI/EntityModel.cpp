@@ -78,6 +78,11 @@ EntityModel::EntityModel(EntityBase::SharedPtr entity)
             model->setVerticalHeaderItem(model->rowCount()-1, reflLabelItem);
 
         }
+        else
+        {
+            //We could not do anything with it
+            delete reflLabelItem;
+        }
 
     };
     entity->iterateThroughAllProperties(func);
