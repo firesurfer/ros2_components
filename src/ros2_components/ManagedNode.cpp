@@ -140,7 +140,7 @@ void ManagedNode::exit()
         std::cout << "Called exit on: " << rosNode->getNodeName() << std::endl;
     }
 
-    rclcpp::shutdown();
+   // rclcpp::shutdown();
 }
 
 void ManagedNode::setup()
