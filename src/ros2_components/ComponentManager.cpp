@@ -386,7 +386,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                     {
                         toDelete = true;
                         //TODO delete from list more efficient
-                        LOG(Info) << "Deleting: " << myInfo.name << std::endl;
+                        LOG(Info) << "Deleting: " << myInfo.name << " due to timeout"<< std::endl;
                         emit componentDeleted(myInfo);
 
                     }
