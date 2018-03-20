@@ -36,8 +36,7 @@ ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : compone
 
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
-    //Are only used when Components handling is enabled, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
-    this->listComponentsResponseSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
+    //Is only used when Components handling is enabled, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
     this->listComponentsRequestPublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
 
     //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
@@ -83,6 +82,7 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 
 void ComponentManager::enableComponentHandling()
 {
+    this->listComponentsResponseSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
     handle_components = true;
 }
 
