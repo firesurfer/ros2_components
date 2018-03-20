@@ -36,20 +36,15 @@ ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : compone
 
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
-    //Subscriptions
+    //Are only used when Components handling is enabled, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
     this->listComponentsResponseSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
-
-    //Publishers
     this->listComponentsRequestPublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
-
-    LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
-
 
     //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
     this->listComponentsRequestSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest", std::bind(&ComponentManager::listComponentsRequestCallback, this,_1), component_manager_profile);
     this->listComponentsResponsePublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse",component_manager_profile);
 
-
+    LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
 
 ComponentManager::~ComponentManager()
@@ -84,6 +79,11 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 
     //Tell other nodes about entities
     generateResponse();
+}
+
+void ComponentManager::enableComponentHandling()
+{
+    handle_components = true;
 }
 
 std::vector<ComponentInfo> ComponentManager::listComponents()
@@ -271,6 +271,7 @@ void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> call
 
 void ComponentManager::updateComponentsList()
 {
+    enableComponentHandling();
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
     request->nodename = rosNode->get_name();
     this->listComponentsRequestPublisher->publish(request);
@@ -358,6 +359,10 @@ void ComponentManager::listComponentsRequestCallback(ros2_components_msg::msg::L
 
 void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg)
 {
+    if (!handle_components)
+    {
+        return;
+    }
     if(rosNode->get_name() != msg->nodename)
     {
         bool foundInList = false;

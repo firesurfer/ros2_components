@@ -74,6 +74,12 @@ public:
      * @param _baseEntity the nodes' base entity
      */
     void registerComponents(EntityBase::SharedPtr _baseEntity);
+
+    /**
+     * Enables component listing of other nodes.
+     **/
+    void enableComponentHandling();
+
     /**
      * @brief listComponents
      * @return vector of all currently listed components
@@ -301,6 +307,8 @@ private:
     std::condition_variable componentsCV;
     rmw_qos_profile_t component_manager_profile;
     void generateResponse();
+
+    bool handle_components = false;
 
     /*Needed stuff for components timeout*/
     bool enable_components_timeout = false;
