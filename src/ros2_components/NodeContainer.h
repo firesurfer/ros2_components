@@ -75,9 +75,36 @@ public:
      */
     bool ok();
 
+    /**
+     * @brief Wraps create_publisher method of the node -> Allows accessing all publishers of a node
+     */
+    template<typename T>
+    typename rclcpp::Publisher< T>::SharedPtr create_publisher(std::string name, rmw_qos_profile_t& qos_profile)
+    {
+        typename rclcpp::Publisher< T>::SharedPtr pub = ros_node->create_publisher<T>(name, qos_profile);
+        publishers.push_back(pub);
+
+        return pub;
+    }
+
+    /**
+     *@brief Wraps create_subscription of the node -> Allows accessing all subscriptions of a node
+     */
+    template<typename T>
+    typename rclcpp::Subscription<T>::SharedPtr create_subscription(std::string name, std::function<void(T)> callback, rmw_qos_profile_t & qos_profile)
+    {
+        typename rclcpp::Subscription<T>::SharedPtr sub = ros_node->create_subscription<T>(name, callback, qos_profile);
+        subscriptions.push_back(sub);
+        return sub;
+    }
+
+    std::vector<rclcpp::PublisherBase::SharedPtr> getAllPublishers();
+    std::vector<rclcpp::SubscriptionBase::SharedPtr> getAllSubscriptions();
 private:
     rclcpp::Node::SharedPtr ros_node;
     rclcpp::executors::SingleThreadedExecutor executor;
+    std::vector<rclcpp::PublisherBase::SharedPtr> publishers;
+    std::vector<rclcpp::SubscriptionBase::SharedPtr> subscriptions;
 
     bool isSpinning = false;
     bool isSpinningAsync = false;

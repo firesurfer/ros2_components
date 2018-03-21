@@ -13,6 +13,7 @@ eprosima::fastrtps::Participant *FastRtpsInfo::getFastRtpsParticipant(NodeContai
     rcl_node_t * rcl_node = _nodeContainer->getRosNode()->get_node_base_interface()->get_rcl_node_handle();
     rmw_node_t * rmw_node = rcl_node_get_rmw_handle(rcl_node);
     eprosima::fastrtps::Participant * p = rmw_fastrtps_cpp::get_participant(rmw_node);
+
     return p;
 }
 
@@ -36,6 +37,21 @@ eprosima::fastrtps::Subscriber *FastRtpsInfo::getFastRtpsSubscription(rclcpp::Su
     rmw_subscription_t* rmw_sub = rcl_subscription_get_rmw_handle(rcl_sub);
     eprosima::fastrtps::Subscriber * s = rmw_fastrtps_cpp::get_subscriber(rmw_sub);
     return s;
+}
+
+std::vector<eprosima::fastrtps::Publisher*> FastRtpsInfo::getAllFastRtpsPublishers(NodeContainer::SharedPtr _nodeContainer)
+{
+   /* auto ros_node =_nodeContainer->getRosNode()->get_node_base_interface()->get_rcl_node_handle();
+    auto rmw_node = rcl_node_get_rmw_handle(ros_node);
+    auto impl = static_cast<CustomParticipantInfo *>(rmw_node->data);
+
+    WriterInfo * slave_target = impl->secondaryPubListener;
+    slave_target->mapmutex.lock();
+    for (auto it : slave_target->topicNtypes) {
+
+    }
+    slave_target->mapmutex.unlock();*/
+
 }
 
 }

@@ -5,14 +5,16 @@
 #include <iostream>
 #include <memory>
 #include <string>
-
+#include <vector>
 #include "rclcpp/rclcpp.hpp"
 
 #include "rmw_fastrtps_cpp/get_participant.hpp"
 #include "rmw_fastrtps_cpp/get_publisher.hpp"
 #include "rmw_fastrtps_cpp/get_subscriber.hpp"
+#include "rmw_fastrtps_cpp/custom_participant_info.hpp"
 #include "fastrtps/attributes/ParticipantAttributes.h"
 #include "NodeContainer.h"
+
 
 namespace ros2_components {
 
@@ -26,6 +28,7 @@ public:
     static std::vector<std::string> listFoundParticipants(NodeContainer::SharedPtr _nodeContainer);
     static eprosima::fastrtps::Publisher * getFastRtpsPublisher(rclcpp::PublisherBase::SharedPtr _publisher);
     static eprosima::fastrtps::Subscriber * getFastRtpsSubscription(rclcpp::SubscriptionBase::SharedPtr _subscription);
+    static std::vector<eprosima::fastrtps::Publisher*> getAllFastRtpsPublishers(NodeContainer::SharedPtr _nodeContainer);
 
 };
 }

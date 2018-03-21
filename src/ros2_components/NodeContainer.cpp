@@ -101,4 +101,14 @@ bool NodeContainer::ok()
 {
     return rclcpp::ok();
 }
+
+std::vector<rclcpp::PublisherBase::SharedPtr> NodeContainer::getAllPublishers()
+{
+    return publishers;
+}
+
+std::vector<rclcpp::SubscriptionBase::SharedPtr> NodeContainer::getAllSubscriptions()
+{
+    return subscriptions;
+}
 }
