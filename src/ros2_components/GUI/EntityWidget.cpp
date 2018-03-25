@@ -12,7 +12,7 @@ EntityWidget::EntityWidget(EntityBase::SharedPtr _entity, QWidget *parent) :
     ui->setupUi(this);
     this->entity = _entity;
 
-    ui->groupBox->setTitle(QString::fromStdString(entity->getName()));
+    ui->label->setText(QString::fromStdString(entity->getName()));
     model = new EntityModel(entity);
     ui->tableView->setModel(model->getModel());
 }
