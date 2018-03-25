@@ -41,7 +41,7 @@
 /*ros2_components*/
 #include "ros2_simple_logger/Logger.h"
 #include "ros2_components_exceptions.h"
-
+#include "NodeContainer.h"
 
 #include "EntityFactory.h"
 #include "ComponentInfo.h"
@@ -62,7 +62,7 @@ public:
      * @brief ComponentManager
      * @param _localNode
      */
-    ComponentManager(rclcpp::Node::SharedPtr _localNode);
+    ComponentManager(NodeContainer::SharedPtr _nodeContainer);
     /**
      * @brief ~ComponentManager - destructor. Waits for responder thread
      */
@@ -300,7 +300,7 @@ public:
 private:
     std::mutex componentsMutex;
     std::vector<ComponentInfo> components;
-
+    NodeContainer::SharedPtr nodeContainer;
     std::mutex callbacksMutex;
     std::list<QMetaObject::Connection> callbacks;
     uint64_t componentsReader;

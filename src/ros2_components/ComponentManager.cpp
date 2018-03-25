@@ -20,11 +20,12 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : componentsReader(0)
+ComponentManager::ComponentManager(NodeContainer::SharedPtr _nodeContainer) : componentsReader(0),
+    nodeContainer{_nodeContainer}
 {
     using namespace std::placeholders;
     //Variable Assignments
-    this->rosNode = _localNode;
+    this->rosNode = nodeContainer->getRosNode();
 
     //Start responder thread
     //Qos Profile
@@ -37,11 +38,11 @@ ComponentManager::ComponentManager(rclcpp::Node::SharedPtr _localNode) : compone
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
     //Is only used when Components handling is enabled, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
-    this->listComponentsRequestPublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
+    this->listComponentsRequestPublisher = nodeContainer->create_publisher<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest",component_manager_profile);
 
     //Are only used when Components are registered, instantiate them here due to issue: https://github.com/ros2/rmw_fastrtps/issues/157
-    this->listComponentsRequestSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest", std::bind(&ComponentManager::listComponentsRequestCallback, this,_1), component_manager_profile);
-    this->listComponentsResponsePublisher = rosNode->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse",component_manager_profile);
+    this->listComponentsRequestSubscription = nodeContainer->create_subscription<ros2_components_msg::msg::ListComponentsRequest>("listComponentsRequest", std::bind(&ComponentManager::listComponentsRequestCallback, this,_1), component_manager_profile);
+    this->listComponentsResponsePublisher = nodeContainer->create_publisher<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse",component_manager_profile);
 
     LOG(Info) << "Created new instance of a ComponentManager" << std::endl;
 }
@@ -82,7 +83,7 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 
 void ComponentManager::enableComponentHandling()
 {
-    this->listComponentsResponseSubscription = rosNode->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
+    this->listComponentsResponseSubscription = nodeContainer->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
     handle_components = true;
 }
 
