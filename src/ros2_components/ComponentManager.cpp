@@ -83,7 +83,8 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 
 void ComponentManager::enableComponentHandling()
 {
-    this->listComponentsResponseSubscription = nodeContainer->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
+    if(!handle_components)
+        this->listComponentsResponseSubscription = nodeContainer->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
     handle_components = true;
 }
 
