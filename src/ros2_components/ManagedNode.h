@@ -139,6 +139,8 @@ public:
      */
     NodeContainer::SharedPtr getRosNodeContainer() const;
 
+    bool getEnableVerbose() const;
+
 private:
 
     /**
@@ -195,7 +197,7 @@ private:
     std::string logLevelStr = "";
 
     bool printBuildInfoFound = false;
-
+    bool enableVerbose = false;
 
 
 };

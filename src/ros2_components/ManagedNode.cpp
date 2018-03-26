@@ -35,10 +35,12 @@ ManagedNode::ManagedNode(std::string _nodeName, int argc, char *argv[], bool par
     CLIArgument logArg = {"logpath","Path to the logfile - also enables the logging to a file", &this->logfilePath};
     CLIArgument configArg = {"configpath","Path to a configfile", &this->configfilePath};
     CLIArgument logLevelArg = {"loglevel", "The wanted minimum loglevel", &this->logLevelStr};
+    CLIArgument verboseArg ={"verbose", "Enable all debug messages", &this->enableVerbose};
     cliParser.addArgument(idArg);
     cliParser.addArgument(logArg);
     cliParser.addArgument(configArg);
     cliParser.addArgument(logLevelArg);
+    cliParser.addArgument(verboseArg);
     //This defaults to true. You can pass parseCli = false to the constructor in case you want to add your own arguments in an inherited node.
     if(parseCli)
     {
@@ -126,6 +128,11 @@ ManagedNodeState ManagedNode::getNodeState() const
 NodeContainer::SharedPtr ManagedNode::getRosNodeContainer() const
 {
     return rosNode;
+}
+
+bool ManagedNode::getEnableVerbose() const
+{
+    return enableVerbose;
 }
 
 void ManagedNode::doWork()
