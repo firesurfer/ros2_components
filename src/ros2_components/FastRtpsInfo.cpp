@@ -51,7 +51,45 @@ std::vector<eprosima::fastrtps::Publisher*> FastRtpsInfo::getAllFastRtpsPublishe
 
     }
     slave_target->mapmutex.unlock();*/
+    throw std::runtime_error("getAllFastRtpsPublishers not implemented yet");
 
+}
+
+std::string FastRtpsInfo::printPublisherInfo(rclcpp::PublisherBase::SharedPtr _pub)
+{
+
+    std::stringstream info_str;
+    info_str << "Topic name: " << _pub->get_topic_name() << "\n";
+    info_str << "Queue size: " << _pub->get_queue_size() << "\n";
+
+    auto fpub = getFastRtpsPublisher(_pub);
+    info_str << "Heartbeat period: " << duration_t_toString(fpub->getAttributes().times.heartbeatPeriod) << "\n";
+    info_str << "Initial Hearbeat delay: " << duration_t_toString(fpub->getAttributes().times.initialHeartbeatDelay) << "\n";
+    info_str << "Nack Response Delay: s" << duration_t_toString(fpub->getAttributes().times.nackResponseDelay) << "\n";
+
+    return info_str.str();
+ }
+
+std::string FastRtpsInfo::printSubscriberInfo(rclcpp::SubscriptionBase::SharedPtr _sub)
+{
+    std::stringstream info_str;
+    info_str << "Topic name: " << _sub->get_topic_name() << "\n";
+
+    auto fsub = getFastRtpsSubscription(_sub);
+    info_str << "Unread count: " << fsub->getUnreadCount() << "\n";
+    info_str << "Is in clean state: " << fsub->isInCleanState() << "\n";
+    info_str << "Hearbeat Response Delay: " << duration_t_toString(fsub->getAttributes().times.heartbeatResponseDelay) << "\n";
+    info_str << "Initial Ack Nack Delay: " << duration_t_toString(fsub->getAttributes().times.initialAcknackDelay) << "\n";
+    info_str << "User defined ID: " << fsub->getAttributes().getUserDefinedID() << "\n";
+    info_str << "Topic data Type: " << fsub->getAttributes().topic.getTopicDataType() << "\n";
+
+    return info_str.str();
+
+ }
+
+std::string FastRtpsInfo::duration_t_toString(Duration_t _dur)
+{
+    return std::to_string(_dur.seconds) + "." + std::to_string(_dur.fraction);
 }
 
 }

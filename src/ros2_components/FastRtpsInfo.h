@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <sstream>
 #include "rclcpp/rclcpp.hpp"
 
 #include "rmw_fastrtps_cpp/get_participant.hpp"
@@ -29,6 +30,10 @@ public:
     static eprosima::fastrtps::Publisher * getFastRtpsPublisher(rclcpp::PublisherBase::SharedPtr _publisher);
     static eprosima::fastrtps::Subscriber * getFastRtpsSubscription(rclcpp::SubscriptionBase::SharedPtr _subscription);
     static std::vector<eprosima::fastrtps::Publisher*> getAllFastRtpsPublishers(NodeContainer::SharedPtr _nodeContainer);
+    static std::string printPublisherInfo(rclcpp::PublisherBase::SharedPtr _pub);
+    static std::string printSubscriberInfo(rclcpp::SubscriptionBase::SharedPtr _sub);
+private:
+    static std::string duration_t_toString(Duration_t _dur);
 
 };
 }
