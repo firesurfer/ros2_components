@@ -179,7 +179,12 @@ void ManagedNode::setup(LogLevel logLevel)
     //Set loglevel to given loglevel
     if(logLevelStr != "")
         logLevel = simpleLogger::getInstance()->fromString(logLevelStr);
-
+    //In case we enabled verbose we enforce debug log level!
+    if(enableVerbose)
+    {
+        std::cout << "Enabled verbose - setting loglevel to debug" << std::endl;
+        logLevel = LogLevel::Debug;
+    }
     LOGLEVEL(logLevel);
     //If the --logfile argument was successfully parsed, set logfilepath (this will enable logging to a file)
     if(this->logfilePath != "")
