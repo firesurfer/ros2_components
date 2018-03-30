@@ -18,17 +18,18 @@
 #include "EntityBase.h"
 namespace ros2_components {
 
-EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, string _className)
+EntityBase::EntityBase(int64_t _id, bool _subscribe,  NodeContainer::SharedPtr _nodeContainer, string _className):
+    id{_id},
+    subscriber{_subscribe},
+    nodeContainer{_nodeContainer},
+    className{_className}
 {
-    this->id = _id;
-    this->subscriber = _subscribe;
-    this->parentNode = _parentNode;
+
     this->className = _className;
     this->active = true;
     this->virtualEntity = false;
     this->name = getClassName()  + std::to_string(id);
 
-    //TODO rework meta mechanism
 
     REFLECT(className);
     REFLECT(active);
@@ -39,7 +40,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Nod
 
 }
 
-EntityBase::EntityBase(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, string _className, string _componentName):EntityBase(_id,_subscribe, _parentNode,_className)
+EntityBase::EntityBase(int64_t _id, bool _subscribe,  NodeContainer::SharedPtr _nodeContainer, string _className, string _componentName):EntityBase(_id,_subscribe, _nodeContainer,_className)
 {
     this->name = _componentName + std::to_string(_id);
 }
@@ -62,7 +63,7 @@ EntityBase::~EntityBase()
             info.parentType = parent_ptr->getClassName();
         }
         info.name = getName();
-        info.nodename = parentNode->get_name();
+        info.nodename = nodeContainer->getRosNode()->get_name();
         info.type = getClassName();
         emit entityDeleted(info);
     }
@@ -101,6 +102,11 @@ bool EntityBase::isSubscriber()
 rclcpp::Node::SharedPtr EntityBase::getParentNode()
 {
     return parentNode;
+}
+
+NodeContainer::SharedPtr EntityBase::getNodeContainer()
+{
+    return nodeContainer;
 }
 
 void EntityBase::addChild(std::shared_ptr<EntityBase> child, bool remote)

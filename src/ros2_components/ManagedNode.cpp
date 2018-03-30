@@ -171,7 +171,7 @@ void ManagedNode::setup(LogLevel logLevel)
     //Some info before the logger was started
     std::cout << "Started node: " << rosNode->getRosNode()->get_name() << std::endl;
     //Create the entity that represents the node (This is the real base)
-    this->nodeEntity = std::make_shared<NodeEntity>(rosNode->getNodeId(), this->nodeName, rosNode->getRosNode());
+    this->nodeEntity = std::make_shared<NodeEntity>(rosNode->getNodeId(), this->nodeName, rosNode);
 
 
     //Init logger

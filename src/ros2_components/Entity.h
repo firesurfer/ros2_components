@@ -32,38 +32,38 @@ public:
      * @brief Constructor of Entity
      * @param className is used together with the id to itentify topics, etc. of this entity
      */
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
+    Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className) : EntityBase(_id, _subscribe, _nodeContainer, _className)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
         if(!isSubscriber())
         {
-            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            entityPublisher = nodeContainer->create_publisher<MessageType>(getName(), custom_qos_profile);
             pubBase = entityPublisher;
         }
         else
         {
             using namespace std::placeholders;
-            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            entitySubscription = nodeContainer->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
             subBase = entitySubscription;
         }
         LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
     }
 
-
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
+    //TODO deduplicate
+    Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_nodeContainer,_className,_componentName)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
         custom_qos_profile = rmw_qos_profile_sensor_data;
         if(!isSubscriber())
         {
-            entityPublisher = parentNode->create_publisher<MessageType>(getName(), custom_qos_profile);
+            entityPublisher = nodeContainer->create_publisher<MessageType>(getName(), custom_qos_profile);
             pubBase = entityPublisher;
         }
         else
         {
             using namespace std::placeholders;
-            entitySubscription = parentNode->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
+            entitySubscription = nodeContainer->create_subscription<MessageType>(getName(), std::bind(&Entity::internalListenerCallback, this,_1), custom_qos_profile);
             subBase = entitySubscription;
         }
         LOG(LogLevel::Info) << "Created: " << getName() << " As a subscriber?: " << std::to_string(isSubscriber())<<std::endl;
@@ -170,12 +170,12 @@ template<>
 class Entity<std_msgs::msg::Empty> :public EntityBase
 {
 public:
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className) : EntityBase(_id, _subscribe, _parentNode, _className)
+    Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className) : EntityBase(_id, _subscribe, _nodeContainer, _className)
     {
 
     }
 
-    Entity(int64_t _id, bool _subscribe, std::shared_ptr<rclcpp::Node> _parentNode, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_parentNode,_className,_componentName)
+    Entity(int64_t _id, bool _subscribe,NodeContainer::SharedPtr _nodeContainer, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_nodeContainer,_className,_componentName)
     {
 
     }

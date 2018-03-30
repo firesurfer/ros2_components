@@ -295,7 +295,7 @@ std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentIn
         subscribeArg = Q_ARG(bool, true);
     else
         subscribeArg = Q_ARG(bool, false);
-    QGenericArgument nodeArg  =Q_ARG(std::shared_ptr< rclcpp::Node >, rosNode);
+    QGenericArgument nodeArg  =Q_ARG(NodeContainer::SharedPtr, nodeContainer);
 
     std::shared_ptr<EntityBase> ent = EntityFactory::createInstanceFromName(info.type,idArg,subscribeArg,nodeArg);
     //std::shared_ptr<T> secEnt = dynamic_pointer_cast<T>(ent);

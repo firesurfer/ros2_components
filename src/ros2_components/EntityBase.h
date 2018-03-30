@@ -40,6 +40,7 @@
 #include "Reflect.h"
 #include "ComponentInfo.h"
 #include "ros2_components_exceptions.h"
+#include "NodeContainer.h"
 
 /*Qt5*/
 #include <QObject>
@@ -63,8 +64,8 @@ class EntityBase : public QObject, public std::enable_shared_from_this<EntityBas
 public:
 
     typedef std::shared_ptr<EntityBase> SharedPtr;
-    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode, std::string _className);
-    EntityBase(int64_t _id, bool _subscribe, std::shared_ptr< rclcpp::Node > _parentNode, std::string _className, std::string _componentName);
+    EntityBase(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className);
+    EntityBase(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className, std::string _componentName);
     virtual ~EntityBase();
 
     /**
@@ -98,6 +99,12 @@ public:
      * @return The rosnode associated with this entity
      */
     rclcpp::Node::SharedPtr getParentNode();
+
+    /**
+     * @brief getNodeContainer
+     * @return
+     */
+    NodeContainer::SharedPtr getNodeContainer();
 
     /**
      * @brief addChild
@@ -251,6 +258,10 @@ protected:
      */
     std::shared_ptr<rclcpp::Node> parentNode;
     /**
+     * @brief nodeContainer - wraps up the ros2 node
+     */
+    NodeContainer::SharedPtr nodeContainer;
+    /**
      * Helper method so we can use REFLECT on a variable
      */
     template <class T>
@@ -329,4 +340,7 @@ private:
 
 
 };
+
+
+
 }
