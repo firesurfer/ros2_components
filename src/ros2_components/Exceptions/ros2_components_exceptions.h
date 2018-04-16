@@ -10,5 +10,5 @@
 #include "MissingChildException.h"
 #include "EntityWidgetCastException.h"
 #include "EntityWidgetNotRegisteredException.h"
-
+#include "NotImplementedException.h"
 #endif // ROS2_COMPONENTS_EXCEPTIONS_H
