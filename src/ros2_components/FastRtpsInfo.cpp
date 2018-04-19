@@ -87,7 +87,7 @@ std::string FastRtpsInfo::printSubscriberInfo(rclcpp::SubscriptionBase::SharedPt
 
  }
 
-std::string FastRtpsInfo::duration_t_toString(Duration_t _dur)
+std::string FastRtpsInfo::duration_t_toString(eprosima::fastrtps::rtps::Duration_t _dur)
 {
     return std::to_string(_dur.seconds) + "." + std::to_string(_dur.fraction);
 }

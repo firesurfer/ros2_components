@@ -34,7 +34,7 @@ public:
     static std::string printPublisherInfo(rclcpp::PublisherBase::SharedPtr _pub);
     static std::string printSubscriberInfo(rclcpp::SubscriptionBase::SharedPtr _sub);
 private:
-    static std::string duration_t_toString(Duration_t _dur);
+    static std::string duration_t_toString(eprosima::fastrtps::rtps::Duration_t _dur);
 
 };
 }
