@@ -14,6 +14,7 @@
 #include "rmw_fastrtps_cpp/get_subscriber.hpp"
 #include "rmw_fastrtps_cpp/custom_participant_info.hpp"
 #include "fastrtps/attributes/ParticipantAttributes.h"
+#include "fastrtps/fastrtps_all.h"
 #include "NodeContainer.h"
 
 
