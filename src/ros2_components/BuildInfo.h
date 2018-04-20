@@ -11,7 +11,11 @@ class BuildInfo
 public:
     static std::string get_build_date()
     {
+#ifndef BUILD_TIME
         return std::string(__DATE__) + "  " + std::string(__TIME__);
+#else
+        return std::string(BUILD_TIME);
+#endif
     }
 
     static std::string get_build_version()

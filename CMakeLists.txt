@@ -10,7 +10,16 @@ endif()
 IF (NOT DEFINED BUILD_VERSION)
     SET(BUILD_VERSION "not set")
 ENDIF()
-ADD_DEFINITIONS(-DBUILD_VERSION="${BUILD_VERSION}")
+
+
+option(BUILD_TIME_FROM_CMAKE "Set the build time via cmake. Might force rebuilds every build!" OFF)
+
+if(BUILD_TIME_FROM_CMAKE)
+string(TIMESTAMP BUILD_TIME "%H:%M:%S %d.%m.%Y" )
+    ADD_DEFINITIONS(-DBUILD_VERSION="${BUILD_VERSION}" -DBUILD_TIME="${BUILD_TIME}")
+else()
+    ADD_DEFINITIONS(-DBUILD_VERSION="${BUILD_VERSION}")
+endif()
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
