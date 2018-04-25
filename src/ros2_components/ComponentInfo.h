@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 <Lennart Nachtigall> <firesurfer65@yahoo.de>
+ * Copyright 2018 <Lennart Nachtigall> <firesurfer127@gmail.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  *
  */
-
 #pragma once
 
 
