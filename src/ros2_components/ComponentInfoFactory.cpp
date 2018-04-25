@@ -32,7 +32,7 @@ ComponentInfo ComponentInfoFactory::fromEntity(EntityBase::SharedPtr ent)
     //TODO move this into a more general place
 
     info.machineip = Networking::getLocalIpV4();
-    if(ent->getParent() != NULL)
+    if(ent->getParent() != nullptr)
     {
         info.parentId = ent->getParent()->getId();
         info.parentType = ent->getParent()->getClassName();

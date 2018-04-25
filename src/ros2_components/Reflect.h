@@ -55,12 +55,12 @@ public:
     string key;
     string type;
 
-    virtual ~Element() {}
+    virtual ~Element(){}
 
-    virtual std::string getKey(){return key;}
-    virtual std::string getType(){return type;}
+    virtual std::string getKey();
+    virtual std::string getType();
     virtual size_t getSize()=0;
-    virtual void print(){}
+    virtual void print()=0;
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
     virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key, std::string & _type)=0;
@@ -151,12 +151,13 @@ public:
     {
         return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
+    //TODO why only use 8 bit length?
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
     {
         _key = key;
         _type = type;
 
-        length = data.length();
+        length = static_cast<uint8_t>(data.length());
         return data.c_str();
 
     }
@@ -203,11 +204,12 @@ public:
     {
         return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
+    //TOD0 8 bit length?
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
     {
         _key = key;
         _type = type;
-        length = data.size();
+        length = static_cast<uint8_t>(data.size());
         return data.data();
     }
     virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)

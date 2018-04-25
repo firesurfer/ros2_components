@@ -28,10 +28,10 @@ namespace ros2_components {
 
 class NodeEntity: public Entity<std_msgs::msg::Empty>
 {
-
+    Q_OBJECT
 public:
     typedef std::shared_ptr<NodeEntity> SharedPtr;
-    NodeEntity(uint64_t _id, std::string _name, NodeContainer::SharedPtr _nodeContainer);
+    Q_INVOKABLE NodeEntity(uint64_t _id, std::string _name, NodeContainer::SharedPtr _nodeContainer);
 
     virtual ~NodeEntity();
 

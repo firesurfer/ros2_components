@@ -25,7 +25,7 @@ class AlreadySpinningException: public std::exception
 public:
     AlreadySpinningException();
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
        return "Node is already spinning";
     }

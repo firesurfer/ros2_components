@@ -27,7 +27,7 @@ class EntityCircleException: public std::exception
 public:
     explicit EntityCircleException(const std::string& msg = "An Entity circle has been created");
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return message.c_str();
     }

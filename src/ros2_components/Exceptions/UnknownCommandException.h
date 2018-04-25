@@ -26,7 +26,7 @@ class UnknownCommandException : std::exception
 public:
     explicit UnknownCommandException(const std::string& msg = "Unknown command");
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return message.c_str();
     }

@@ -20,9 +20,9 @@
 namespace ros2_components {
 
 EntityBase::EntityBase(int64_t _id, bool _subscribe,  NodeContainer::SharedPtr _nodeContainer, string _className):
+    nodeContainer{_nodeContainer},
     id{_id},
     subscriber{_subscribe},
-    nodeContainer{_nodeContainer},
     className{_className}
 {
 
@@ -35,7 +35,7 @@ EntityBase::EntityBase(int64_t _id, bool _subscribe,  NodeContainer::SharedPtr _
     REFLECT(className);
     REFLECT(active);
     REFLECT(description)
-    qRegisterMetaType<int64_t>("int64_t");
+            qRegisterMetaType<int64_t>("int64_t");
     qRegisterMetaType<std::string>("std::string");
 
 
@@ -198,7 +198,7 @@ void EntityBase::iterateThroughAllProperties(std::function<void(Element *)> func
 {
     for(Element* elem: this->internalmap)
     {
-        if(func != NULL)
+        if(func != nullptr)
             func(elem);
     }
 }

@@ -86,11 +86,20 @@ public:
      * @return The description string of this verb
      */
     std::string getDescription() const;
-
+    /**
+     * @brief getAllCliArguments
+     * @return
+     */
     std::vector<CLIArgument> getAllCliArguments() const;
-
+    /**
+     * @brief getChildVerbs
+     * @return
+     */
     std::map<std::string, CLIVerb> getChildVerbs() const;
-
+    /**
+     * @brief getAllCliParameter
+     * @return
+     */
     std::vector<CLIParameter> getAllCliParameter() const;
 
 

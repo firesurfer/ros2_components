@@ -25,7 +25,7 @@ class NodeNotInitializedException: public std::exception
 public:
     NodeNotInitializedException();
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
        return "Node has not been initialized";
     }

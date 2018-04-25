@@ -25,7 +25,7 @@ class TimeoutException: public std::exception
 public:
     TimeoutException();
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return "Timed out";
     }

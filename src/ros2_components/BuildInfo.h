@@ -64,7 +64,7 @@ public:
     static std::vector<std::string> get_loaded_libraries()
     {
         libraries_names.clear();
-        dl_iterate_phdr(iterate_libraries,NULL);
+        dl_iterate_phdr(iterate_libraries, nullptr);
         return BuildInfo::libraries_names;
     }
 private:

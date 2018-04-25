@@ -28,7 +28,7 @@ class NotImplementedException:  std::exception
 public:
     explicit NotImplementedException(const std::string& msg = "Functionality not implemented");
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return message.c_str();
     }

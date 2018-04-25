@@ -142,7 +142,7 @@ bool CLIVerb::parse(std::vector<std::__cxx11::string> &str, bool * error)
         }
 
     }
-    int i = 0;
+    size_t i = 0;
     if(cliParameters.size() != parameters.size())
     {
         throw std::runtime_error("Wrong amount of parameters. Expecting: "+ std::to_string(cliParameters.size()));

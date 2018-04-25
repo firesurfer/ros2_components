@@ -26,7 +26,7 @@ class MissingChildException : std::exception
 public:
     explicit MissingChildException(const std::string& msg = "Requested child is missing");
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return message.c_str();
     }

@@ -26,7 +26,7 @@ class EntityCastException: public std::exception
 public:
     explicit EntityCastException(const std::string& msg = "Could not cast entity to given type");
 
-    virtual const char* what() const throw()
+    virtual const char* what() const noexcept
     {
         return message.c_str();
     }

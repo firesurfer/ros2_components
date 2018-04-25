@@ -20,8 +20,9 @@
 
 namespace ros2_components
 {
-ComponentManager::ComponentManager(NodeContainer::SharedPtr _nodeContainer) : componentsReader(0),
-    nodeContainer{_nodeContainer}
+ComponentManager::ComponentManager(NodeContainer::SharedPtr _nodeContainer) :
+    nodeContainer{_nodeContainer},
+    componentsReader(0)
 {
     using namespace std::placeholders;
     //Variable Assignments
@@ -167,7 +168,7 @@ ComponentInfo ComponentManager::getInfoWithFilter(std::function<bool (const Comp
                 {
                     break;
                 }
-                hertz = std::max(hertz, (long) (std::chrono::milliseconds(1000).count() / diffTime.count()));
+                hertz = std::max(hertz, static_cast<long>((std::chrono::milliseconds(1000).count() / diffTime.count())));
             }
 
             rclcpp::WallRate loop_rate(hertz);

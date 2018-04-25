@@ -16,3 +16,7 @@
  */
 
 #include "Reflect.h"
+
+string Element::getKey(){return key;}
+
+string Element::getType(){return type;}
