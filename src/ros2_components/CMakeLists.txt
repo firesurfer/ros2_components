@@ -34,9 +34,9 @@ ament_target_dependencies(ros2_components
     ros2_components_msgs)
 target_link_libraries(ros2_components 
     Threads::Threads
-    Qt5::Core
-    Qt5::Network
-    Qt5::Widgets
+    ${Qt5Core_LIBRARIES}
+    ${Qt5Network_LIBRARIES}
+    ${Qt5Widgets_LIBRARIES}
 
 )
 install(TARGETS ros2_components DESTINATION lib)
