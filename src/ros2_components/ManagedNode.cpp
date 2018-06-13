@@ -116,7 +116,7 @@ ManagedNodeState ManagedNode::getNodeState() const
         return ManagedNodeState::Initialized;
     if(isSetup  && rosNode && rosNode->getIsSpinningAsync() )
         return ManagedNodeState::SpinningAsync;
-    if(isSetup   && rosNode && !rosNode->getIsSpinning() )
+    if(isSetup   && rosNode && rosNode->getIsSpinning() )
         return ManagedNodeState::SpinningSync;
     if(! rosNode)
         return ManagedNodeState::ExitCalled;
