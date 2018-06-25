@@ -47,7 +47,6 @@ using namespace std;
  *
  */
 
-//TODO remove parameter variant
 //TODO use configurable map
 //TODO Check assertions
 class Element{
@@ -61,8 +60,6 @@ public:
     virtual std::string getType();
     virtual size_t getSize()=0;
     virtual void print()=0;
-    virtual rclcpp::parameter::ParameterVariant  getParameterVariant()=0;
-    virtual rclcpp::parameter::ParameterVariant  getParameterVariant(std::string prefix)= 0;
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key, std::string & _type)=0;
     virtual std::vector<uint8_t> getBytes(std::string & _key, std::string &_type)=0;
     
@@ -95,14 +92,6 @@ public:
     virtual size_t getSize()
     {
         return sizeof(T);
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant()
-    {
-        return rclcpp::parameter::ParameterVariant(key, data);
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
-    {
-        return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
     {
@@ -142,14 +131,6 @@ public:
     virtual size_t getSize()
     {
         return data.length();
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant()
-    {
-        return rclcpp::parameter::ParameterVariant(key, data);
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
-    {
-        return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
     //TODO why only use 8 bit length?
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
@@ -195,14 +176,6 @@ public:
     virtual size_t getSize()
     {
         return data.size();
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant()
-    {
-        return rclcpp::parameter::ParameterVariant(key, data);
-    }
-    virtual rclcpp::parameter::ParameterVariant getParameterVariant(std::string prefix)
-    {
-        return rclcpp::parameter::ParameterVariant(prefix+"."+key, data);
     }
     //TOD0 8 bit length?
     virtual const void * getVoidPtr(uint8_t & length, std::string & _key,std::string &_type)
