@@ -35,7 +35,7 @@ std::shared_ptr<EntityBase> EntityFactory::createInstanceFromName(string classNa
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
     {
-        throw EntityNotRegisteredException();
+        throw EntityNotRegisteredException(className);
     }
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
@@ -53,7 +53,7 @@ std::shared_ptr<EntityBase> EntityFactory::createInstanceFromName(string classNa
 std::shared_ptr<QMetaObject> EntityFactory::getQMetaObject(string className)
 {
     if(!metaObjs.keys().contains(QString::fromStdString(className)))
-        throw EntityNotRegisteredException();
+        throw EntityNotRegisteredException(className);
 
     const QMetaObject *meta = metaObjs[QString::fromStdString(className)];
     LOG(LogLevel::Debug) << "Class name from staticMetaObject: " << meta->className() << std::endl;

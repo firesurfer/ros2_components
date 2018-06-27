@@ -19,16 +19,21 @@
 #define ENTITYNOTREGISTEREDEXCEPTION
 
 #include <exception>
+#include <string>
 
 class EntityNotRegisteredException: public std::exception
 {
 public:
     EntityNotRegisteredException();
+    EntityNotRegisteredException(const std::string& type);
 
     virtual const char* what() const noexcept
     {
-        return "Entity is not registered to the EntityFactory";
+      return m_message.data();
     }
+
+private:
+    std::string m_message;
 };
 
 #endif //ENTITYNOTREGISTEREDEXCEPTION

@@ -18,5 +18,11 @@
 #include "EntityNotRegisteredException.h"
 
 EntityNotRegisteredException::EntityNotRegisteredException()
+  : m_message("Entity is not registered to the EntityFactory")
+{
+}
+
+EntityNotRegisteredException::EntityNotRegisteredException(const std::string& type)
+  : m_message("Entity of type '" + type + "' is not registered to the EntityFactory")
 {
 }
