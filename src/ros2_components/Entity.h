@@ -54,7 +54,7 @@ public:
     Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_nodeContainer,_className,_componentName)
     {
         //Some ROS2 QOS Configuration -> Taken from an example
-        custom_qos_profile = rmw_qos_profile_sensor_data;
+        custom_qos_profile = rmw_qos_profile_parameters;
         if(!isSubscriber())
         {
             entityPublisher = nodeContainer->create_publisher<MessageType>(getName(), custom_qos_profile);
