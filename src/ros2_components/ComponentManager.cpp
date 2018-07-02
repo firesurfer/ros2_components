@@ -286,7 +286,7 @@ std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentIn
     bool waitIndefinitely = timeout < std::chrono::milliseconds::zero();
     if(!EntityFactory::contains(info.type))
     {
-        throw EntityNotRegisteredException();
+        throw EntityNotRegisteredException(info.type);
     }
 
     QGenericArgument subscribeArg;
