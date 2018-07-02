@@ -34,8 +34,7 @@ public:
      */
     Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className) : EntityBase(_id, _subscribe, _nodeContainer, _className)
     {
-        //Some ROS2 QOS Configuration -> Taken from an example
-        custom_qos_profile = rmw_qos_profile_parameters;
+        custom_qos_profile = rmw_qos_profile_default;
         if(!isSubscriber())
         {
             entityPublisher = nodeContainer->create_publisher<MessageType>(getName(), custom_qos_profile);
@@ -53,8 +52,7 @@ public:
     //TODO deduplicate
     Entity(int64_t _id, bool _subscribe, NodeContainer::SharedPtr _nodeContainer, std::string _className, std::string _componentName):EntityBase(_id,_subscribe,_nodeContainer,_className,_componentName)
     {
-        //Some ROS2 QOS Configuration -> Taken from an example
-        custom_qos_profile = rmw_qos_profile_parameters;
+        custom_qos_profile = rmw_qos_profile_default;
         if(!isSubscriber())
         {
             entityPublisher = nodeContainer->create_publisher<MessageType>(getName(), custom_qos_profile);
