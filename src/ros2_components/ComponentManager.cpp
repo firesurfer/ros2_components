@@ -84,8 +84,10 @@ void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 
 void ComponentManager::enableComponentHandling()
 {
-    if(!handle_components)
+    if(!this->listComponentsResponseSubscription)
+    {
         this->listComponentsResponseSubscription = nodeContainer->create_subscription<ros2_components_msg::msg::ListComponentsResponse>("listComponentsResponse", std::bind(&ComponentManager::listComponentsResponseCallback, this,_1), component_manager_profile);
+    }
     handle_components = true;
 }
 
@@ -394,7 +396,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
                     {
                         toDelete = true;
                         //TODO delete from list more efficient
-                        LOG(Info) << "Deleting: " << myInfo.name << " due to timeout"<< std::endl;
+                        LOG(Info) << "Deleting component: " << myInfo.name << std::endl;
                         emit componentDeleted(myInfo);
 
                     }
