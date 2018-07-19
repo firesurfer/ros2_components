@@ -34,7 +34,7 @@ ComponentManager::ComponentManager(NodeContainer::SharedPtr _nodeContainer) :
     component_manager_profile = rmw_qos_profile_default;
     component_manager_profile.depth = 5000;
     component_manager_profile.reliability = RMW_QOS_POLICY_RELIABILITY_RELIABLE;
-    component_manager_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
+    //component_manager_profile.durability = RMW_QOS_POLICY_DURABILITY_VOLATILE;
 
     //component_manager_profile.history = RMW_QOS_POLICY_KEEP_ALL_HISTORY;
 
