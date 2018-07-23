@@ -58,6 +58,7 @@ ComponentManager::~ComponentManager()
 
 void ComponentManager::registerComponents(EntityBase::SharedPtr _baseEntity)
 {
+    LOG(Debug) << "registerComponents" << std::endl;
     //Variable Assignments
     while (_baseEntity->getParent() != nullptr)
     {
@@ -278,7 +279,7 @@ void ComponentManager::updateComponentsList()
 {
     enableComponentHandling();
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
-    request->nodename = rosNode->get_name();
+    request->nodename =  "Cube4001"; //rosNode->get_name();
     this->listComponentsRequestPublisher->publish(request);
 }
 
@@ -356,8 +357,12 @@ void ComponentManager::enableComponentTimeout()
 
 void ComponentManager::listComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
+    LOG(Debug) << "listComponentsRequestCallback" << std::endl;
+    LOG(Debug) << "rosNode: " << rosNode->get_name() << std::endl;
+    LOG(Debug) << "msg: " << msg->nodename << std::endl;
     if(rosNode->get_name() != msg->nodename)
     {
+        LOG(Debug) << "generateResponse" << std::endl;
         generateResponse();
     }
 }
@@ -373,6 +378,11 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
         bool foundInList = false;
         bool toDelete = false;
         ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
+
+        if (currentInfo.type == "Cube")
+        {
+            LOG(Debug) << "currentInfo: " << currentInfo.name << std::endl;
+        }
         {
             ReaderGuard rg(this);
             //Save time we found the component
@@ -524,12 +534,14 @@ void ComponentManager::collect_timed_out_components()
 
 void ComponentManager::generateResponse()
 {
+    LOG(Debug) << "Response" << std::endl;
     auto responseFunc = [&]()
     {
         if(baseEntity)
         {
             ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(this->baseEntity).toRosMessage();
             msg->nodename = rosNode->get_name();
+            LOG(Debug) << "Name: " << rosNode->get_name() << std::endl;
             msg->deleted = false;
             this->listComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
