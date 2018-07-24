@@ -350,9 +350,10 @@ std::shared_ptr<EntityBase> ComponentManager::rebuildComponent(const ComponentIn
     return ent;
 }
 
-void ComponentManager::enableComponentTimeout()
+void ComponentManager::enableComponentTimeout(chrono::seconds garbage_time)
 {
     this->enable_components_timeout = true;
+    this->components_timeout_garbage_collect_time = garbage_time;
     components_timeout_timer = rosNode->create_wall_timer(500ms, std::bind(&ComponentManager::collect_timed_out_components,this));
 }
 
