@@ -469,8 +469,7 @@ void ComponentManager::collect_timed_out_components()
             {
                 //Ask for it
                 updateComponentsList();
-                //Save the component into a second list
-                components_last_request_times[currentInfo.id] = current_time;
+                components_last_request_times[currentInfo.id] = std::min(current_time, components_last_request_times[currentInfo.id]);
             }
             else
             {
@@ -527,6 +526,8 @@ void ComponentManager::collect_timed_out_components()
                         pos++;
                     }
                     components.erase(components.begin()+pos);
+                    components_times.erase(component_id);
+                    components_last_request_times.erase(component_id);
                 }
             }
         }
