@@ -277,7 +277,7 @@ void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> call
 
 void ComponentManager::updateComponentsList()
 {
-    LOG(Debug) << "Update: " << std::endl;
+    LOG(Debug) << "updateComponentList " << std::endl;
     enableComponentHandling();
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
     request->nodename = rosNode->get_name();
@@ -416,7 +416,6 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             {
                 componentsCV.wait(lck);
             }
-
 
             components.push_back(currentInfo);
 
