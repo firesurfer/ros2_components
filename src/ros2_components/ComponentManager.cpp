@@ -420,7 +420,6 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             components.push_back(currentInfo);
 
             lck.unlock(); //Connected functions could try to read -> deadlock!
-            LOG(Debug) << "new component: " << currentInfo.name << std::endl;
             emit newComponentFound(currentInfo);
         }
         if(toDelete)
