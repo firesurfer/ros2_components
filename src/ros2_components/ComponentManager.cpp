@@ -277,9 +277,10 @@ void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> call
 
 void ComponentManager::updateComponentsList()
 {
+    LOG(Debug) << "Update: " << std::endl;
     enableComponentHandling();
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
-    request->nodename =  "Cube4001"; //rosNode->get_name();
+    request->nodename = rosNode->get_name();
     this->listComponentsRequestPublisher->publish(request);
 }
 
@@ -390,7 +391,6 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             components_times[currentInfo.id] = current_time;
             for(ComponentInfo & myInfo: components)
             {
-
                 if(myInfo.name == currentInfo.name)
                 {
                     //LOG(Debug) << "My: " << myInfo.id << " " << myInfo.name << " Remote: " << currentInfo.id << " " << currentInfo.name << std::endl;
