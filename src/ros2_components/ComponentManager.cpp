@@ -359,12 +359,8 @@ void ComponentManager::enableComponentTimeout(chrono::seconds garbage_time)
 
 void ComponentManager::listComponentsRequestCallback(ros2_components_msg::msg::ListComponentsRequest::SharedPtr msg)
 {
-    LOG(Debug) << "listComponentsRequestCallback" << std::endl;
-    LOG(Debug) << "rosNode: " << rosNode->get_name() << std::endl;
-    LOG(Debug) << "msg: " << msg->nodename << std::endl;
     if(rosNode->get_name() != msg->nodename)
     {
-        LOG(Debug) << "generateResponse" << std::endl;
         generateResponse();
     }
 }
@@ -380,11 +376,6 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
         bool foundInList = false;
         bool toDelete = false;
         ComponentInfo currentInfo = ComponentInfoFactory::fromListComponentsResponseMessage(msg);
-
-        if (currentInfo.type == "Cube")
-        {
-            LOG(Debug) << "currentInfo: " << currentInfo.name << std::endl;
-        }
         {
             ReaderGuard rg(this);
             //Save time we found the component
@@ -430,6 +421,7 @@ void ComponentManager::listComponentsResponseCallback(ros2_components_msg::msg::
             components.push_back(currentInfo);
 
             lck.unlock(); //Connected functions could try to read -> deadlock!
+            LOG(Debug) << "new component: " << currentInfo.name << std::endl;
             emit newComponentFound(currentInfo);
         }
         if(toDelete)
