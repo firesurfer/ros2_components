@@ -461,7 +461,15 @@ void ComponentManager::collect_timed_out_components()
             {
                 //Ask for it
                 updateComponentsList();
-                components_last_request_times[currentInfo.id] = std::min(current_time, components_last_request_times[currentInfo.id]);
+                auto it = components_last_request_times.find(currentInfo.id);
+                if (it == components_last_request_times.end())
+                {
+                  components_last_request_times[currentInfo.id] = current_time;
+                }
+                else
+                {
+                  components_last_request_times[currentInfo.id] = std::min(current_time, components_last_request_times[currentInfo.id]);
+                }
             }
             else
             {
@@ -478,7 +486,7 @@ void ComponentManager::collect_timed_out_components()
 
         for(auto & it: components_last_request_times)
         {
-            if(current_time - it.second > components_timeout_garbage_collect_time)
+            if(current_time - it.second > 2 * components_timeout_garbage_collect_time)
             {
                 //Delete component
                 int64_t component_id = it.first;
