@@ -277,7 +277,6 @@ void ComponentManager::getInfoToIdAsync(std::function<void (ComponentInfo)> call
 
 void ComponentManager::updateComponentsList()
 {
-    LOG(Debug) << "updateComponentList " << std::endl;
     enableComponentHandling();
     ros2_components_msg::msg::ListComponentsRequest::SharedPtr request = std::make_shared<ros2_components_msg::msg::ListComponentsRequest>();
     request->nodename = rosNode->get_name();
@@ -451,6 +450,7 @@ void ComponentManager::collect_timed_out_components()
     if(enable_components_timeout)
     {
         auto current_time = std::chrono::steady_clock::now();
+        bool component_timed_out = false;
         for(ComponentInfo & currentInfo: components)
         {
             //We haven't heard about the component for a long time
@@ -458,7 +458,7 @@ void ComponentManager::collect_timed_out_components()
             if((current_time - components_times[currentInfo.id]) > components_timeout_garbage_collect_time)
             {
                 //Ask for it
-                updateComponentsList();
+                component_timed_out = true;
                 auto it = components_last_request_times.find(currentInfo.id);
                 if (it == components_last_request_times.end())
                 {
@@ -481,6 +481,10 @@ void ComponentManager::collect_timed_out_components()
             }
 
         }
+        if (component_timed_out)
+        {
+          updateComponentsList();
+        }
 
         for(auto & it: components_last_request_times)
         {
@@ -499,8 +503,10 @@ void ComponentManager::collect_timed_out_components()
                         {
                             component_info = info;
                             info_found = true;
+                            break;
                         }
                     }
+                    LOG(Debug) << "Failed to find timed out component " << component_id << std::endl;
                 } //Cannot write while own ReaderGuard is open, close it first
 
                 if(info_found)
@@ -523,10 +529,11 @@ void ComponentManager::collect_timed_out_components()
                         }
                         pos++;
                     }
+                    LOG(Debug) << "Deleting component " << components[pos].id << " due to timeout" << std::endl;
                     components.erase(components.begin()+pos);
-                    components_times.erase(component_id);
-                    components_last_request_times.erase(component_id);
                 }
+                components_times.erase(component_id);
+                components_last_request_times.erase(component_id);
             }
         }
     }
@@ -534,7 +541,6 @@ void ComponentManager::collect_timed_out_components()
 
 void ComponentManager::generateResponse()
 {
-    LOG(Debug) << "Response" << std::endl;
     auto responseFunc = [&]()
     {
         if(baseEntity)
