@@ -21,7 +21,7 @@
 #include <QWidget>
 #include "EntityBase.h"
 #include "EntityModel.h"
-
+#include <QVBoxLayout>
 namespace Ui {
 class EntityWidget;
 }
@@ -44,7 +44,8 @@ private:
 protected:
     EntityModel* model;
     EntityBase::SharedPtr entity;
-     Ui::EntityWidget *ui;
+    Ui::EntityWidget *ui;
+    QVBoxLayout* main_layout;
 };
 
 }

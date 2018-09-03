@@ -26,7 +26,9 @@ EntityWidget::EntityWidget(EntityBase::SharedPtr _entity, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::EntityWidget)
 {
+
     ui->setupUi(this);
+    this->main_layout = ui->verticalLayout;
     this->entity = _entity;
 
     ui->label->setText(QString::fromStdString(entity->getName()));
