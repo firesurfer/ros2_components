@@ -547,7 +547,6 @@ void ComponentManager::generateResponse()
         {
             ros2_components_msg::msg::ListComponentsResponse::SharedPtr msg = ComponentInfoFactory::fromEntity(this->baseEntity).toRosMessage();
             msg->nodename = rosNode->get_name();
-            LOG(Debug) << "Name: " << rosNode->get_name() << std::endl;
             msg->deleted = false;
             this->listComponentsResponsePublisher->publish(msg);
             std::function<void(EntityBase::SharedPtr)> iteratingFunc = [&](EntityBase::SharedPtr ent)
