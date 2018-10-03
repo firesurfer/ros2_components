@@ -70,18 +70,18 @@ EntityBase::~EntityBase()
     }
 }
 
-int64_t EntityBase::getId()
+int64_t EntityBase::getId() const
 {
     return id;
 }
 
-string EntityBase::getName()
+string EntityBase::getName() const
 {
     return name;
 }
 
 
-string EntityBase::getClassName()
+string EntityBase::getClassName() const
 {
     /* const QMetaObject* metaObject = this->metaObject();
 
@@ -90,22 +90,22 @@ string EntityBase::getClassName()
     return className;
 }
 
-bool EntityBase::isVirtual()
+bool EntityBase::isVirtual() const
 {
     return virtualEntity;
 }
 
-bool EntityBase::isSubscriber()
+bool EntityBase::isSubscriber() const
 {
     return subscriber;
 }
 
-rclcpp::Node::SharedPtr EntityBase::getParentNode()
+rclcpp::Node::SharedPtr EntityBase::getParentNode() const
 {
     return parentNode;
 }
 
-NodeContainer::SharedPtr EntityBase::getNodeContainer()
+NodeContainer::SharedPtr EntityBase::getNodeContainer() const
 {
     return nodeContainer;
 }

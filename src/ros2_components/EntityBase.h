@@ -72,39 +72,39 @@ public:
      * @brief getId
      * @return The Component ID
      */
-    int64_t getId();
+    int64_t getId() const;
     /**
      * @brief getName
      * @return The name of the current component
      * This name is generated from getClassName and getId
      */
-    std::string getName();
+    std::string getName() const;
     /**
      * @brief getClassName
      * @return The class name
      */
-    std::string getClassName();
+    std::string getClassName() const;
     /**
      * @brief isVirtual
      * @return In case this is a virtual Entity (A Entity without a direct hardware representation) this will be true
      */
-    bool isVirtual();
+    bool isVirtual() const;
     /**
      * @brief isSubscriber
      * @return Is this a subscriber or a publisher
      */
-    bool isSubscriber();
+    bool isSubscriber() const;
     /**
      * @brief getParentNode
      * @return The rosnode associated with this entity
      */
-    rclcpp::Node::SharedPtr getParentNode();
+    rclcpp::Node::SharedPtr getParentNode() const;
 
     /**
      * @brief getNodeContainer
      * @return
      */
-    NodeContainer::SharedPtr getNodeContainer();
+    NodeContainer::SharedPtr getNodeContainer() const;
 
     /**
      * @brief addChild
